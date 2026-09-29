@@ -12,6 +12,14 @@ _Avoid_: Quran copy, edition
 One page of the Mushaf, numbered 1–604. The unit that all progress and all amounts are measured in, including fractions (¼, ½).
 _Avoid_: Sheet, side
 
+**Surah**:
+One of the 114 chapters of the Quran. Surahs are the order in which new memorisation moves.
+_Avoid_: Chapter, sura
+
+**Ayah**:
+One verse within a Surah. The finest position a Sabaq can start or end at.
+_Avoid_: Verse, line
+
 **Juz**:
 One of the 30 standard divisions of the Quran; in the Mushaf, exactly 20 Pages.
 _Avoid_: Para, part, sipara
@@ -19,15 +27,19 @@ _Avoid_: Para, part, sipara
 ## The three kinds of work
 
 **Sabaq**:
-The new portion being memorised for the first time today.
+The new portion being memorised for the first time today: an Ayah range within one Surah. Its size is expressed in Pages (default ½).
 _Avoid_: Lesson, new work
 
+**Memorisation order**:
+The sequence new material is memorised in: Surahs from last to first (an-Nas, al-Falaq, al-Ikhlas, …), each Surah from its first Ayah to its last.
+_Avoid_: Direction, progress order
+
 **Sabqi**:
-Revision of recently memorised Pages that are not yet settled enough to join the Manzil.
+Revision of the most recently memorised 5 Pages' worth of material (by Memorisation order), revised in full each day. Material older than that belongs to the Manzil.
 _Avoid_: Recent revision, dhor (ambiguous between regions)
 
 **Manzil**:
-Revision of older, settled memorisation, worked through in rotation so the whole memorised portion is revisited regularly.
+Revision of all memorised material outside the Sabqi, worked through one slice a day in rotation so everything is revisited regularly.
 _Avoid_: Old revision, dhor
 
 ## Days
@@ -37,9 +49,13 @@ The Sabaq, Sabqi and Manzil the app suggests for today. A suggestion, not an obl
 _Avoid_: Schedule, assignment, target
 
 **Log**:
-The record of what was actually done on a given day, per kind of work. Any kind may be absent (e.g. a revision-only day with no Sabaq).
+The record of what was actually done on a given Day, per kind of work. A revision slice that was only partly done counts as not done, and is suggested again in full. Any kind may be absent (e.g. a revision-only day with no Sabaq).
 _Avoid_: Entry, session, check-in
 
 **Gap**:
 One or more days with nothing logged. A Gap never creates overdue work: the next Today's plan continues from where the last Log left off.
 _Avoid_: Missed day, streak break, backlog
+
+**Day**:
+A local calendar date, midnight to midnight.
+_Avoid_: Session
