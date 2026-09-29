@@ -8,7 +8,8 @@ const READY_KEY = `qcf4-fonts-ready-${qcf.version}`
 const PARALLEL = 4
 
 export const QCF_FONT_COUNT = qcf.fonts.length
-const fontUrl = (name: string) => `${CDN}${name}_W.woff2`
+// Page fonts are named <font>_W.woff2 in the package; the surah-name font's file is listed with it.
+const fontUrl = (name: string) => `${CDN}${name === qcf.names.font ? qcf.names.file : `${name}_W.woff2`}`
 
 const markReady = (ready: boolean) => {
   try {
@@ -29,31 +30,57 @@ export const qcfFontsReady = async (): Promise<boolean> => {
   return ready
 }
 
+const fetchInto = async (cache: Cache, name: string) => {
+  const url = fontUrl(name)
+  if (await cache.match(url)) return
+  const response = await fetch(url, { mode: 'cors' })
+  if (!response.ok) throw new Error(`Font ${name}: HTTP ${response.status}`)
+  await cache.put(url, response)
+}
+
 // Download every font once (about 36 MB). Reports progress as fonts finish; resumes where it left off.
+// The surah-name font comes too, though it isn't counted: phones that downloaded before it existed fetch it on use.
 export const downloadQcfFonts = async (onProgress: (done: number) => void): Promise<void> => {
   const cache = await caches.open(CACHE)
   const queue = [...qcf.fonts]
   let done = 0
   const worker = async () => {
     for (let name = queue.shift(); name; name = queue.shift()) {
-      const url = fontUrl(name)
-      if (!(await cache.match(url))) {
-        const response = await fetch(url, { mode: 'cors' })
-        if (!response.ok) throw new Error(`Font ${name}: HTTP ${response.status}`)
-        await cache.put(url, response)
-      }
+      await fetchInto(cache, name)
       onProgress(++done)
     }
   }
   await Promise.all(Array.from({ length: PARALLEL }, worker))
+  await fetchInto(cache, qcf.names.font)
   markReady(true)
 }
 
 const loaded = new Map<string, Promise<boolean>>()
 
 // Make a page's font usable, from Cache Storage only (no network). Resolves false if it isn't downloaded.
-export const loadQcfFont = (fontIndex: number): Promise<boolean> => {
-  const name = qcf.fonts[fontIndex]
+export const loadQcfFont = (fontIndex: number): Promise<boolean> => loadCached(qcf.fonts[fontIndex])
+
+// The surah-name font: from Cache Storage, or fetched once in the background when the page fonts are already here.
+export const QCF_NAME_FONT = qcf.names.font
+export const qcfNameGlyph = (surah: number) => String.fromCodePoint(qcf.names.firstGlyph + surah - 1)
+let nameFont: Promise<boolean> | null = null // one load shared by every banner on the page
+export const loadQcfNameFont = (): Promise<boolean> => {
+  nameFont ??= (async () => {
+    if (await loadCached(QCF_NAME_FONT)) return true
+    try {
+      await fetchInto(await caches.open(CACHE), QCF_NAME_FONT)
+    } catch {
+      return false // offline: the bundled font writes the names until next time
+    }
+    return loadCached(QCF_NAME_FONT)
+  })().then((ready) => {
+    if (!ready) nameFont = null // try again on a later page
+    return ready
+  })
+  return nameFont
+}
+
+const loadCached = (name: string): Promise<boolean> => {
   if (!loaded.has(name)) {
     loaded.set(
       name,

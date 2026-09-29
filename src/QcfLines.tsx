@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, surahArabic } from './quran'
+import { loadQcfNameFont, qcfNameGlyph } from './qcfFonts'
 import SurahBadge from './SurahBadge'
 
 // [glyph code, surah, ayah, kind: 0 word, 1 ayah end, 2 quarter mark]
@@ -48,6 +49,10 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
+  const [namesReady, setNamesReady] = useState(false) // the surah-name font, for the banners
+  useEffect(() => {
+    if (lines.some((line) => typeof line === 'string' && line.startsWith('h'))) loadQcfNameFont().then(setNamesReady)
+  }, [lines])
 
   // Size the font so the widest printed line exactly fills the page width.
   useLayoutEffect(() => {
@@ -99,7 +104,11 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
         if (typeof line === 'string')
           return (
             <div key={i} className={`m-line surah-band ${mark}`}>
-              <SurahBadge name={surahArabic(Number(line.slice(1)))} />
+              <SurahBadge
+                surah={Number(line.slice(1))}
+                name={surahArabic(Number(line.slice(1)))}
+                glyph={namesReady ? qcfNameGlyph(Number(line.slice(1))) : null}
+              />
             </div>
           )
         return (

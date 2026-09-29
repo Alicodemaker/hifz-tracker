@@ -291,7 +291,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
             if (typeof line === 'string')
               return (
                 <div key={i} className={`m-line surah-band ${mark}`}>
-                  <SurahBadge name={surahArabic(Number(line.slice(1)))} />
+                  <SurahBadge surah={Number(line.slice(1))} name={surahArabic(Number(line.slice(1)))} glyph={null} />
                 </div>
               )
             return (
