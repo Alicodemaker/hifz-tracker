@@ -63,11 +63,19 @@ const firstQcfAyah = (lines: QcfLine[]): { surah: number; ayah: number } => {
 
 const sameAyah = (piece: Piece, surah: number, ayah: number) => piece[0] === surah && piece[1] === ayah
 
-// Which line holds the start of today's portion, for the margin mark.
-const portionStart = (lines: Line[], portion: Range[] | null): number => {
-  if (!portion?.length) return -1
-  const { surah, from } = portion[0]
-  return lines.findIndex((line) => typeof line !== 'string' && line.some((p) => sameAyah(p, surah, from)))
+// Which lines hold the start and the end of today's portion, for the margin marks.
+const portionMarks = (lines: Line[], portion: Range[] | null): { start: number; end: number } => {
+  let start = -1
+  let end = -1
+  if (!portion?.length) return { start, end }
+  const first = portion[0]
+  const last = portion[portion.length - 1]
+  lines.forEach((line, i) => {
+    if (typeof line === 'string') return
+    if (start < 0 && line.some((p) => sameAyah(p, first.surah, first.from))) start = i
+    if (line.some((p) => sameAyah(p, last.surah, last.to) && p[3] === 1)) end = i
+  })
+  return { start, end }
 }
 
 // Split a piece into its words and the end-of-ayah sign, so the sign can be tinted.
@@ -228,7 +236,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     return () => window.clearTimeout(fadeTimer.current)
   }, [arrivedFrom]) // fixed for each visit, since the page remounts every time
 
-  const start = portionStart(lines, portion)
+  const { start, end } = portionMarks(lines, portion)
   const top = qcfPage ? firstQcfAyah(qcfPage.lines) : lines.length ? firstAyah(lines) : null
 
   return (
@@ -275,7 +283,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           dir="rtl"
         >
           {lines.map((line, i) => {
-            const mark = `${i === start ? 'mark-start' : ''} ${centered.has(i) ? 'center' : ''}`
+            const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
             if (line === 'b')
               return (
                 <div key={i} className={`m-line bismillah ${mark}`}>

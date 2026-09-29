@@ -416,8 +416,12 @@ select, input[type='number'] {
   visibility: hidden; /* until the font size is fitted */
   min-height: 0;
   min-width: 0;
-  overflow-y: auto; /* in landscape the page is taller than the screen: it scrolls rather than crushing lines */
-  overflow-x: hidden;
+  overflow: hidden;
+}
+/* In landscape the page is taller than the screen: it scrolls rather than crushing lines, with no scrollbar showing. */
+@media (orientation: landscape) {
+  .m-lines { overflow-y: auto; scrollbar-width: none; }
+  .m-lines::-webkit-scrollbar { display: none; }
 }
 .m-lines.fitted { visibility: visible; }
 .m-lines.short { justify-content: center; gap: var(--space-4); }
@@ -474,8 +478,9 @@ select, input[type='number'] {
 .m-lines.measuring .basmala { font-size: 1em; }
 .basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
 
-/* A thin margin mark where today's portion starts (in the right margin, as the page reads right to left). */
-.m-line.mark-start::before {
+/* Thin margin marks where today's portion starts and ends. */
+.m-line.mark-start::before,
+.m-line.mark-end::after {
   content: '';
   position: absolute;
   inset-inline-start: calc(-1 * var(--space-2) + 2px);
@@ -484,6 +489,7 @@ select, input[type='number'] {
   border-radius: 2px;
   background: var(--mushaf-olive);
 }
+.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
 
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
