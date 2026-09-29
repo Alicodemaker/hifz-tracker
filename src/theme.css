@@ -1,0 +1,59 @@
+/* The whole look in one place: the paper, ink and lapis of a mushaf. */
+@import '@fontsource/amiri/arabic-400.css';
+@import '@fontsource-variable/figtree/wght.css';
+
+:root {
+  /* Colour: warm paper and ink, with lapis as the one accent. */
+  --paper: #f7f1e6; /* page background */
+  --leaf: #fffbf4; /* raised surfaces */
+  --ink: #2a241d; /* text */
+  --ink-faded: #6f6457; /* secondary text */
+  --rule: #e4d9c6; /* lines and tracks */
+  --lapis: #2f5c6e; /* the accent: done states, primary actions, progress */
+  --on-lapis: #fffbf4;
+  --lapis-wash: #e3ebec; /* quiet lapis tint behind done items */
+  --alert: #9a3b2e;
+
+  /* Type */
+  --font-ui: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-arabic: 'Amiri', 'Scheherazade New', 'Geeza Pro', serif;
+  --text-sm: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.625rem;
+  --arabic-hero: 3.25rem;
+  --arabic-row: 1.75rem;
+  --arabic-list: 1.375rem;
+
+  /* Space: a 4px base, used in steps. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Shape and touch */
+  --radius-sm: 10px;
+  --radius-lg: 18px;
+  --tap: 52px; /* minimum tap target */
+  --check-size: 26px; /* checkbox boxes */
+  --tap-primary: 64px; /* the Done buttons */
+  --screen-max: 480px;
+  --action-bar-height: 128px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17130f;
+    --leaf: #221c17;
+    --ink: #efe6d6;
+    --ink-faded: #a89c8a;
+    --rule: #3a3129;
+    --lapis: #8db7c7;
+    --on-lapis: #17130f;
+    --lapis-wash: #1f2a2d;
+    --alert: #e2a092;
+  }
+}

@@ -1,0 +1,256 @@
+@import './theme.css';
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, p, ul { margin: 0; }
+h1 { font-size: var(--text-xl); font-weight: 650; letter-spacing: -0.01em; }
+h2 { font-size: var(--text-md); font-weight: 600; }
+
+:focus-visible { outline: 3px solid var(--lapis); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+.arabic {
+  font-family: var(--font-arabic);
+  direction: rtl;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.faded { color: var(--ink-faded); }
+.small { font-size: var(--text-sm); }
+
+/* Screens */
+.screen {
+  max-width: var(--screen-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) calc(var(--action-bar-height) + var(--space-5) + env(safe-area-inset-bottom));
+}
+
+.screen-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.screen-head nav { display: flex; gap: var(--space-1); }
+.screen-head h1.date { font-size: var(--text-lg); }
+
+/* Buttons */
+button {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled { opacity: 0.35; cursor: default; }
+
+.link {
+  min-height: var(--tap);
+  padding: 0 var(--space-2);
+  color: var(--lapis);
+  font-weight: 550;
+  font-size: var(--text-sm);
+}
+
+.button {
+  min-height: var(--tap);
+  width: 100%;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-md);
+}
+.button.primary { background: var(--lapis); color: var(--on-lapis); }
+.button.quiet { background: var(--leaf); box-shadow: inset 0 0 0 1px var(--rule); }
+
+/* Thumb-reach bar for each screen's primary actions */
+.action-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  padding: var(--space-5) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, transparent, var(--paper) var(--space-5));
+}
+.action-bar > * { max-width: calc(var(--screen-max) - 2 * var(--space-4)); margin-inline: auto; }
+.action-bar .hint { text-align: center; margin-top: var(--space-2); }
+.action-bar .row { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-2); }
+
+.notice {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--lapis-wash);
+  color: var(--ink);
+}
+.notice.alert { color: var(--alert); background: var(--leaf); box-shadow: inset 0 0 0 1px var(--alert); }
+
+/* Today: the Hifz as a surah header band, like the opening of a surah in the mushaf */
+.hifz {
+  text-align: center;
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  background: var(--leaf);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+}
+.band {
+  margin: var(--space-3) 0 var(--space-4);
+  padding: var(--space-2) 0;
+  border-block: 3px double var(--lapis);
+}
+.band .arabic { font-size: var(--arabic-hero); line-height: 1.45; color: var(--ink); }
+.hifz .range { font-size: var(--text-lg); font-weight: 600; }
+.hifz .empty { padding: var(--space-6) 0; }
+
+.kind-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-faded);
+}
+.kind-label.done { color: var(--lapis); }
+
+.stepper {
+  display: grid;
+  grid-template-columns: var(--tap) 1fr var(--tap);
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.stepper button {
+  height: var(--tap);
+  border-radius: 50%;
+  font-size: var(--text-xl);
+  font-weight: 400;
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+/* Today: Rabt and Muraja'a as quiet rows under the band */
+.revision { list-style: none; padding: 0; }
+.revision li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--rule);
+}
+.revision li:last-child { border-bottom: 1px solid var(--rule); }
+.revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: left; }
+.revision .range { font-weight: 600; }
+
+/* The check that answers a Done tap */
+.tick { width: 1.1em; height: 1.1em; flex: none; }
+.tick path { stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.tick circle { fill: none; stroke: currentColor; stroke-width: 1.5; }
+.done .tick path { stroke-dasharray: 14; stroke-dashoffset: 0; animation: draw 360ms ease-out; }
+@keyframes draw { from { stroke-dashoffset: 14; } }
+
+.done-buttons button {
+  min-height: var(--tap-primary);
+  border-radius: var(--radius-lg);
+  background: var(--leaf);
+  box-shadow: inset 0 0 0 1px var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-size: var(--text-md);
+}
+.done-buttons button[aria-pressed='true'] { background: var(--lapis); color: var(--on-lapis); box-shadow: none; }
+
+/* Juz rings */
+.ring { display: block; }
+.ring .track { fill: none; stroke: var(--rule); }
+.ring .fill { fill: none; stroke: var(--lapis); stroke-linecap: round; transition: stroke-dasharray 400ms ease; }
+.ring text { fill: var(--ink); font-family: var(--font-ui); font-weight: 600; }
+.ring.full circle.core { fill: var(--lapis); }
+.ring.full text { fill: var(--on-lapis); }
+
+.juz-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-3) var(--space-2);
+  justify-items: center;
+  margin-bottom: var(--space-6);
+  direction: rtl; /* Juz 1 at the right, as a mushaf opens */
+}
+.juz-summary { margin-bottom: var(--space-3); }
+
+/* History */
+.days { list-style: none; padding: 0; }
+.days li { padding: var(--space-4) 0; border-top: 1px solid var(--rule); }
+.days .date { font-weight: 600; margin-bottom: var(--space-1); }
+.days p:not(.date) { font-size: var(--text-sm); color: var(--ink-faded); }
+.days strong { color: var(--ink); font-weight: 600; }
+
+/* Setup */
+.field-row { display: grid; grid-template-columns: 1fr 6.5rem; gap: var(--space-3); margin-bottom: var(--space-6); }
+.field { display: grid; gap: var(--space-1); font-size: var(--text-sm); color: var(--ink-faded); }
+select, input[type='number'] {
+  font: inherit;
+  color: var(--ink);
+  background: var(--leaf);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  width: 100%;
+}
+.section-title { margin-bottom: var(--space-1); }
+.section-title + p { margin-bottom: var(--space-3); }
+
+.juz-group { margin-top: var(--space-5); }
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  border-top: 1px solid var(--rule);
+}
+.check .name { flex: 1; }
+.check .arabic { font-size: var(--arabic-list); line-height: 1.3; }
+.check.juz { border-top: none; font-weight: 600; }
+.check.juz .ring { margin-inline-start: auto; }
+.check input {
+  appearance: none;
+  flex: none;
+  width: var(--check-size);
+  height: var(--check-size);
+  margin: 0;
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--leaf);
+  display: grid;
+  place-items: center;
+}
+.check input:checked { background: var(--lapis); border-color: var(--lapis); }
+.check input:checked::after {
+  content: '';
+  /* The tick is drawn from the box size so it scales with --check-size. */
+  width: calc(var(--check-size) * 0.27);
+  height: calc(var(--check-size) * 0.46);
+  border: solid var(--on-lapis);
+  border-width: 0 calc(var(--check-size) * 0.1) calc(var(--check-size) * 0.1) 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+.check input:disabled { opacity: 0.35; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
