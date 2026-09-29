@@ -17,6 +17,8 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 7. ✅ **Hide mode**: a small round button floats at the bottom right and fades out after 5 seconds; only a tap on the screen brings it back (not a swipe or page turn). It turns hide mode on or off across all pages: ayah text becomes faint blank shapes in exactly its place and width, while headers, the bismillah and ayah markers stay visible. Tapping an ayah reveals it, tapping again hides it, and each page starts fully hidden whenever it is shown.
 8. **Exact mushaf font** (added at the builder's request): bundle the `quran-qcf4` page data (MIT). A "Download exact mushaf font (36 MB)" button on the Mushaf page fetches the 48 QCF4 fonts once from jsDelivr (pinned to 1.1.0) and keeps them on the phone; pages then render in QCF4 like the reference, and fall back to the bundled font until then. The surah badge and Amiri basmala are shared by both looks.
 
+9. **Page tools** (added at the builder's request): when a page is opened from Today, a "Hifz done" (or Rabt, Muraja'a) button floats at the bottom left. It ticks that area and goes back to Today; if it is already ticked, it only undoes. Opened from Hifz, a counter beside it counts today's read-throughs (− to undo), which Today's Hifz card also shows. They fade with the hide button. Once the exact font is in use, only its page data loads.
+
 ## What we're NOT doing
 
 - No search, bookmarks, audio, translation or tafsir

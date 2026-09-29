@@ -1,4 +1,4 @@
-import type { Day } from './day'
+import { toggleDone, type Day, type Kind } from './day'
 import { arabicNames, describeRanges, describeSize } from './format'
 import { describeDuration, type FinishEstimates } from './pace'
 import type { Range } from './plan'
@@ -11,7 +11,7 @@ type Props = {
   estimates: FinishEstimates | null
   onChange: (day: Day) => void
   onChangeAmount: (direction: 1 | -1) => void
-  onOpenPage: (portion: Range[]) => void
+  onOpenPage: (kind: Kind, portion: Range[]) => void
   onEditSetup: () => void
   onHistory: () => void
 }
@@ -61,16 +61,14 @@ export default function Today({
 }: Props) {
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
-  const planEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
+  const reps = day.hifzReps ?? 0
 
   // Tapping an area opens its Mushaf page; its own buttons keep their jobs.
-  const openFrom = (portion: Range[]) => (event: React.MouseEvent) => {
-    if (portion.length && !(event.target as Element).closest('button')) onOpenPage(portion)
+  const openFrom = (kind: Kind, portion: Range[]) => (event: React.MouseEvent) => {
+    if (portion.length && !(event.target as Element).closest('button')) onOpenPage(kind, portion)
   }
 
-  const toggleHifz = () => onChange({ ...day, hifzEnd: hifzDone ? null : planEnd })
-  const toggleRabt = () => onChange({ ...day, rabtDone: !day.rabtDone })
-  const toggleMuraja = () => onChange({ ...day, murajaDone: !day.murajaDone })
+  const toggle = (kind: Kind) => () => onChange(toggleDone(day, kind))
 
   return (
     <main className="screen">
@@ -86,7 +84,7 @@ export default function Today({
         </nav>
       </header>
 
-      <section className={`hifz opens-page ${hifzDone ? 'done' : ''}`} onClick={openFrom(plan.hifz)}>
+      <section className={`hifz opens-page ${hifzDone ? 'done' : ''}`} onClick={openFrom('hifz', plan.hifz)}>
         <KindLabel name="Hifz" done={hifzDone} />
         {plan.hifz.length ? (
           <>
@@ -96,7 +94,10 @@ export default function Today({
               </p>
             </div>
             <p className="range">{describeRanges(plan.hifz)}</p>
-            <p className="faded small">{describeSize(plan.hifz)}</p>
+            <p className="faded small">
+              {describeSize(plan.hifz)}
+              {reps > 0 && `, read ${reps}×`}
+            </p>
             {!hifzDone && (
               <div className="stepper">
                 <button disabled={hifzAmount <= 0.25} onClick={() => onChangeAmount(-1)} aria-label="Quarter of a page less each day">
@@ -130,26 +131,26 @@ export default function Today({
           ranges={plan.rabt}
           done={day.rabtDone}
           empty="Nothing recent to revise yet."
-          onOpen={openFrom(plan.rabt)}
+          onOpen={openFrom('rabt', plan.rabt)}
         />
         <RevisionRow
           name="Muraja'a"
           ranges={plan.muraja}
           done={day.murajaDone}
           empty="Nothing in the rotation yet."
-          onOpen={openFrom(plan.muraja)}
+          onOpen={openFrom('muraja', plan.muraja)}
         />
       </ul>
 
       <div className="action-bar">
         <div className="row done-buttons">
-          <button onClick={toggleHifz} disabled={!plan.hifz.length} aria-pressed={hifzDone}>
+          <button onClick={toggle('hifz')} disabled={!plan.hifz.length} aria-pressed={hifzDone}>
             Hifz
           </button>
-          <button onClick={toggleRabt} disabled={!plan.rabt.length} aria-pressed={day.rabtDone}>
+          <button onClick={toggle('rabt')} disabled={!plan.rabt.length} aria-pressed={day.rabtDone}>
             Rabt
           </button>
-          <button onClick={toggleMuraja} disabled={!plan.muraja.length} aria-pressed={day.murajaDone}>
+          <button onClick={toggle('muraja')} disabled={!plan.muraja.length} aria-pressed={day.murajaDone}>
             Muraja'a
           </button>
         </div>
