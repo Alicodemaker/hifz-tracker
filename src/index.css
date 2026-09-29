@@ -458,18 +458,28 @@ select, input[type='number'] {
 
 /* Surah header: the builder's badge image across the line, with the name in its central panel. */
 .m-line.surah-band { overflow: visible; }
-.surah-badge { position: relative; width: 100%; aspect-ratio: 1400 / 190; }
-.surah-badge img { display: block; width: 100%; height: 100%; mix-blend-mode: multiply; /* its cream melts into the page */ }
+.surah-badge { position: relative; width: 100%; aspect-ratio: 400 / 44; }
+.surah-badge svg { display: block; width: 100%; height: 100%; }
+.surah-badge .frame { fill: none; stroke: var(--mushaf-ink); stroke-width: 1.2; }
+.surah-badge .band { fill: var(--mushaf-rosette-field); }
+.surah-badge .vine { fill: none; stroke: var(--banner-vine); stroke-width: 1.2; }
+.surah-badge .leaf { fill: var(--banner-leaf); }
+.surah-badge .flower ellipse { fill: var(--mushaf-olive); }
+.surah-badge .flower .heart { fill: var(--mushaf-rosette-field); }
+.surah-badge .panel-edge { fill: var(--mushaf-olive); }
+.surah-badge .panel { fill: var(--mushaf-paper); }
 .surah-badge .b-name {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
   font-family: var(--font-quran);
-  font-size: calc(var(--quran-size, 20px) * 0.95);
+  font-size: calc(var(--quran-size, 20px) * 0.8);
+  line-height: 1;
   color: var(--mushaf-ink);
   -webkit-text-stroke: var(--mushaf-ink-weight) currentColor;
 }
+.surah-badge .qcf-name { font-family: 'QCF4_QBSML', var(--font-quran); font-size: calc(var(--quran-size, 20px) * 0.9); -webkit-text-stroke: 0; }
 
 /* Basmala: the printed mushaf's own, level and centred in its line at text size (the exact font's glyph, or the bundled
    font's words), with the same ink weight as the text. */
@@ -480,7 +490,7 @@ select, input[type='number'] {
    line above to the banner, the banner to the basmala, and the basmala to the text. The first two pages' compact
    layout is already even. */
 .m-lines:not(.short) .surah-badge { top: 0.17em; }
-.m-lines:not(.short) .qcf-basmala { top: 0.45em; }
+.m-lines:not(.short) .qcf-basmala { top: 0.37em; }
 .qcf-basmala { left: 0.05em; } /* its ink sits a little left of its box */
 
 /* Thin margin marks where today's portion starts and ends. */

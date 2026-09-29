@@ -63,6 +63,8 @@
   --mushaf-rosette: #4b7a3b; /* ayah rosette petals and ring */
   --mushaf-rosette-field: #e6efd4; /* inside the rosette, behind the number */
   --mushaf-blank: #ebe3cf; /* hidden ayahs in hide mode */
+  --banner-vine: #9fb77a; /* the surah banner's vine and leaves, between the band and the olive flowers */
+  --banner-leaf: #8fae62;
   --mushaf-ink-weight: 0.3px; /* a hairline stroke that gives the bundled font the reference's heavier ink */
   --qcf-ink-weight: 0.15px; /* a little extra ink on the downloaded QCF4 font, to match the reference */
   --mushaf-head-size: 0.8125rem; /* 13px, as small as the reference's header */
