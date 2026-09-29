@@ -66,7 +66,7 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
       if (widest <= 0) return
       const size = Math.floor(((BASE_SIZE * available) / widest) * 10) / 10
       setFontSize(size)
-      if (basmalaWidth) setBasmalaSize(Math.floor(((BASE_SIZE * available * 0.8) / basmalaWidth) * 10) / 10)
+      if (basmalaWidth) setBasmalaSize(Math.floor(((BASE_SIZE * available * 0.6) / basmalaWidth) * 10) / 10) // 60% of the line, so its tall letters stay within it
       setCentered(new Set(widths.flatMap((w, i) => (w > 0 && w < widest * 0.75 && endsSurah(lines[i]) ? [i] : []))))
     }
     document.fonts.ready.then(fit)

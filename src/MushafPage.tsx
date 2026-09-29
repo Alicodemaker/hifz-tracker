@@ -155,11 +155,11 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       const widths = [...box.children].map((el) =>
         el.classList.contains('surah-band') ? 0 : (el.querySelector<HTMLElement>('.m-text')?.offsetWidth ?? 0),
       )
-      // The basmala ligature is very wide: size it to about 80% of the line, as on the reference page.
+      // The basmala ligature is very wide and tall: size it to 60% of the line, so its letters stay within the line.
       const basmala = box.querySelector<HTMLElement>('.basmala')
       if (basmala) {
         basmala.style.fontSize = `${size}px`
-        setBasmalaSize(Math.floor(((size * available * 0.8) / basmala.offsetWidth) * 10) / 10)
+        setBasmalaSize(Math.floor(((size * available * 0.6) / basmala.offsetWidth) * 10) / 10)
         basmala.style.fontSize = ''
       }
       box.classList.remove('measuring')
