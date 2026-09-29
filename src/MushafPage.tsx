@@ -56,9 +56,9 @@ const splitMarker = (piece: Piece): [string, string] => {
 }
 
 const BASE_SIZE = 20 // px, used only to measure
-// At 20px, 95% of pages have no line wider than this. Sizing to it keeps one text size on every page;
-// the few wider lines are narrowed slightly to fit (at most about 10%).
-const TYPICAL_WIDEST_AT_BASE = 412
+// At 20px with the page's tighter word spacing, 95% of pages have no line wider than this. Sizing to it
+// keeps one text size on every page; the few wider lines are narrowed slightly to fit (at most about 12%).
+const TYPICAL_WIDEST_AT_BASE = 365
 const NO_LINES: Line[] = []
 
 const SWIPE_MIN = 50 // px of mostly horizontal travel
@@ -82,7 +82,7 @@ export default function MushafPage({ page, portion, hiding, onToggleHiding, onBa
     const box = linesRef.current
     if (!box || !lines.length) return
     const fit = () => {
-      const available = box.clientWidth * 0.97
+      const available = box.clientWidth
       const size = Math.floor(((BASE_SIZE * available) / TYPICAL_WIDEST_AT_BASE) * 10) / 10
       // Measure each line's natural width at that size.
       box.classList.add('measuring')
@@ -175,49 +175,53 @@ export default function MushafPage({ page, portion, hiding, onToggleHiding, onBa
         <span className="m-juz">Juz {juzOfAyah(ayahIndex(top))}</span>
       </header>
 
-      <div
-        ref={linesRef}
-        className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''}`}
-        style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
-        lang="ar"
-        dir="rtl"
-      >
-        {lines.map((line, i) => {
-          const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
-          if (line === 'b')
+      <div className="m-frame">
+        <div
+          ref={linesRef}
+          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''}`}
+          style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
+          lang="ar"
+          dir="rtl"
+        >
+          {lines.map((line, i) => {
+            const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
+            if (line === 'b')
+              return (
+                <div key={i} className={`m-line bismillah ${mark}`}>
+                  <span className="m-text">{data!.bismillah}</span>
+                </div>
+              )
+            if (typeof line === 'string')
+              return (
+                <div key={i} className={`m-line surah-band ${mark}`}>
+                  <span className="m-text">
+                    <span className="cartouche">سُورَةُ {surahArabic(Number(line.slice(1)))}</span>
+                  </span>
+                </div>
+              )
             return (
-              <div key={i} className={`m-line bismillah ${mark}`}>
-                <span className="m-text">{data!.bismillah}</span>
+              <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
+                <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
+                  {line.map((piece) => {
+                    const [words, marker] = splitMarker(piece)
+                    const key = `${piece[0]}:${piece[1]}`
+                    return (
+                      <span
+                        key={key}
+                        className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
+                        data-ayah={key}
+                        onClick={hiding ? () => toggleAyah(key) : undefined}
+                      >
+                        <span className="m-words">{words}</span>
+                        {marker && <span className="m-marker"> {marker}</span>}{' '}
+                      </span>
+                    )
+                  })}
+                </span>
               </div>
             )
-          if (typeof line === 'string')
-            return (
-              <div key={i} className={`m-line surah-band ${mark}`}>
-                <span className="m-text">سُورَةُ {surahArabic(Number(line.slice(1)))}</span>
-              </div>
-            )
-          return (
-            <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
-              <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
-                {line.map((piece) => {
-                  const [words, marker] = splitMarker(piece)
-                  const key = `${piece[0]}:${piece[1]}`
-                  return (
-                    <span
-                      key={key}
-                      className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
-                      data-ayah={key}
-                      onClick={hiding ? () => toggleAyah(key) : undefined}
-                    >
-                      <span className="m-words">{words}</span>
-                      {marker && <span className="m-marker"> {marker}</span>}{' '}
-                    </span>
-                  )
-                })}
-              </span>
-            </div>
-          )
-        })}
+          })}
+        </div>
       </div>
 
       <p className="m-source">Line layout: KFGQPC 1441H edition</p>

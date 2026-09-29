@@ -46,16 +46,18 @@
   --radius-lg: 18px;
   --tap: 52px; /* minimum tap target */
   --check-size: 26px; /* checkbox boxes */
+  --icon: 26px; /* line icons in buttons */
   --tap-primary: 64px; /* the Done buttons */
   --screen-max: 480px;
   --action-bar-height: 128px;
 
-  /* The Mushaf page: always light paper and dark ink, like the printed mushaf, even in dark mode. */
-  --mushaf-paper: #fdf9ef;
+  /* The Mushaf page: cream paper, dark ink and olive ornament, like the printed mushaf, even in dark mode. */
+  --mushaf-paper: #fdf8ec;
   --mushaf-ink: #1c1a17;
   --mushaf-faded: #7a6f5e;
-  --mushaf-lapis: #2f5c6e;
-  --mushaf-blank: #ebe2cf; /* hidden ayahs in hide mode */
+  --mushaf-olive: #56702f; /* header, frame, ayah rosettes, surah cartouches */
+  --mushaf-olive-wash: #edf0dc; /* inside the surah cartouche */
+  --mushaf-blank: #e9e0cb; /* hidden ayahs in hide mode */
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
 }
 
