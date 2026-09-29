@@ -14,7 +14,7 @@ A phone-first, offline PWA that tells me each morning what to do today (Hifz, Ra
    - Muraja'a slices: whole surahs, at most 10 pages, long surahs split by page, Juz 30 in two fixed halves, wrapping around at the end.
    - Gaps and partial days: the plan pauses, and a partly done slice comes back in full.
 4. ✅ **Setup screen**: tick memorised surahs, or whole juz, and set the next Hifz position. The defaults are my real state: an-Nas → Fussilat memorised, next Hifz Ghafir 1.
-5. **Today screen**: three cards (Hifz, Rabt, Muraja'a) showing surah and ayah ranges with sizes in pages. Big "Done" buttons sit at the bottom within thumb reach, and I can adjust the Hifz end ayah before tapping. Logs are saved to on-device storage.
+5. ✅ **Today screen**: three cards (Hifz, Rabt, Muraja'a) showing surah and ayah ranges with sizes in pages. Big "Done" buttons sit at the bottom within thumb reach, and I can adjust the Hifz end ayah before tapping. Logs are saved to on-device storage.
 6. **History and backup**: a list of logged days. "Back up" creates one file and opens the phone's share sheet (so I can pick Save to Drive), and "Restore" loads that file back.
 
 ## What we're NOT doing

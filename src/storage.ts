@@ -1,14 +1,14 @@
 // Everything the app remembers lives in one localStorage entry on this device.
-import type { Progress } from './plan'
+import type { Saved } from './day'
 
 const KEY = 'hifz-tracker'
-
-export type Saved = { version: 1; progress: Progress }
 
 export const load = (): Saved | null => {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as Saved) : null
+    if (!raw) return null
+    const saved = JSON.parse(raw) as Saved
+    return { ...saved, today: saved.today ?? null, history: saved.history ?? [] }
   } catch {
     return null
   }

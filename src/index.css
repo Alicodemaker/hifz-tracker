@@ -102,3 +102,21 @@ button.secondary { background: var(--surface); color: var(--text); border: 1px s
   background: linear-gradient(transparent, var(--bg) 30%);
 }
 .action-bar > * { max-width: 448px; margin: 0 auto; display: block; }
+
+.top { display: flex; align-items: center; justify-content: space-between; }
+button.link { background: none; color: var(--accent); min-height: 44px; padding: 0 4px; font-weight: 500; font-size: 0.95rem; }
+
+.kind { border-left: 6px solid var(--border); }
+.kind.done { border-left-color: var(--accent); }
+.kind.done h2::after { content: ' ✓'; color: var(--accent); }
+.range { font-size: 1.15rem; font-weight: 600; margin-bottom: 2px; }
+
+.stepper { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.stepper button { min-width: 56px; font-size: 1.4rem; }
+.stepper span { flex: 1; text-align: center; }
+
+.tall { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
+.done-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.done-buttons button { width: 100%; min-height: 64px; padding: 0 4px; white-space: nowrap; }
+.done-buttons button:disabled { opacity: 0.4; }
+.hint { text-align: center; margin: 8px 0 0; }
