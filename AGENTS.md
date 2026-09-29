@@ -6,9 +6,10 @@ A mobile-first web app (PWA) for people memorising the Quran (hifz) to track the
 
 - Users are people memorising the Quran, or someone tracking on their behalf.
 - Work is tracked in three kinds:
-  - **Sabaq**: the new lesson being memorised today.
-  - **Sabqi**: recent revision of what was memorised in the last few days or weeks.
-  - **Manzil**: revision of older memorisation, rotated so the whole memorised portion stays fresh.
+  - **Hifz**: the new portion being memorised today (called *sabaq* in South Asia).
+  - **Rabt**: daily revision of recently memorised material (*sabqi*).
+  - **Muraja'a**: revision of older memorisation, rotated so the whole memorised portion stays fresh (*manzil*).
+- Use these three terms, in the English alphabet, in the UI, code and docs. `CONTEXT.md` is the glossary.
 - The Quran is divided into surahs, ayahs, juz and pages. Progress is expressed in these units.
 
 ## Product constraints

@@ -23,3 +23,5 @@
 One PWA screen that shows today's sabaq, sabqi and manzil, with a big "done" tap for each and a simple history. Progress is counted in pages and manzil follows a fixed rotation. No stats, streaks, reminders or profiles.
 
 **Verdict: Build the wedge.** Use it yourself for two weeks before adding anything.
+
+> Terminology note: this roast predates ADR-0006. Sabaq, sabqi and manzil are now Hifz, Rabt and Muraja'a.

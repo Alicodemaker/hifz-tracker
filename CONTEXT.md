@@ -17,7 +17,7 @@ One of the 114 chapters of the Quran. Surahs are the order in which new memorisa
 _Avoid_: Chapter, sura
 
 **Ayah**:
-One verse within a Surah. The finest position a Sabaq can start or end at.
+One verse within a Surah. The finest position a Hifz can start or end at.
 _Avoid_: Verse, line
 
 **Juz**:
@@ -26,34 +26,36 @@ _Avoid_: Para, part, sipara
 
 ## The three kinds of work
 
-**Sabaq**:
-The new portion being memorised for the first time today: an Ayah range within one Surah. Its size is expressed in Pages (default ½).
-_Avoid_: Lesson, new work
+The app uses the Arab-world halaqa terms, written in the English alphabet.
+
+**Hifz**:
+The new portion being memorised for the first time today: a run of Ayahs in Memorisation order, about ½ Page. It may combine several short Surahs, and it ends at a Surah's last Ayah if less than ½ Page of that Surah would be left.
+_Avoid_: Sabaq, lesson, new work. (Hifz here means the day's new portion; the overall practice is "memorisation".)
 
 **Memorisation order**:
 The sequence new material is memorised in: Surahs from last to first (an-Nas, al-Falaq, al-Ikhlas, …), each Surah from its first Ayah to its last.
 _Avoid_: Direction, progress order
 
-**Sabqi**:
-Revision of the most recently memorised 5 Pages' worth of material (by Memorisation order), revised in full each day. Material older than that belongs to the Manzil.
-_Avoid_: Recent revision, dhor (ambiguous between regions)
+**Rabt**:
+Revision of the most recently memorised 5 Pages' worth of material (by Memorisation order), revised in full each day. Material older than that belongs to the Muraja'a.
+_Avoid_: Sabqi, recent revision, dhor
 
-**Manzil**:
-Revision of all memorised material outside the Sabqi, worked through one Manzil slice a day in rotation so everything is revisited regularly.
-_Avoid_: Old revision, dhor
+**Muraja'a**:
+Revision of all memorised material outside the Rabt, worked through one Muraja'a slice a day in rotation so everything is revisited regularly.
+_Avoid_: Manzil, old revision, dhor
 
-**Manzil slice**:
-One day's portion of the Manzil, taken in Mushaf order from where the last slice ended, wrapping around after the last memorised Surah. It is made of whole Surahs totalling at most 10 Pages. A Surah longer than 10 Pages is split at Page boundaries into pieces of about 10 Pages. Juz 30 is always two fixed slices: an-Naba to al-Layl, and ad-Duha to an-Nas.
-_Avoid_: Portion, chunk, daily manzil
+**Muraja'a slice**:
+One day's portion of the Muraja'a, taken in Mushaf order from where the last slice ended, wrapping around after the last memorised Surah. It is made of whole Surahs totalling at most 10 Pages. A Surah longer than 10 Pages is split at Page boundaries into pieces of about 10 Pages. Juz 30 is always two fixed slices: an-Naba to al-Layl, and ad-Duha to an-Nas.
+_Avoid_: Manzil slice, portion, chunk
 
 ## Days
 
 **Today's plan**:
-The Sabaq, Sabqi and Manzil the app suggests for today. A suggestion, not an obligation: the person confirms or adjusts each part.
+The Hifz, Rabt and Muraja'a the app suggests for today. A suggestion, not an obligation: the person confirms or adjusts each part.
 _Avoid_: Schedule, assignment, target
 
 **Log**:
-The record of what was actually done on a given Day, per kind of work. A revision slice that was only partly done counts as not done, and is suggested again in full. Any kind may be absent (e.g. a revision-only day with no Sabaq).
+The record of what was actually done on a given Day, per kind of work. A revision slice that was only partly done counts as not done, and is suggested again in full. Any kind may be absent (e.g. a revision-only day with no Hifz).
 _Avoid_: Entry, session, check-in
 
 **Gap**:
