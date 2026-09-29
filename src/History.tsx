@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import BackButton from './BackButton'
 import { backupFile, shareBackup } from './backup'
 import { localDate, type Day, type Saved } from './day'
 import { describeRanges, hifzUpTo } from './format'
@@ -44,10 +45,10 @@ export default function History({ saved, onRestore, onBack }: Props) {
   return (
     <main className="screen">
       <header className="screen-head">
-        <h1>History</h1>
-        <button className="link" onClick={onBack}>
-          Today
-        </button>
+        <div className="title-row">
+          <BackButton onClick={onBack} label="Back to Today" />
+          <h1>History</h1>
+        </div>
       </header>
       {message && <p className="notice">{message}</p>}
 
