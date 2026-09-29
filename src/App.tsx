@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { localDate, startDay, type Day, type Saved } from './day'
-import type { Progress } from './plan'
 import History from './History'
+import { changeHifzAmount, finishEstimates } from './pace'
+import { DEFAULT_HIFZ_AMOUNT, type Progress } from './plan'
 import Setup from './Setup'
 import { load, save } from './storage'
 import Today from './Today'
@@ -34,7 +35,9 @@ export default function App() {
 
   const saveSetup = (progress: Progress) => {
     // New setup replaces today's plan; ticks made today under the old setup are dropped.
-    update(startDay({ version: 1, progress, today: null, history: saved?.history ?? [] }, localDate()))
+    // Setup doesn't show the Hifz amount, so keep the one already chosen.
+    const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
+    update(startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [] }, localDate()))
     setScreen('today')
   }
 
@@ -56,7 +59,10 @@ export default function App() {
     <Today
       key={saved.today!.date}
       day={saved.today!}
+      hifzAmount={saved.progress.hifzAmount ?? DEFAULT_HIFZ_AMOUNT}
+      estimates={finishEstimates(saved)}
       onChange={changeDay}
+      onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
       onEditSetup={() => setScreen('setup')}
       onHistory={() => setScreen('history')}
     />

@@ -1,20 +1,18 @@
-import { useState } from 'react'
 import type { Day } from './day'
-import { arabicNames, describeRanges, describeSize, hifzUpTo } from './format'
+import { arabicNames, describeRanges, describeSize } from './format'
+import { describeDuration, type FinishEstimates } from './pace'
 import type { Range } from './plan'
-import { type AyahRef, ayahCount } from './quran'
+import { surahName } from './quran'
 import Tick from './Tick'
 
-type Props = { day: Day; onChange: (day: Day) => void; onEditSetup: () => void; onHistory: () => void }
-
-// Every Ayah the Hifz could end on: through today's suggestion, up to the end of its last Surah.
-const hifzEndChoices = (hifz: Range[]): AyahRef[] => {
-  const choices: AyahRef[] = []
-  hifz.forEach((r, i) => {
-    const to = i === hifz.length - 1 ? ayahCount(r.surah) : r.to
-    for (let ayah = r.from; ayah <= to; ayah++) choices.push({ surah: r.surah, ayah })
-  })
-  return choices
+type Props = {
+  day: Day
+  hifzAmount: number
+  estimates: FinishEstimates | null
+  onChange: (day: Day) => void
+  onChangeAmount: (direction: 1 | -1) => void
+  onEditSetup: () => void
+  onHistory: () => void
 }
 
 const longDate = (date: string) =>
@@ -48,17 +46,12 @@ function RevisionRow({ name, ranges, done, empty }: { name: string; ranges: Rang
   )
 }
 
-export default function Today({ day, onChange, onEditSetup, onHistory }: Props) {
+export default function Today({ day, hifzAmount, estimates, onChange, onChangeAmount, onEditSetup, onHistory }: Props) {
   const { plan } = day
-  const suggestedEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
-  const choices = hifzEndChoices(plan.hifz)
   const hifzDone = day.hifzEnd !== null
-  const [draftEnd, setDraft] = useState(suggestedEnd)
-  const end = day.hifzEnd ?? draftEnd
-  const endIndex = end ? choices.findIndex((c) => c.surah === end.surah && c.ayah === end.ayah) : -1
-  const hifzShown = end ? hifzUpTo(plan.hifz, end) : []
+  const planEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
 
-  const toggleHifz = () => onChange({ ...day, hifzEnd: hifzDone ? null : end })
+  const toggleHifz = () => onChange({ ...day, hifzEnd: hifzDone ? null : planEnd })
   const toggleRabt = () => onChange({ ...day, rabtDone: !day.rabtDone })
   const toggleMuraja = () => onChange({ ...day, murajaDone: !day.murajaDone })
 
@@ -82,22 +75,28 @@ export default function Today({ day, onChange, onEditSetup, onHistory }: Props) 
           <>
             <div className="band">
               <p lang="ar" className="arabic">
-                {arabicNames(hifzShown)}
+                {arabicNames(plan.hifz)}
               </p>
             </div>
-            <p className="range">{describeRanges(hifzShown)}</p>
-            <p className="faded small">{describeSize(hifzShown)}</p>
+            <p className="range">{describeRanges(plan.hifz)}</p>
+            <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (
               <div className="stepper">
-                <button disabled={endIndex <= 0} onClick={() => setDraft(choices[endIndex - 1])} aria-label="End one ayah earlier">
+                <button disabled={hifzAmount <= 0.25} onClick={() => onChangeAmount(-1)} aria-label="Quarter of a page less each day">
                   −
                 </button>
-                <span className="faded small">End ayah</span>
-                <button
-                  disabled={endIndex >= choices.length - 1}
-                  onClick={() => setDraft(choices[endIndex + 1])}
-                  aria-label="End one ayah later"
-                >
+                <p className="faded small estimates">
+                  {estimates ? (
+                    <>
+                      {surahName(plan.hifz[0].surah)} in {describeDuration(estimates.surahDays)}
+                      <br />
+                      Quran in {describeDuration(estimates.quranDays)}
+                    </>
+                  ) : (
+                    'Log a few Hifz days to see your pace'
+                  )}
+                </p>
+                <button disabled={hifzAmount >= 5} onClick={() => onChangeAmount(1)} aria-label="Quarter of a page more each day">
                   +
                 </button>
               </div>
