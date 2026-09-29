@@ -333,4 +333,35 @@ select, input[type='number'] {
 }
 .m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2)); }
 
+/* Hide mode: each hidden ayah becomes a faint blank bar in exactly its place; ayah markers stay visible. */
+.m-lines.hiding { -webkit-user-select: none; user-select: none; }
+.m-lines.hiding .m-ayah { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-lines.hiding .m-ayah:not(.revealed) .m-words {
+  color: transparent;
+  background: var(--mushaf-blank);
+  border-radius: var(--radius-sm);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.m-lines.hiding .m-line.bismillah,
+.m-lines.hiding .m-line.surah-band { cursor: default; }
+
+.hide-toggle {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(var(--space-7) + env(safe-area-inset-bottom));
+  width: var(--tap-primary);
+  height: var(--tap-primary);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-lapis);
+  box-shadow: 0 2px 10px rgb(28 26 23 / 18%), inset 0 0 0 1.5px var(--mushaf-lapis);
+  transition: opacity 400ms ease;
+}
+.hide-toggle.on { background: var(--mushaf-lapis); color: var(--mushaf-paper); }
+.hide-toggle.faded-out { opacity: 0; pointer-events: none; }
+.hide-toggle svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
 .m-source { text-align: center; font-size: 0.75rem; color: var(--mushaf-faded); padding-bottom: var(--space-2); }

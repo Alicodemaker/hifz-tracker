@@ -13,7 +13,14 @@ let cached: MushafData | null = null
 const loadMushaf = async (): Promise<MushafData> =>
   (cached ??= (await import('./data/mushaf.json')).default as MushafData)
 
-type Props = { page: number; portion: Range[] | null; onBack: () => void; onTurn: (page: number) => void }
+type Props = {
+  page: number
+  portion: Range[] | null
+  hiding: boolean
+  onToggleHiding: () => void
+  onBack: () => void
+  onTurn: (page: number) => void
+}
 
 const firstAyah = (lines: Line[]): { surah: number; ayah: number } => {
   for (const line of lines) {
@@ -55,8 +62,9 @@ const TYPICAL_WIDEST_AT_BASE = 412
 const NO_LINES: Line[] = []
 
 const SWIPE_MIN = 50 // px of mostly horizontal travel
+const BUTTON_FADE_MS = 10_000
 
-export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
+export default function MushafPage({ page, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -119,11 +127,43 @@ export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [page, onTurn])
 
+  // Hide mode: every page starts fully hidden each time it is shown; tapping an ayah reveals or hides it.
+  // The page remounts on every visit; revealed ayahs also reset when hide mode is switched.
+  const scope = String(hiding)
+  const [reveals, setReveals] = useState<{ scope: string; keys: Set<string> }>({ scope, keys: new Set() })
+  const revealed = reveals.scope === scope ? reveals.keys : new Set<string>()
+  const toggleAyah = (key: string) => {
+    const keys = new Set(revealed)
+    if (!keys.delete(key)) keys.add(key)
+    setReveals({ scope, keys })
+  }
+
+  // The hide button fades after ten seconds without a touch; any touch brings it back.
+  const [buttonVisible, setButtonVisible] = useState(true)
+  const fadeTimer = useRef<number | undefined>(undefined)
+  const startFadeTimer = () => {
+    window.clearTimeout(fadeTimer.current)
+    fadeTimer.current = window.setTimeout(() => setButtonVisible(false), BUTTON_FADE_MS)
+  }
+  const wake = () => {
+    setButtonVisible(true)
+    startFadeTimer()
+  }
+  useEffect(() => {
+    startFadeTimer()
+    return () => window.clearTimeout(fadeTimer.current)
+  }, [])
+
   const { start, end } = portionMarks(lines, portion)
   const top = firstAyah(lines)
 
   return (
-    <main className="mushaf" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <main
+      className="mushaf"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onPointerDown={wake}
+    >
       <header className="m-head">
         <button className="back" onClick={onBack} aria-label="Back to Today">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -137,7 +177,7 @@ export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
 
       <div
         ref={linesRef}
-        className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''}`}
+        className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''}`}
         style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
         lang="ar"
         dir="rtl"
@@ -161,9 +201,15 @@ export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
               <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
                 {line.map((piece) => {
                   const [words, marker] = splitMarker(piece)
+                  const key = `${piece[0]}:${piece[1]}`
                   return (
-                    <span key={`${piece[0]}:${piece[1]}`} className="m-ayah" data-ayah={`${piece[0]}:${piece[1]}`}>
-                      {words}
+                    <span
+                      key={key}
+                      className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
+                      data-ayah={key}
+                      onClick={hiding ? () => toggleAyah(key) : undefined}
+                    >
+                      <span className="m-words">{words}</span>
                       {marker && <span className="m-marker"> {marker}</span>}{' '}
                     </span>
                   )
@@ -175,6 +221,20 @@ export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
       </div>
 
       <p className="m-source">Line layout: KFGQPC 1441H edition</p>
+
+      <button
+        className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}
+        onClick={onToggleHiding}
+        aria-pressed={hiding}
+        aria-label={hiding ? 'Show the text' : 'Hide the text'}
+        tabIndex={buttonVisible ? 0 : -1}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+          <circle cx="12" cy="12" r="3" />
+          {!hiding && <path d="M4 4l16 16" />}
+        </svg>
+      </button>
     </main>
   )
 }

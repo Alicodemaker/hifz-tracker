@@ -55,6 +55,7 @@
   --mushaf-ink: #1c1a17;
   --mushaf-faded: #7a6f5e;
   --mushaf-lapis: #2f5c6e;
+  --mushaf-blank: #ebe2cf; /* hidden ayahs in hide mode */
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
 }
 

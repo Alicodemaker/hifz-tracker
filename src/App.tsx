@@ -28,6 +28,7 @@ export default function App() {
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
   const openedFromToday = useRef(false)
+  const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
@@ -92,7 +93,17 @@ export default function App() {
   }
 
   if (saved && mushafPage) {
-    return <MushafPage page={mushafPage} portion={portion} onBack={leavePage} onTurn={turnTo} />
+    return (
+      <MushafPage
+        key={mushafPage} // a fresh page on every visit, so hide mode starts fully hidden each time
+        page={mushafPage}
+        portion={portion}
+        hiding={hiding}
+        onToggleHiding={() => setHiding((on) => !on)}
+        onBack={leavePage}
+        onTurn={turnTo}
+      />
+    )
   }
 
   if (!saved || screen === 'setup') return <Setup initial={saved?.progress ?? null} onSave={saveSetup} onRestore={restore} />
