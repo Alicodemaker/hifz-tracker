@@ -1,37 +1,34 @@
-# PLAN: Hifz Tracker version 1
+# PLAN: Hifz Tracker v1.1 (Mushaf page, Hifz amount, pace)
+
+The finished v1 plan is in `docs/plans/PLAN-v1.md`.
 
 ## What we're doing
 
-A phone-first, offline PWA that tells me each morning what to do today (Hifz, Rabt and Muraja'a) and lets me log it with one tap. It follows the rules in `CONTEXT.md` and `docs/adr/`: pages of the Madani mushaf, surahs memorised backwards, a 5-page Rabt, Muraja'a slices of at most 10 pages, and gaps that pause instead of piling up. Everything is stored on the phone, with a backup file I can save to Google Drive. I use it myself for two weeks before adding anything else.
+Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area opens the exact Mushaf page (KFGQPC text and 15-line layout, ADR-0007), so I can memorise without switching apps. The Hifz − / + now changes my daily Hifz amount in ¼-page steps (starting at ½), and the "End ayah" text becomes estimates of when I'll finish the surah and the Quran at my real pace (ADR-0008). The installed app's navigation bar stops being white in dark mode.
 
 ## Steps
 
-1. ✅ **Scaffold**: Vite + React + TypeScript, set up as an installable PWA that loads offline, deployed to GitHub Pages so it can be installed on the phone from day one.
-2. ✅ **Quran data**: a local data file (generated from the `quran-meta` and `quran-json` npm packages, because tanzil.net is blocked from the build environment; attribution in the file) covering the 114 surahs, their ayah counts, the page each ayah is on, the juz boundaries and ayah lengths for estimating sizes. Tests check known facts (604 pages, Juz 30 starts at page 582, Fussilat starts at page 477).
-3. ✅ **Planning rules**, written test-first as plain functions with no UI:
-   - Hifz: about ½ page, combining short surahs and finishing a surah if less than ½ page of it would be left.
-   - Rabt: the last 5 pages' worth of material.
-   - Muraja'a slices: whole surahs, at most 10 pages, long surahs split by page, Juz 30 in two fixed halves, wrapping around at the end.
-   - Gaps and partial days: the plan pauses, and a partly done slice comes back in full.
-4. ✅ **Setup screen**: tick memorised surahs, or whole juz, and set the next Hifz position. The defaults are my real state: an-Nas → Fussilat memorised, next Hifz Ghafir 1.
-5. ✅ **Today screen**: three cards (Hifz, Rabt, Muraja'a) showing surah and ayah ranges with sizes in pages. Big "Done" buttons sit at the bottom within thumb reach, and I can adjust the Hifz end ayah before tapping. Logs are saved to on-device storage.
-6. ✅ **History and backup**: a list of logged days. "Back up" creates one file and opens the phone's share sheet (so I can pick Save to Drive), and "Restore" loads that file back.
+1. **Navigation bar**: set the manifest's theme and background colours to the dark paper colour, and check the built manifest.
+2. **Hifz amount** (test-first): progress remembers a Hifz amount (default ½ page, ¼-page steps, from ¼ up to 5 pages). Today's Hifz ends at the ayah closest to it, and older saves load with ½.
+3. **Pace estimates** (test-first): Hifz days per week from the last 4 weeks of history (every day until 4 weeks exist); time to finish the current surah and the Quran, as friendly durations.
+4. **Today's Hifz row**: − / + change the Hifz amount by ¼ page, and the middle text shows the two estimates. Everything else stays as it is now.
+5. **Mushaf data**: a build script turns `@quran.ws/text` into a compact per-page file of 15 lines (with surah headers and bismillah), and the KFGQPC font ships unmodified with its licence. Tests check pages 1, 467 and 604 line by line.
+6. **Mushaf page screen**: light paper even in dark mode; header with English surah name, page number and juz; each line justified; surah header bands; lapis ayah markers; thin margin marks where today's portion starts and ends. Offline.
+7. **Opening and moving**: tapping an area (not its buttons) opens the page where that portion starts. Swiping right goes to the next page, across all 604. The back link and the phone's back gesture return to Today.
 
 ## What we're NOT doing
 
-- No accounts, backend, sync or direct Google Drive integration (ADR-0004)
-- No streaks, stats, badges or progress percentages. Exception: the Juz rings (how much of each juz is memorised), added in the redesign at the builder's request
-- No reminders or notifications
-- No weak-juz marking or extra revision for weaker juz
-- No multiple people, parent mode or teacher mode
-- No other mushaf layouts (Indo-Pak) and no switching between them (ADR-0001)
-- No Quran text, audio or tafsir, only surah and ayah references
-- No settings screen: Hifz size ½ page, Rabt 5 pages and slice size 10 pages are fixed, and you adjust on the day instead
-- No Arabic-script labels (the English alphabet only), and no day start based on Fajr or a custom time
-- No catch-up or backlog after missed days (ADR-0002)
+- No search, bookmarks, audio, translation or tafsir
+- No tapping words or ayahs on the page, and no "hide the text" memorising mode
+- No hizb or rub' fractions in the page header
+- No dark-mode page (the Mushaf page stays light, by choice)
+- No pixel-identical glyph fonts or page images (ADR-0007), and no other mushaf editions
+- No ayah-by-ayah end adjustment: the ¼-page amount is the only control
+- No settings screen for Rabt size or Muraja'a slice size; they stay 5 and 10 pages
+- No changes to the Rabt and Muraja'a rules, Setup, History or Backup
 
 ## How we'll know it works
 
-1. On first launch, setup is pre-filled with an-Nas → Fussilat. Today's plan shows Hifz = Ghafir 1–n (about ½ page), a 5-page Rabt ending at Fussilat, and a Muraja'a slice of at most 10 pages.
-2. Put the phone in airplane mode, reopen the installed app, tap Done on all three cards and reopen: the logs are still there, and tomorrow's plan moves forward correctly. After skipping two days, the plan picks up exactly where it stopped.
-3. Tap Back up, save to Drive, clear the site data, Restore from Drive: all history is back.
+1. Today shows Ghafir 1–5 at ½ page. Tapping + gives about ¾ page (e.g. Ghafir 1–7) with shorter finish estimates, and tomorrow's plan keeps ¾ page.
+2. Tapping the Rabt area opens page 478 with the same 15 lines as the printed page. Swiping right shows page 479, and the phone's back gesture returns to Today. The same works in airplane mode.
+3. After reinstalling, the navigation bar is dark, not white, when the phone is in dark mode.
