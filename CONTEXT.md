@@ -61,7 +61,7 @@ Revision of every memorised Surah that has no part in the Rabt, worked through o
 _Avoid_: Manzil, old revision, dhor
 
 **Muraja'a slice**:
-One day's portion of the Muraja'a, taken in Mushaf order from where the last slice ended, wrapping around after the last memorised Surah. It is made of whole Surahs totalling at most 10 Pages. A Surah longer than 10 Pages is split at Page boundaries into pieces of about 10 Pages. Juz 30 is always two fixed slices: an-Naba to al-Layl, and ad-Duha to an-Nas.
+One day's portion of the Muraja'a, taken in Mushaf order from where the last slice ended, wrapping around after the last memorised Surah. It is made of whole Surahs totalling at most the chosen Muraja'a size (5, 10, 15 or 20 Pages; 10 unless changed in Settings). A Surah longer than that is split at Page boundaries into pieces of about that size. Juz 30 is always two fixed slices: an-Naba to al-Layl, and ad-Duha to an-Nas.
 _Avoid_: Manzil slice, portion, chunk
 
 ## Days

@@ -20,19 +20,11 @@ type Props = {
 
 const BASE_SIZE = 20 // px, used only to measure
 
-// Which lines hold the start and the end of today's portion, for the margin marks.
-const portionMarks = (lines: QcfLine[], portion: Range[] | null) => {
-  let start = -1
-  let end = -1
-  if (!portion?.length) return { start, end }
-  const first = portion[0]
-  const last = portion[portion.length - 1]
-  lines.forEach((line, i) => {
-    if (typeof line === 'string') return
-    if (start < 0 && line.some(([, s, a]) => s === first.surah && a === first.from)) start = i
-    if (line.some(([, s, a, kind]) => s === last.surah && a === last.to && kind === 1)) end = i
-  })
-  return { start, end }
+// Which line holds the start of today's portion, for the margin mark.
+const portionStart = (lines: QcfLine[], portion: Range[] | null) => {
+  if (!portion?.length) return -1
+  const { surah, from } = portion[0]
+  return lines.findIndex((line) => typeof line !== 'string' && line.some(([, s, a]) => s === surah && a === from))
 }
 
 // As printed, a short line that ends a surah sits centred; every other line fills the width.
@@ -74,7 +66,7 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
     return () => window.removeEventListener('resize', fit)
   }, [lines, fontFamily])
 
-  const { start, end } = portionMarks(lines, portion)
+  const start = portionStart(lines, portion)
 
   return (
     <div
@@ -91,7 +83,7 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
       dir="rtl"
     >
       {lines.map((line, i) => {
-        const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''}`
+        const mark = i === start ? 'mark-start' : ''
         if (line === 'b')
           return (
             <div key={i} className={`m-line bismillah ${mark}`}>

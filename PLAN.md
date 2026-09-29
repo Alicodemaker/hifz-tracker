@@ -22,6 +22,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 10. **Buttons and celebrations** (added at the builder's request): on the Mushaf page, all buttons (back, hide, Done, counter) show and hide together; a tap on the page toggles them, and they still fade after 5 seconds. Ticking a kind done plays a small anime-style burst of sparkles and flower petals from the tap; ticking the last one of the day plays a big one with manga focus lines, falling petals and "ما شاء الله". Undoing never celebrates.
 
 11. **Settings** (added at the builder's request): Setup is renamed Settings. It gains a Theme choice (Phone, Light, Dark) that applies at once and is kept on the phone, and a back button to Today (not on the first run). History gets the same back button.
+12. **Night page and Muraja'a size** (added at the builder's request): in dark mode the Mushaf page uses a dimmer parchment (still a light page with dark ink). Only the mark where today's portion starts stays; the end mark in the left margin is gone. Settings gains "Muraja'a per day": 5, 10, 15 or 20 pages (10 by default), still in whole surahs (ADR-0005).
 
 ## What we're NOT doing
 
@@ -31,7 +32,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 - No dark-mode page (the Mushaf page stays light, by choice)
 - No page images, and no other mushaf editions. The exact QCF4 glyph fonts are an optional one-time download (step 8, ADR-0009), never bundled
 - No ayah-by-ayah end adjustment: the ¼-page amount is the only control
-- No settings screen for Rabt size or Muraja'a slice size; they stay 5 and 10 pages
+- No setting for Rabt size; it stays 5 pages (Muraja'a size became a setting in step 12)
 - No changes to the Rabt and Muraja'a rules, Setup, History or Backup
 
 ## How we'll know it works
