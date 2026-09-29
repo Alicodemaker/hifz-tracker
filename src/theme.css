@@ -60,11 +60,15 @@
   --mushaf-paper: #fdf9f0;
   --mushaf-ink: #1a1a1a;
   --mushaf-olive: #5f7a2e; /* header text and underlines, margin marks, hide button */
-  --mushaf-olive-wash: #edf0dc; /* inside the surah cartouche */
+  --mushaf-badge-leaf: #6b8f3a; /* surah badge: leaves and medallion rings */
+  --mushaf-badge-frame: #e3ebcf; /* surah badge: the band behind the leaves */
+  --mushaf-badge-panel: #fbf6e6; /* surah badge: the central panel and medallions */
+  --mushaf-badge-accent: #a33b2f; /* surah badge: small red buds */
   --mushaf-rosette: #4b7a3b; /* ayah rosette petals and ring */
   --mushaf-rosette-field: #e6efd4; /* inside the rosette, behind the number */
   --mushaf-blank: #ebe3cf; /* hidden ayahs in hide mode */
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
+  --font-basmala: 'Amiri', serif; /* Amiri's calligraphic basmala ligature (U+FDFD) */
 }
 
 @media (prefers-color-scheme: dark) {

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, ayahIndex, juzEighthOfAyah, juzOfAyah, surahArabic, surahName } from './quran'
 import Rosette from './Rosette'
+import SurahBadge from './SurahBadge'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
 type Piece = [number, number, string, number]
@@ -71,6 +72,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
   const [squeezed, setSqueezed] = useState<Map<number, number>>(new Map())
+  const [basmalaSize, setBasmalaSize] = useState<number | null>(null)
   const linesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -92,6 +94,13 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       const widths = [...box.children].map((el) =>
         el.classList.contains('surah-band') ? 0 : (el.querySelector<HTMLElement>('.m-text')?.offsetWidth ?? 0),
       )
+      // The basmala ligature is very wide: size it to about 80% of the line, as on the reference page.
+      const basmala = box.querySelector<HTMLElement>('.basmala')
+      if (basmala) {
+        basmala.style.fontSize = `${size}px`
+        setBasmalaSize(Math.floor(((size * available * 0.8) / basmala.offsetWidth) * 10) / 10)
+        basmala.style.fontSize = ''
+      }
       box.classList.remove('measuring')
       setFontSize(size)
       // As printed, a short line that ends a surah sits centred; every other line is justified edge to edge.
@@ -186,7 +195,11 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       <div
         ref={linesRef}
         className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
-        style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
+        style={
+          fontSize
+            ? ({ '--quran-size': `${fontSize}px`, '--basmala-size': basmalaSize ? `${basmalaSize}px` : undefined } as React.CSSProperties)
+            : undefined
+        }
         lang="ar"
         dir="rtl"
       >
@@ -195,15 +208,15 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           if (line === 'b')
             return (
               <div key={i} className={`m-line bismillah ${mark}`}>
-                <span className="m-text">{data!.bismillah}</span>
+                <span className="basmala" lang="ar">
+                  {'\uFDFD'}
+                </span>
               </div>
             )
           if (typeof line === 'string')
             return (
               <div key={i} className={`m-line surah-band ${mark}`}>
-                <span className="m-text">
-                  <span className="cartouche">سُورَةُ {surahArabic(Number(line.slice(1)))}</span>
-                </span>
+                <SurahBadge name={surahArabic(Number(line.slice(1)))} />
               </div>
             )
           return (

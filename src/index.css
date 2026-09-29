@@ -325,7 +325,6 @@ select, input[type='number'] {
 .m-line.squeezed .m-text { width: auto; transform: scaleX(var(--squeeze)); transform-origin: right center; }
 /* Centred lines aren't spread by justification, so they keep the font's normal word spacing. */
 .m-line.center .m-text,
-.m-line.bismillah .m-text,
 .m-lines.short .m-text { text-align: center; text-align-last: center; word-spacing: normal; }
 
 /* Ayah rosettes: filled green, with the number inside, as on the reference page. */
@@ -336,35 +335,21 @@ select, input[type='number'] {
 .rosette .inner { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.8; }
 .rosette text { fill: var(--mushaf-ink); font-family: var(--font-quran); }
 
-/* Surah header: a pointed cartouche on a double-ruled band, with a diamond at each end. */
-.m-line.surah-band .m-text {
-  position: relative;
-  text-align: center;
-  text-align-last: center;
-  word-spacing: normal;
-  line-height: 1.5;
-  border-block: 3px double var(--mushaf-olive);
-  background: linear-gradient(var(--mushaf-olive), var(--mushaf-olive)) center / 100% 1px no-repeat;
-}
-.m-line.surah-band .m-text::before,
-.m-line.surah-band .m-text::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  background: var(--mushaf-olive);
-  transform: translateY(-50%) rotate(45deg);
-}
-.m-line.surah-band .m-text::before { right: 6px; }
-.m-line.surah-band .m-text::after { left: 6px; }
-/* The SVG repeats --mushaf-olive-wash and --mushaf-olive: a data URI can't read CSS variables. */
-.cartouche {
-  display: inline-block;
-  padding: 0 2.2em;
-  color: var(--mushaf-ink);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpath d='M8 2H92L99 20L92 38H8L1 20Z' fill='%23edf0dc' stroke='%235f7a2e' stroke-width='1.5' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M11 5H89L95 20L89 35H11L5 20Z' fill='none' stroke='%235f7a2e' stroke-width='0.75' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-}
+/* Surah header: our ornate badge, filling the line like the reference. */
+.m-line.surah-band { overflow: visible; }
+.surah-badge { display: block; width: 100%; height: auto; }
+.surah-badge .b-frame { fill: var(--mushaf-badge-frame); stroke: var(--mushaf-rosette); stroke-width: 1.5; }
+.surah-badge .b-leaf { fill: var(--mushaf-badge-leaf); }
+.surah-badge .b-accent { fill: var(--mushaf-badge-accent); }
+.surah-badge .b-panel { fill: var(--mushaf-badge-panel); stroke: var(--mushaf-rosette); stroke-width: 1.2; }
+.surah-badge .b-line { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.6; }
+.surah-badge .b-stem { fill: none; stroke: var(--mushaf-badge-leaf); stroke-width: 0.8; }
+.surah-badge .b-name { font-family: var(--font-quran); font-size: 17px; fill: var(--mushaf-ink); }
+.surah-badge .b-word { font-family: var(--font-quran); font-size: 10px; fill: var(--mushaf-rosette); }
+
+/* Basmala: Amiri's calligraphic ligature, sized to sit within the line like the reference. */
+.m-line.bismillah { justify-content: center; }
+.basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
 
 /* Thin margin marks where today's portion starts and ends. */
 .m-line.mark-start::before,
