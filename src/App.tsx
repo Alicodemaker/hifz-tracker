@@ -28,6 +28,7 @@ export default function App() {
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
   const openedFromToday = useRef(false)
+  const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
@@ -73,6 +74,7 @@ export default function App() {
   // Opening adds a history entry, so the phone's back gesture returns to Today.
   const openPage = (ranges: Range[]) => {
     setPortion(ranges)
+    setArrivedFrom(null)
     openedFromToday.current = true
     window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
   }
@@ -80,6 +82,7 @@ export default function App() {
   const turnTo = (page: number) => {
     if (page < 1 || page > 604) return
     history.replaceState(null, '', `#/page/${page}`)
+    setArrivedFrom(mushafPage && page > mushafPage ? 'next' : 'prev')
     setMushafPage(page)
   }
   const leavePage = () => {
@@ -97,6 +100,7 @@ export default function App() {
       <MushafPage
         key={mushafPage} // a fresh page on every visit, so hide mode starts fully hidden each time
         page={mushafPage}
+        arrivedFrom={arrivedFrom}
         portion={portion}
         hiding={hiding}
         onToggleHiding={() => setHiding((on) => !on)}

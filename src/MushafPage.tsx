@@ -15,6 +15,7 @@ const loadMushaf = async (): Promise<MushafData> =>
 
 type Props = {
   page: number
+  arrivedFrom: 'next' | 'prev' | null // which way the last page turn went, for the slide
   portion: Range[] | null
   hiding: boolean
   onToggleHiding: () => void
@@ -64,7 +65,7 @@ const NO_LINES: Line[] = []
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 10_000
 
-export default function MushafPage({ page, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
+export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -178,7 +179,7 @@ export default function MushafPage({ page, portion, hiding, onToggleHiding, onBa
       <div className="m-frame">
         <div
           ref={linesRef}
-          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''}`}
+          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
           style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
           lang="ar"
           dir="rtl"
@@ -224,7 +225,9 @@ export default function MushafPage({ page, portion, hiding, onToggleHiding, onBa
         </div>
       </div>
 
-      <p className="m-source">Line layout: KFGQPC 1441H edition</p>
+      <footer className="m-foot">
+        <p className="m-source">Line layout: KFGQPC 1441H edition</p>
+      </footer>
 
       <button
         className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}

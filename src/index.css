@@ -161,7 +161,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .tick { width: 1.1em; height: 1.1em; flex: none; }
 .tick path { stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .tick circle { fill: none; stroke: currentColor; stroke-width: 1.5; }
-.done .tick path { stroke-dasharray: 14; stroke-dashoffset: 0; animation: draw 360ms ease-out; }
+.done .tick path { stroke-dasharray: 14; stroke-dashoffset: 0; animation: draw var(--motion-calm) ease-out; }
 @keyframes draw { from { stroke-dashoffset: 14; } }
 
 .done-buttons button {
@@ -181,7 +181,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 /* Juz rings */
 .ring { display: block; }
 .ring .track { fill: none; stroke: var(--rule); }
-.ring .fill { fill: none; stroke: var(--lapis); stroke-linecap: round; transition: stroke-dasharray 400ms ease; }
+.ring .fill { fill: none; stroke: var(--lapis); stroke-linecap: round; transition: stroke-dasharray var(--motion-calm) ease; }
 .ring text { fill: var(--ink); font-family: var(--font-ui); font-weight: 600; }
 .ring.full circle.core { fill: var(--lapis); }
 .ring.full text { fill: var(--on-lapis); }
@@ -267,7 +267,7 @@ select, input[type='number'] {
   flex-direction: column;
   background: var(--mushaf-paper);
   color: var(--mushaf-ink);
-  padding: env(safe-area-inset-top) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
+  padding: env(safe-area-inset-top) var(--space-1) env(safe-area-inset-bottom);
 }
 
 /* Header as in the reference: surah, page and juz in olive with dotted underlines. */
@@ -293,7 +293,7 @@ select, input[type='number'] {
   display: flex;
   border: 3px double var(--mushaf-olive);
   border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-1) var(--space-2); /* the text breathes inside the frame */
 }
 
 .m-lines {
@@ -371,13 +371,13 @@ select, input[type='number'] {
 .m-line.mark-end::after {
   content: '';
   position: absolute;
-  inset-inline-start: calc(-1 * var(--space-2) + 1px);
+  inset-inline-start: calc(-1 * var(--space-2) + 2px);
   width: 3px;
   height: 60%;
   border-radius: 2px;
   background: var(--mushaf-olive);
 }
-.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 1px); }
+.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
 
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
@@ -389,13 +389,13 @@ select, input[type='number'] {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.m-lines.hiding .m-ayah.revealed .m-words { animation: reveal 220ms ease-out; }
+.m-lines.hiding .m-ayah.revealed .m-words { animation: reveal var(--motion-quick) ease-out; }
 @keyframes reveal { from { opacity: 0; } }
 
 .hide-toggle {
   position: fixed;
-  right: var(--space-5);
-  bottom: calc(var(--space-7) + env(safe-area-inset-bottom));
+  right: var(--space-2);
+  bottom: calc(var(--space-1) + env(safe-area-inset-bottom));
   width: var(--tap-primary);
   height: var(--tap-primary);
   border-radius: 50%;
@@ -404,10 +404,23 @@ select, input[type='number'] {
   background: var(--mushaf-paper);
   color: var(--mushaf-olive);
   box-shadow: 0 3px 14px rgb(28 26 23 / 16%), inset 0 0 0 1.5px var(--mushaf-olive);
-  transition: opacity 400ms ease, background-color 200ms ease;
+  transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
 }
 .hide-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
 .hide-toggle svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-.m-source { text-align: center; font-size: var(--text-sm); color: var(--mushaf-faded); padding-top: var(--space-1); }
+/* Footer row: the source note on the left, and room on the right for the hide button so it never covers text. */
+.m-foot {
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--tap-primary) + var(--space-2));
+  padding-inline: var(--space-2);
+}
+.m-source { font-size: var(--text-sm); color: var(--mushaf-faded); }
+
+/* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
+.m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }
+.m-lines.enter-prev { animation: turn-prev var(--motion-quick) ease-out; }
+@keyframes turn-next { from { transform: translateX(calc(-1 * var(--space-6))); opacity: 0.3; } }
+@keyframes turn-prev { from { transform: translateX(var(--space-6)); opacity: 0.3; } }

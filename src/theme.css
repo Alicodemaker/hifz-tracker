@@ -47,6 +47,10 @@
   --tap: 52px; /* minimum tap target */
   --check-size: 26px; /* checkbox boxes */
   --icon: 26px; /* line icons in buttons */
+
+  /* Motion: two speeds only. Quick answers a tap; calm is for fades and progress. */
+  --motion-quick: 200ms;
+  --motion-calm: 400ms;
   --tap-primary: 64px; /* the Done buttons */
   --screen-max: 480px;
   --action-bar-height: 128px;
