@@ -210,8 +210,9 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     setReveals({ scope, keys })
   }
 
-  // The hide button fades after five seconds, and only a tap on the screen (not a swipe) brings it back.
-  // It shows when the page is opened, but not after a page turn.
+  // All the page's buttons (back, hide, Done, counter) show and hide together: a tap on the page (not a swipe)
+  // shows them and the next tap hides them; they also fade on their own after five seconds.
+  // They show when the page is opened, but not after a page turn.
   const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null)
   const fadeTimer = useRef<number | undefined>(undefined)
   const startFadeTimer = () => {
@@ -221,6 +222,14 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
   const wake = () => {
     setButtonVisible(true)
     startFadeTimer()
+  }
+  const onPageTap = (e: React.MouseEvent) => {
+    const target = e.target as Element
+    if (target.closest('button')) return wake() // using a button keeps them all showing
+    if (hiding && target.closest('.m-ayah, .qcf-glyph.word')) return // that tap reveals or hides an ayah
+    if (!buttonVisible) return wake()
+    window.clearTimeout(fadeTimer.current)
+    setButtonVisible(false)
   }
   useEffect(() => {
     if (arrivedFrom === null) startFadeTimer()
@@ -235,10 +244,10 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       className="mushaf"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      onClick={wake}
+      onClick={onPageTap}
     >
       <header className="m-head">
-        <button className="back" onClick={onBack} aria-label="Back to Today">
+        <button className={`back ${buttonVisible ? '' : 'faded-out'}`} onClick={onBack} aria-label="Back to Today" tabIndex={buttonVisible ? 0 : -1}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M15.5 5l-7 7 7 7" />
           </svg>

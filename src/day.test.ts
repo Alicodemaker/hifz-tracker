@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countRep, startDay, toggleDone, type Saved } from './day'
+import { celebrationFor, countRep, startDay, toggleDone, type Saved } from './day'
 import { planToday, type Progress } from './plan'
 
 const progress: Progress = {
@@ -82,5 +82,30 @@ describe('countRep', () => {
   it('starts each new day at none', () => {
     const counted = { ...fresh, today: countRep(day, 1) }
     expect(startDay(counted, '2026-09-30').today!.hifzReps ?? 0).toBe(0)
+  })
+})
+
+describe('celebrationFor', () => {
+  const day = startDay(fresh, '2026-09-29').today!
+
+  it('is small when one kind becomes done and others are left', () => {
+    expect(celebrationFor(day, toggleDone(day, 'rabt'))).toBe('small')
+  })
+
+  it('is big when the last kind of the day becomes done', () => {
+    const two = toggleDone(toggleDone(day, 'hifz'), 'rabt')
+    expect(celebrationFor(two, toggleDone(two, 'muraja'))).toBe('big')
+  })
+
+  it('counts a kind with nothing planned as done', () => {
+    const noMuraja = { ...day, plan: { ...day.plan, muraja: [] } }
+    const hifz = toggleDone(noMuraja, 'hifz')
+    expect(celebrationFor(hifz, toggleDone(hifz, 'rabt'))).toBe('big')
+  })
+
+  it('is nothing for an undo, or for a change that ticks nothing', () => {
+    const rabt = toggleDone(day, 'rabt')
+    expect(celebrationFor(rabt, toggleDone(rabt, 'rabt'))).toBeNull()
+    expect(celebrationFor(day, countRep(day, 1))).toBeNull()
   })
 })
