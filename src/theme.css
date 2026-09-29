@@ -56,7 +56,7 @@
   --action-bar-height: 128px;
 
   /* The Mushaf page, modelled on the builder's reference Quran app: cream paper, black ink, olive header,
-     green rosettes. It stays a light page in dark mode, on dimmer parchment. */
+     green rosettes. It stays light even in dark mode. */
   --mushaf-paper: #fff9f3;
   --mushaf-ink: #1a1a1a;
   --mushaf-olive: #5f7a2e; /* header text and underlines, margin marks, hide button */
@@ -91,10 +91,6 @@
     --on-lapis: #17130f;
     --lapis-wash: #1f2a2d;
     --alert: #e2a092;
-    /* The Mushaf page at night: dimmer parchment, still a light page with dark ink. */
-    --mushaf-paper: #e2d5bb;
-    --mushaf-blank: #d1c2a3;
-    --mushaf-rosette-field: #d6dcbc;
   }
 }
 :root[data-theme='dark'] {
@@ -107,7 +103,4 @@
   --on-lapis: #17130f;
   --lapis-wash: #1f2a2d;
   --alert: #e2a092;
-  --mushaf-paper: #e2d5bb;
-  --mushaf-blank: #d1c2a3;
-  --mushaf-rosette-field: #d6dcbc;
 }
