@@ -286,8 +286,20 @@ select, input[type='number'] {
 .m-head .m-label { text-decoration: underline dashed 1px; text-underline-offset: 5px; }
 .m-head .m-surah { justify-self: start; display: flex; align-items: center; gap: var(--space-1); }
 .m-head .m-juz { justify-self: end; }
-.mushaf .back { width: var(--space-5); height: var(--tap); margin-inline-start: calc(-1 * var(--space-1)); color: var(--mushaf-olive); display: grid; place-items: center; }
-.mushaf .back svg { width: var(--space-5); height: var(--space-5); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* Back: a filled olive disc in the top-left corner that reads as a floating button. */
+.mushaf .back {
+  flex: none;
+  width: var(--float-button);
+  height: var(--float-button);
+  margin-inline-end: var(--space-1);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-olive);
+  color: var(--mushaf-paper);
+  box-shadow: var(--float-shadow);
+}
+.mushaf .back svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 
 .m-lines {
   flex: 1;
@@ -383,29 +395,29 @@ select, input[type='number'] {
 
 .hide-toggle {
   position: fixed;
-  right: var(--space-2);
-  bottom: calc(var(--space-1) + env(safe-area-inset-bottom));
-  width: var(--tap-primary);
-  height: var(--tap-primary);
+  right: var(--space-3);
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  width: var(--float-button);
+  height: var(--float-button);
   border-radius: 50%;
   display: grid;
   place-items: center;
   background: var(--mushaf-paper);
   color: var(--mushaf-olive);
-  box-shadow: 0 3px 14px rgb(28 26 23 / 16%), inset 0 0 0 1.5px var(--mushaf-olive);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
   transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
 }
 .hide-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
-.hide-toggle svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hide-toggle svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* A clear strip at the bottom for the hide button (so it never covers text), and the font download. */
+/* A strip at the bottom for the font download, shown only until the exact font is in place. */
 .m-foot {
   flex: none;
   display: flex;
   align-items: center;
-  height: calc(var(--tap-primary) + var(--space-2));
-  padding-inline: var(--space-2) calc(var(--tap-primary) + var(--space-4));
+  height: calc(var(--float-button) + var(--space-3));
+  padding-inline: var(--space-2) calc(var(--float-button) + var(--space-4));
 }
 .font-download {
   min-height: var(--tap);
@@ -419,6 +431,11 @@ select, input[type='number'] {
 
 /* The exact QCF4 look (ADR-0009): one glyph per word, each printed line spread edge to edge. */
 .m-lines.qcf { font-family: var(--qcf-font), var(--font-quran); }
+/* QCF4 is a colour font, which ignores text-stroke: a hairline shadow on all four sides thickens the words instead. */
+.m-lines.qcf .qcf-glyph.word {
+  --w: var(--qcf-ink-weight);
+  text-shadow: var(--w) 0 currentColor, calc(-1 * var(--w)) 0 currentColor, 0 var(--w) currentColor, 0 calc(-1 * var(--w)) currentColor;
+}
 .qcf-row { display: flex; width: 100%; justify-content: space-between; align-items: center; line-height: 1.9; white-space: nowrap; }
 .m-lines.measuring .qcf-row { display: inline-flex; width: auto; justify-content: flex-start; }
 .m-line.center .qcf-row,

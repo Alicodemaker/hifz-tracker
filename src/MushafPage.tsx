@@ -301,23 +301,26 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
         </div>
       )}
 
-      <div className="m-foot">
-        {fontState === 'absent' && (
-          <button className="font-download" onClick={download}>
-            Download exact mushaf font (36 MB)
-          </button>
-        )}
-        {fontState === 'downloading' && (
-          <p className="font-status">
-            Downloading font {downloaded} of {QCF_FONT_COUNT}…
-          </p>
-        )}
-        {fontState === 'failed' && (
-          <button className="font-download" onClick={download}>
-            Download stopped. Check your connection and tap to resume
-          </button>
-        )}
-      </div>
+      {/* Only while the exact font isn't in place; otherwise the text runs to the bottom under the floating button. */}
+      {(fontState === 'absent' || fontState === 'downloading' || fontState === 'failed') && (
+        <div className="m-foot">
+          {fontState === 'absent' && (
+            <button className="font-download" onClick={download}>
+              Download exact mushaf font (36 MB)
+            </button>
+          )}
+          {fontState === 'downloading' && (
+            <p className="font-status">
+              Downloading font {downloaded} of {QCF_FONT_COUNT}…
+            </p>
+          )}
+          {fontState === 'failed' && (
+            <button className="font-download" onClick={download}>
+              Download stopped. Check your connection and tap to resume
+            </button>
+          )}
+        </div>
+      )}
 
       <button
         className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}
