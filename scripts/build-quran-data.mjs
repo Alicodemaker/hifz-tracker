@@ -18,7 +18,7 @@ for (let s = 1; s <= meta.numSurahs; s++) {
   const m = getSurahMeta(s)
   const t = text[s - 1]
   if (t.verses.length !== m.ayahCount) throw new Error(`Ayah count mismatch in surah ${s}`)
-  surahs.push({ name: t.transliteration, ayahs: m.ayahCount })
+  surahs.push({ name: t.transliteration, arabic: m.name, ayahs: m.ayahCount })
   for (let a = 1; a <= m.ayahCount; a++) {
     ayahPage.push(findPage(s, a))
     ayahLetters.push(letterCount(t.verses[a - 1].text))

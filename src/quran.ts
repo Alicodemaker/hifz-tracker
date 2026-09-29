@@ -16,6 +16,7 @@ for (const s of data.surahs) {
 export const AYAH_COUNT = running
 
 export const surahName = (surah: number): string => data.surahs[surah - 1].name
+export const surahArabic = (surah: number): string => data.surahs[surah - 1].arabic
 export const ayahCount = (surah: number): number => data.surahs[surah - 1].ayahs
 
 export const ayahIndex = ({ surah, ayah }: AyahRef): number => firstIndex[surah - 1] + ayah - 1
@@ -46,3 +47,15 @@ export const juzOfSurah = (surah: number): number => {
   })
   return juz
 }
+
+// Lookups by global Ayah index (0-based, Mushaf order).
+export const ayahAt = (index: number): AyahRef => {
+  let surah = 1
+  while (surah < SURAH_COUNT && firstIndex[surah] <= index) surah++
+  return { surah, ayah: index - firstIndex[surah - 1] + 1 }
+}
+
+export const ayahSizeAt = (index: number): number => data.ayahSize[index]
+
+const juzStartIndex = data.juzStarts.map(([surah, ayah]) => ayahIndex({ surah, ayah }))
+export const juzOfAyah = (index: number): number => juzStartIndex.filter((start) => start <= index).length

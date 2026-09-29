@@ -49,7 +49,7 @@ const planHifz = (next: AyahRef | null): Range[] => {
   return hifz
 }
 
-const isMemorised = (ref: AyahRef, progress: Progress): boolean =>
+export const isMemorised = (ref: AyahRef, progress: Progress): boolean =>
   progress.memorised.includes(ref.surah) ||
   (progress.hifzNext?.surah === ref.surah && ref.ayah < progress.hifzNext.ayah)
 

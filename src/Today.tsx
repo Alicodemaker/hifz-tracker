@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import type { Day } from './day'
-import { describeRanges, describeSize, hifzUpTo } from './format'
+import { arabicNames, describeRanges, describeSize, hifzUpTo } from './format'
 import type { Range } from './plan'
 import { type AyahRef, ayahCount } from './quran'
+import Tick from './Tick'
 
 type Props = { day: Day; onChange: (day: Day) => void; onEditSetup: () => void; onHistory: () => void }
 
@@ -16,6 +17,37 @@ const hifzEndChoices = (hifz: Range[]): AyahRef[] => {
   return choices
 }
 
+const longDate = (date: string) =>
+  new Date(`${date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })
+
+function KindLabel({ name, done }: { name: string; done: boolean }) {
+  return (
+    <h2 className={`kind-label ${done ? 'done' : ''}`}>
+      {done && <Tick />}
+      {name}
+    </h2>
+  )
+}
+
+function RevisionRow({ name, ranges, done, empty }: { name: string; ranges: Range[]; done: boolean; empty: string }) {
+  return (
+    <li className={done ? 'done' : ''}>
+      <KindLabel name={name} done={done} />
+      {ranges.length ? (
+        <>
+          <p lang="ar" className="arabic">
+            {arabicNames(ranges)}
+          </p>
+          <p className="range">{describeRanges(ranges)}</p>
+          <p className="faded small">{describeSize(ranges)}</p>
+        </>
+      ) : (
+        <p className="faded small">{empty}</p>
+      )}
+    </li>
+  )
+}
+
 export default function Today({ day, onChange, onEditSetup, onHistory }: Props) {
   const { plan } = day
   const suggestedEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
@@ -26,16 +58,14 @@ export default function Today({ day, onChange, onEditSetup, onHistory }: Props) 
   const endIndex = end ? choices.findIndex((c) => c.surah === end.surah && c.ayah === end.ayah) : -1
   const hifzShown = end ? hifzUpTo(plan.hifz, end) : []
 
-  const setDraftEnd = (index: number) => setDraft(choices[index])
-
   const toggleHifz = () => onChange({ ...day, hifzEnd: hifzDone ? null : end })
   const toggleRabt = () => onChange({ ...day, rabtDone: !day.rabtDone })
   const toggleMuraja = () => onChange({ ...day, murajaDone: !day.murajaDone })
 
   return (
-    <main className="screen with-action-bar tall">
-      <header className="top">
-        <h1>Today</h1>
+    <main className="screen">
+      <header className="screen-head">
+        <h1 className="date">{longDate(day.date)}</h1>
         <nav>
           <button className="link" onClick={onHistory}>
             History
@@ -46,23 +76,27 @@ export default function Today({ day, onChange, onEditSetup, onHistory }: Props) 
         </nav>
       </header>
 
-      <section className={`card kind ${hifzDone ? 'done' : ''}`}>
-        <h2>Hifz</h2>
+      <section className={`hifz ${hifzDone ? 'done' : ''}`}>
+        <KindLabel name="Hifz" done={hifzDone} />
         {plan.hifz.length ? (
           <>
+            <div className="band">
+              <p lang="ar" className="arabic">
+                {arabicNames(hifzShown)}
+              </p>
+            </div>
             <p className="range">{describeRanges(hifzShown)}</p>
-            <p className="muted small">{describeSize(hifzShown)}</p>
+            <p className="faded small">{describeSize(hifzShown)}</p>
             {!hifzDone && (
-              <div className="stepper" aria-label="Adjust where today's Hifz ends">
-                <button className="secondary" disabled={endIndex <= 0} onClick={() => setDraftEnd(endIndex - 1)} aria-label="One ayah less">
+              <div className="stepper">
+                <button disabled={endIndex <= 0} onClick={() => setDraft(choices[endIndex - 1])} aria-label="End one ayah earlier">
                   −
                 </button>
-                <span className="muted small">End ayah</span>
+                <span className="faded small">End ayah</span>
                 <button
-                  className="secondary"
                   disabled={endIndex >= choices.length - 1}
-                  onClick={() => setDraftEnd(endIndex + 1)}
-                  aria-label="One ayah more"
+                  onClick={() => setDraft(choices[endIndex + 1])}
+                  aria-label="End one ayah later"
                 >
                   +
                 </button>
@@ -70,47 +104,28 @@ export default function Today({ day, onChange, onEditSetup, onHistory }: Props) 
             )}
           </>
         ) : (
-          <p className="muted">Nothing new to memorise.</p>
+          <p className="faded empty">Nothing new to memorise.</p>
         )}
       </section>
 
-      <section className={`card kind ${day.rabtDone ? 'done' : ''}`}>
-        <h2>Rabt</h2>
-        {plan.rabt.length ? (
-          <>
-            <p className="range">{describeRanges(plan.rabt)}</p>
-            <p className="muted small">{describeSize(plan.rabt)}</p>
-          </>
-        ) : (
-          <p className="muted">Nothing recent to revise yet.</p>
-        )}
-      </section>
-
-      <section className={`card kind ${day.murajaDone ? 'done' : ''}`}>
-        <h2>Muraja'a</h2>
-        {plan.muraja.length ? (
-          <>
-            <p className="range">{describeRanges(plan.muraja)}</p>
-            <p className="muted small">{describeSize(plan.muraja)}</p>
-          </>
-        ) : (
-          <p className="muted">Nothing in the rotation yet.</p>
-        )}
-      </section>
+      <ul className="revision">
+        <RevisionRow name="Rabt" ranges={plan.rabt} done={day.rabtDone} empty="Nothing recent to revise yet." />
+        <RevisionRow name="Muraja'a" ranges={plan.muraja} done={day.murajaDone} empty="Nothing in the rotation yet." />
+      </ul>
 
       <div className="action-bar">
-        <div className="done-buttons">
-          <button className={hifzDone ? 'primary' : 'secondary'} onClick={toggleHifz} disabled={!plan.hifz.length} aria-pressed={hifzDone}>
+        <div className="row done-buttons">
+          <button onClick={toggleHifz} disabled={!plan.hifz.length} aria-pressed={hifzDone}>
             Hifz
           </button>
-          <button className={day.rabtDone ? 'primary' : 'secondary'} onClick={toggleRabt} disabled={!plan.rabt.length} aria-pressed={day.rabtDone}>
+          <button onClick={toggleRabt} disabled={!plan.rabt.length} aria-pressed={day.rabtDone}>
             Rabt
           </button>
-          <button className={day.murajaDone ? 'primary' : 'secondary'} onClick={toggleMuraja} disabled={!plan.muraja.length} aria-pressed={day.murajaDone}>
+          <button onClick={toggleMuraja} disabled={!plan.muraja.length} aria-pressed={day.murajaDone}>
             Muraja'a
           </button>
         </div>
-        <p className="muted small hint">Tap when done. Tap again to undo.</p>
+        <p className="faded small hint">Tap when done. Tap again to undo.</p>
       </div>
     </main>
   )
