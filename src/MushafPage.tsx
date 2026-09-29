@@ -240,7 +240,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       <header className="m-head">
         <button className="back" onClick={onBack} aria-label="Back to Today">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15 5l-7 7 7 7" />
+            <path d="M15.5 5l-7 7 7 7" />
           </svg>
         </button>
         <span className="m-page m-label">{page}</span>
@@ -350,8 +350,10 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           </button>
           {reps && (
             <div className="tool rep-tool">
-              <button onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
-                −
+              <button className="rep-less" onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 12h12" />
+                </svg>
               </button>
               <button className="rep-count" onClick={() => reps.onCount(1)} aria-label={`Read ${reps.count} times. Tap to count one more`} tabIndex={buttonVisible ? 0 : -1}>
                 {reps.count}×

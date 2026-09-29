@@ -439,9 +439,11 @@ select, input[type='number'] {
 .done-tool { gap: var(--space-1); padding-inline: var(--space-3) var(--space-4); background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .done-tool.on { background: var(--mushaf-paper); color: var(--mushaf-olive); }
 .done-tool svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.rep-tool button { height: 100%; color: inherit; }
-.rep-tool button:first-child { padding-inline: var(--space-3) var(--space-2); font-size: var(--text-lg); font-weight: 400; }
-.rep-tool .rep-count { min-width: var(--float-button); padding-inline: var(--space-2) var(--space-4); font-size: var(--text-md); font-variant-numeric: tabular-nums; }
+/* The counter: an equal-width − slot, a hairline, then the count, each centred in its own part. */
+.rep-tool button { height: 100%; color: inherit; display: grid; place-items: center; }
+.rep-tool .rep-less { width: var(--float-button); border-inline-end: 1px solid color-mix(in srgb, var(--mushaf-olive) 35%, transparent); }
+.rep-tool .rep-less svg { width: var(--float-icon); height: var(--float-icon); stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.rep-tool .rep-count { min-width: var(--float-button); padding-inline: var(--space-3); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
 
 /* A strip at the bottom for the font download, shown only until the exact font is in place. */
 .m-foot {

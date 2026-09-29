@@ -66,8 +66,8 @@
   --mushaf-ink-weight: 0.3px; /* a hairline stroke that gives the bundled font the reference's heavier ink */
   --qcf-ink-weight: 0.15px; /* a little extra ink on the downloaded QCF4 font, to match the reference */
   --mushaf-head-size: 0.8125rem; /* 13px, as small as the reference's header */
-  --float-button: 44px; /* the back and hide buttons that float over the page */
-  --float-icon: 22px;
+  --float-button: 36px; /* the back, hide and page-tool buttons that float over the page */
+  --float-icon: 18px;
   --float-shadow: 0 2px 10px rgb(28 26 23 / 22%);
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
   --font-basmala: 'Amiri', serif; /* Amiri's calligraphic basmala ligature (U+FDFD) */
