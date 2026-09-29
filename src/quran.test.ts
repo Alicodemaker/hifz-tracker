@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import data from './data/quran.json'
-import { AYAH_COUNT, PAGE_COUNT, ayahCount, juzStartPage, pageOf, sizeInPages, surahName, surahSize } from './quran'
+import { AYAH_COUNT, PAGE_COUNT, ayahCount, juzOfSurah, juzStartPage, pageOf, sizeInPages, surahName, surahSize } from './quran'
 
 describe('Quran data (15-line Madani mushaf)', () => {
   it('has 114 surahs, 6236 ayahs and 604 pages', () => {
@@ -35,5 +35,14 @@ describe('Quran data (15-line Madani mushaf)', () => {
     expect(surahSize(2)).toBeCloseTo(48, 1) // al-Baqarah: pages 2–49
     expect(sizeInPages({ surah: 112, ayah: 1 }, { surah: 114, ayah: 6 })).toBeCloseTo(1, 2) // last page
     expect(surahSize(114)).toBeLessThan(0.5)
+  })
+
+  it('groups each surah under the juz it starts in', () => {
+    expect(juzOfSurah(114)).toBe(30)
+    expect(juzOfSurah(78)).toBe(30) // an-Naba opens Juz 30
+    expect(juzOfSurah(67)).toBe(29) // al-Mulk opens Juz 29
+    expect(juzOfSurah(51)).toBe(26) // adh-Dhariyat starts in Juz 26 and ends in Juz 27
+    expect(juzOfSurah(41)).toBe(24) // Fussilat
+    expect(juzOfSurah(2)).toBe(1)
   })
 })

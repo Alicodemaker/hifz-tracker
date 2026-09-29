@@ -36,3 +36,13 @@ export const sizeInPages = (from: AyahRef, to: AyahRef): number => {
 
 export const surahSize = (surah: number): number =>
   sizeInPages({ surah, ayah: 1 }, { surah, ayah: ayahCount(surah) })
+
+// The Juz a Surah's first Ayah falls in.
+export const juzOfSurah = (surah: number): number => {
+  const start = ayahIndex({ surah, ayah: 1 })
+  let juz = 1
+  data.juzStarts.forEach(([s, a], i) => {
+    if (ayahIndex({ surah: s, ayah: a }) <= start) juz = i + 1
+  })
+  return juz
+}
