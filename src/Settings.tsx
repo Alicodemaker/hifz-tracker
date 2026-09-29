@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import BackButton from './BackButton'
 import type { Saved } from './day'
-import type { Progress } from './plan'
+import { DEFAULT_MURAJA_PAGES, type Progress } from './plan'
 import JuzRing from './JuzRing'
 import { juzProgress } from './progress'
 import RestoreButton from './RestoreButton'
@@ -18,6 +18,8 @@ const JUZ_GROUPS = Array.from({ length: 30 }, (_, i) => 30 - i).map((juz) => ({
   juz,
   surahs: ALL_SURAHS.filter((s) => juzOfSurah(s) === juz),
 }))
+
+const MURAJA_PAGES = [5, 10, 15, 20]
 
 const THEMES: { value: Theme; label: string }[] = [
   { value: 'system', label: 'Phone' },
@@ -37,6 +39,7 @@ export default function Settings({ initial, onSave, onRestore, onBack }: Props) 
   const [next, setNext] = useState(initial?.hifzNext ?? DEFAULT_NEXT)
   const [message, setMessage] = useState('')
   const [theme, setTheme] = useState(loadTheme)
+  const [murajaPages, setMurajaPages] = useState(initial?.murajaPages ?? DEFAULT_MURAJA_PAGES)
 
   // The theme applies straight away; progress changes wait for Save.
   const chooseTheme = (choice: Theme) => {
@@ -55,7 +58,12 @@ export default function Settings({ initial, onSave, onRestore, onBack }: Props) 
   const shares = useMemo(() => juzProgress({ memorised: [...memorised], hifzNext: next, murajaNext: null }), [memorised, next])
 
   const submit = () =>
-    onSave({ memorised: [...memorised].sort((a, b) => a - b), hifzNext: next, murajaNext: initial?.murajaNext ?? null })
+    onSave({
+      memorised: [...memorised].sort((a, b) => a - b),
+      hifzNext: next,
+      murajaNext: initial?.murajaNext ?? null,
+      murajaPages,
+    })
 
   return (
     <main className="screen">
@@ -105,6 +113,16 @@ export default function Settings({ initial, onSave, onRestore, onBack }: Props) 
         </label>
       </div>
       {nextIsMemorised && <p className="notice alert">{surahName(next.surah)} is also ticked as memorised below. Untick it to save.</p>}
+
+      <h2 className="section-title">Muraja'a per day</h2>
+      <p className="faded small">Whole surahs, up to this many pages. A longer surah is split across days.</p>
+      <div className="segmented" role="group" aria-label="Muraja'a pages per day">
+        {MURAJA_PAGES.map((pages) => (
+          <button key={pages} aria-pressed={murajaPages === pages} onClick={() => setMurajaPages(pages)}>
+            {pages} pages
+          </button>
+        ))}
+      </div>
 
       <h2 className="section-title">Memorised surahs</h2>
       <p className="faded small">Tick whole surahs, or a whole juz at once.</p>

@@ -250,6 +250,7 @@ select, input[type='number'] {
 }
 .section-title { margin-bottom: var(--space-1); }
 .section-title + p { margin-bottom: var(--space-3); }
+.section-title + p + .segmented { margin-top: 0; }
 
 .juz-group { margin-top: var(--space-5); }
 .check {
@@ -473,9 +474,8 @@ select, input[type='number'] {
 .m-lines.measuring .basmala { font-size: 1em; }
 .basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
 
-/* Thin margin marks where today's portion starts and ends. */
-.m-line.mark-start::before,
-.m-line.mark-end::after {
+/* A thin margin mark where today's portion starts (in the right margin, as the page reads right to left). */
+.m-line.mark-start::before {
   content: '';
   position: absolute;
   inset-inline-start: calc(-1 * var(--space-2) + 2px);
@@ -484,7 +484,6 @@ select, input[type='number'] {
   border-radius: 2px;
   background: var(--mushaf-olive);
 }
-.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
 
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }

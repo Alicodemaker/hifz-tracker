@@ -6,6 +6,7 @@ export type Progress = {
   hifzNext: AyahRef | null // next Ayah to memorise; earlier Ayahs of its Surah are memorised
   murajaNext: AyahRef | null // where the next Muraja'a slice starts
   hifzAmount?: number // chosen daily Hifz size in Pages; ½ when absent (older saves)
+  murajaPages?: number // chosen most Pages in a Muraja'a slice; 10 when absent (older saves)
 }
 
 export type Range = { surah: number; from: number; to: number } // Ayahs, inclusive
@@ -13,8 +14,8 @@ export type Range = { surah: number; from: number; to: number } // Ayahs, inclus
 export type TodaysPlan = { hifz: Range[]; rabt: Range[]; muraja: Range[] }
 
 export const DEFAULT_HIFZ_AMOUNT = 0.5
+export const DEFAULT_MURAJA_PAGES = 10
 const RABT_PAGES = 5
-const SLICE_PAGES = 10
 
 const ayahSize = (ref: AyahRef) => sizeInPages(ref, ref)
 
@@ -92,8 +93,8 @@ const JUZ_30_HALVES = [
 ]
 
 // Split a Surah longer than a slice into equal-ish pieces, cutting only between Pages.
-const splitLongSurah = (surah: number): Range[] => {
-  const pieces = Math.ceil(surahSize(surah) / SLICE_PAGES)
+const splitLongSurah = (surah: number, limit: number): Range[] => {
+  const pieces = Math.ceil(surahSize(surah) / limit)
   const target = surahSize(surah) / pieces
   const count = ayahCount(surah)
   const pageSize = (page: number, fromAyah: number) => {
@@ -119,13 +120,13 @@ const splitLongSurah = (surah: number): Range[] => {
 }
 
 // The Muraja'a as units, in Mushaf order.
-const murajaUnits = (progress: Progress, rabt: Range[]): Unit[] => {
+const murajaUnits = (progress: Progress, rabt: Range[], limit: number): Unit[] => {
   const inRabt = new Set(rabt.map((r) => r.surah))
   const pool = progress.memorised.filter((s) => !inRabt.has(s)).sort((a, b) => a - b)
   const units: Unit[] = []
   for (const surah of pool) {
-    if (surahSize(surah) > SLICE_PAGES) {
-      units.push(...splitLongSurah(surah).map((piece) => ({ ranges: [piece], alone: true })))
+    if (surahSize(surah) > limit) {
+      units.push(...splitLongSurah(surah, limit).map((piece) => ({ ranges: [piece], alone: true })))
       continue
     }
     const half = JUZ_30_HALVES.find(([from, to]) => surah >= from && surah <= to)
@@ -137,7 +138,8 @@ const murajaUnits = (progress: Progress, rabt: Range[]): Unit[] => {
 }
 
 const planMuraja = (progress: Progress, rabt: Range[]): Range[] => {
-  const units = murajaUnits(progress, rabt)
+  const limit = progress.murajaPages ?? DEFAULT_MURAJA_PAGES
+  const units = murajaUnits(progress, rabt, limit)
   if (units.length === 0) return []
   const pointer = progress.murajaNext ? ayahIndex(progress.murajaNext) : 0
   let i = units.findIndex((u) => startIndex(u.ranges[0]) >= pointer)
@@ -145,10 +147,10 @@ const planMuraja = (progress: Progress, rabt: Range[]): Range[] => {
   const slice = [...units[i].ranges]
   if (units[i].alone) return slice
   let total = rangesSize(slice)
-  // Add whole following Surahs while the slice stays within ten Pages; never wrap mid-slice.
+  // Add whole following Surahs while the slice stays within the chosen Pages; never wrap mid-slice.
   for (i++; i < units.length && !units[i].alone; i++) {
     const extra = rangesSize(units[i].ranges)
-    if (total + extra > SLICE_PAGES) break
+    if (total + extra > limit) break
     slice.push(...units[i].ranges)
     total += extra
   }

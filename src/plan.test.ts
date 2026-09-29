@@ -108,6 +108,36 @@ describe("Muraja'a", () => {
   })
 })
 
+describe("Muraja'a pages", () => {
+  it('is up to ten pages when none has been chosen', () => {
+    expect(planToday({ ...real, murajaPages: 10 }).muraja).toEqual(planToday(real).muraja)
+  })
+
+  it('fills the chosen number of pages with whole surahs', () => {
+    // Starting at short surahs (al-Mulk, Qaf), so none needs splitting.
+    for (const [pages, from] of [[5, 67], [15, 50], [20, 50]]) {
+      const { muraja } = planToday({ ...real, murajaPages: pages, murajaNext: { surah: from, ayah: 1 } })
+      expect(muraja[0].surah).toBe(from)
+      expect(muraja.every(isWhole)).toBe(true)
+      expect(size(muraja)).toBeLessThanOrEqual(pages)
+      const nextSurah = muraja[muraja.length - 1].surah + 1
+      expect(size(muraja) + surahSize(nextSurah)).toBeGreaterThan(pages)
+    }
+  })
+
+  it('splits a surah longer than the chosen pages into pieces of about that size', () => {
+    const withKahf: Progress = { ...real, memorised: [18, ...real.memorised], murajaPages: 5 }
+    const first = planToday({ ...withKahf, murajaNext: { surah: 18, ayah: 1 } }).muraja
+    expect(first).toHaveLength(1)
+    expect(size(first)).toBeLessThan(4.5) // al-Kahf (about 11.5 pages) in three pieces, not two
+  })
+
+  it('still revises Juz 30 in its two fixed halves', () => {
+    const half = planToday({ ...real, murajaPages: 5, murajaNext: { surah: 78, ayah: 1 } }).muraja
+    expect(half.map((r) => r.surah)).toEqual(surahs(78, 92))
+  })
+})
+
 
 describe('Recording a day', () => {
   it('moves Hifz on to the ayah after where you actually stopped', () => {
