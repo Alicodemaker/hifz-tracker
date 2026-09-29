@@ -24,9 +24,10 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'portrait',
-        // Mirrors --paper and --lapis in src/theme.css (config files can't read CSS variables).
-        background_color: '#f7f1e6',
-        theme_color: '#2f5c6e',
+        // Android paints an installed app's navigation bar and splash screen from these, and a
+        // manifest can't switch with dark mode. Dark --paper from src/theme.css suits the phone's dark mode.
+        background_color: '#17130f',
+        theme_color: '#17130f',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

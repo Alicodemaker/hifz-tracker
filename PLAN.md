@@ -8,7 +8,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 
 ## Steps
 
-1. **Navigation bar**: set the manifest's theme and background colours to the dark paper colour, and check the built manifest.
+1. ✅ **Navigation bar**: set the manifest's theme and background colours to the dark paper colour, and check the built manifest.
 2. **Hifz amount** (test-first): progress remembers a Hifz amount (default ½ page, ¼-page steps, from ¼ up to 5 pages). Today's Hifz ends at the ayah closest to it, and older saves load with ½.
 3. **Pace estimates in Today's Hifz row** (test-first): Hifz days per week from the last 4 weeks of history (every day until 4 weeks exist) give the time to finish the current surah and the Quran, as friendly durations. The − / + change the Hifz amount by ¼ page, and the middle text shows the two estimates. Everything else stays as it is now.
 4. **Mushaf data**: a build script turns `@quran.ws/text` into a compact per-page file of 15 lines (with surah headers and bismillah), with each line split into its ayah pieces. The KFGQPC font ships unmodified with its licence. Tests check pages 1, 467 and 604 line by line.
