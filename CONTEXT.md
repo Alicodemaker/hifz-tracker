@@ -20,6 +20,10 @@ _Avoid_: Chapter, sura
 One verse within a Surah. The finest position a Hifz can start or end at.
 _Avoid_: Verse, line
 
+**Mushaf page**:
+One Page shown in the app as it appears in the printed 15-line Madani mushaf: the same words on each of its 15 lines, with Surah headers, the bismillah and Ayah markers.
+_Avoid_: Reader, viewer, page view
+
 **Juz**:
 One of the 30 standard divisions of the Quran; in the Mushaf, exactly 20 Pages.
 _Avoid_: Para, part, sipara
@@ -29,8 +33,16 @@ _Avoid_: Para, part, sipara
 The app uses the Arab-world halaqa terms, written in the English alphabet.
 
 **Hifz**:
-The new portion being memorised for the first time today: a run of Ayahs in Memorisation order, about ½ Page. It may combine several short Surahs, and it ends at a Surah's last Ayah if less than ½ Page of that Surah would be left.
+The new portion being memorised for the first time today: a run of Ayahs in Memorisation order, about one Hifz amount long. It may combine several short Surahs, and it ends at a Surah's last Ayah if less than half a Hifz amount of that Surah would be left.
 _Avoid_: Sabaq, lesson, new work. (Hifz here means the day's new portion; the overall practice is "memorisation".)
+
+**Hifz amount**:
+The size of the daily Hifz the person has chosen, in Pages (¼, ½, ¾, 1 and so on). It stays until they choose another; on a single day they can still end the Hifz a few Ayahs earlier or later.
+_Avoid_: Daily target, quota, sabaq size
+
+**Pace**:
+How fast memorisation moves: the Hifz amount multiplied by how many days a week Hifz is actually logged. It is used to estimate when the current Surah and the whole Quran will be finished.
+_Avoid_: Speed, rate, velocity
 
 **Memorisation order**:
 The sequence new material is memorised in: Surahs from last to first (an-Nas, al-Falaq, al-Ikhlas, …), each Surah from its first Ayah to its last.
