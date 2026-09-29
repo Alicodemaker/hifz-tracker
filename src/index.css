@@ -271,7 +271,7 @@ select, input[type='number'] {
   padding: env(safe-area-inset-top) var(--space-1) env(safe-area-inset-bottom);
 }
 
-/* Header as in the reference: surah, page and juz in olive with dotted underlines. */
+/* Header as in the reference: back at the left, the page number centred, and surah and juz at the right, in small olive type with dashed underlines. */
 .m-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); /* the page number stays centred, as on the reference */
@@ -279,19 +279,18 @@ select, input[type='number'] {
   column-gap: var(--space-2);
   min-height: var(--tap);
   padding-inline: var(--space-1);
-  font-size: var(--text-sm);
+  font-size: var(--mushaf-head-size);
   color: var(--mushaf-olive);
   white-space: nowrap;
 }
 .m-head .m-label { text-decoration: underline dashed 1px; text-underline-offset: 5px; }
-.m-head .m-surah { justify-self: start; display: flex; align-items: center; gap: var(--space-1); }
-.m-head .m-juz { justify-self: end; }
+.m-head .back { justify-self: start; }
+.m-head .m-where { justify-self: end; overflow: hidden; text-overflow: ellipsis; }
 /* Back: a filled olive disc in the top-left corner that reads as a floating button. */
 .mushaf .back {
   flex: none;
   width: var(--float-button);
   height: var(--float-button);
-  margin-inline-end: var(--space-1);
   border-radius: 50%;
   display: grid;
   place-items: center;
