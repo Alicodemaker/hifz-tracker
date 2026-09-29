@@ -6,7 +6,7 @@ import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
 import { pageOf } from './quran'
-import Setup from './Setup'
+import Settings from './Settings'
 import { load, save } from './storage'
 import Today from './Today'
 
@@ -27,7 +27,7 @@ const pageFromHash = (): number | null => {
 
 export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
-  const [screen, setScreen] = useState<'today' | 'setup' | 'history'>('today')
+  const [screen, setScreen] = useState<'today' | 'settings' | 'history'>('today')
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
   const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
@@ -80,9 +80,9 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [])
 
-  const saveSetup = (progress: Progress) => {
-    // New setup replaces today's plan; ticks made today under the old setup are dropped.
-    // Setup doesn't show the Hifz amount, so keep the one already chosen.
+  const saveSettings = (progress: Progress) => {
+    // Saved progress settings replace today's plan; ticks made today under the old ones are dropped.
+    // Settings don't show the Hifz amount, so keep the one already chosen.
     const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
     update(startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [] }, localDate()))
     setScreen('today')
@@ -156,7 +156,15 @@ export default function App() {
       )
     }
 
-    if (!saved || screen === 'setup') return <Setup initial={saved?.progress ?? null} onSave={saveSetup} onRestore={restore} />
+    if (!saved || screen === 'settings')
+      return (
+        <Settings
+          initial={saved?.progress ?? null}
+          onSave={saveSettings}
+          onRestore={restore}
+          onBack={saved ? () => setScreen('today') : null}
+        />
+      )
 
     if (screen === 'history') {
       return <History saved={saved} onRestore={restore} onBack={() => setScreen('today')} />
@@ -171,7 +179,7 @@ export default function App() {
         onChange={changeToday}
         onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
         onOpenPage={openPage}
-        onEditSetup={() => setScreen('setup')}
+        onSettings={() => setScreen('settings')}
         onHistory={() => setScreen('history')}
       />
     )

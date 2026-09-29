@@ -21,6 +21,8 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 
 10. **Buttons and celebrations** (added at the builder's request): on the Mushaf page, all buttons (back, hide, Done, counter) show and hide together; a tap on the page toggles them, and they still fade after 5 seconds. Ticking a kind done plays a small anime-style burst of sparkles and flower petals from the tap; ticking the last one of the day plays a big one with manga focus lines, falling petals and "ما شاء الله". Undoing never celebrates.
 
+11. **Settings** (added at the builder's request): Setup is renamed Settings. It gains a Theme choice (Phone, Light, Dark) that applies at once and is kept on the phone, and a back button to Today (not on the first run). History gets the same back button.
+
 ## What we're NOT doing
 
 - No search, bookmarks, audio, translation or tafsir

@@ -79,8 +79,9 @@
   --font-basmala: 'Amiri', serif; /* Amiri's calligraphic basmala ligature (U+FDFD) */
 }
 
+/* Dark follows the phone unless Light is chosen in Settings, or applies when Dark is chosen. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --paper: #17130f;
     --leaf: #221c17;
     --ink: #efe6d6;
@@ -91,4 +92,15 @@
     --lapis-wash: #1f2a2d;
     --alert: #e2a092;
   }
+}
+:root[data-theme='dark'] {
+  --paper: #17130f;
+  --leaf: #221c17;
+  --ink: #efe6d6;
+  --ink-faded: #a89c8a;
+  --rule: #3a3129;
+  --lapis: #8db7c7;
+  --on-lapis: #17130f;
+  --lapis-wash: #1f2a2d;
+  --alert: #e2a092;
 }

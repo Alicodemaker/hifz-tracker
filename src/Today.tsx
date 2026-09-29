@@ -12,7 +12,7 @@ type Props = {
   onChange: (day: Day) => void
   onChangeAmount: (direction: 1 | -1) => void
   onOpenPage: (kind: Kind, portion: Range[]) => void
-  onEditSetup: () => void
+  onSettings: () => void
   onHistory: () => void
 }
 
@@ -56,7 +56,7 @@ export default function Today({
   onChange,
   onChangeAmount,
   onOpenPage,
-  onEditSetup,
+  onSettings,
   onHistory,
 }: Props) {
   const { plan } = day
@@ -78,8 +78,8 @@ export default function Today({
           <button className="link" onClick={onHistory}>
             History
           </button>
-          <button className="link" onClick={onEditSetup}>
-            Setup
+          <button className="link" onClick={onSettings}>
+            Settings
           </button>
         </nav>
       </header>

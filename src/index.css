@@ -46,6 +46,17 @@ h2 { font-size: var(--text-md); font-weight: 600; }
   margin-bottom: var(--space-5);
 }
 .screen-head nav { display: flex; gap: var(--space-1); }
+.title-row { display: flex; align-items: center; gap: var(--space-1); }
+/* The chevron back to Today, drawn like the Mushaf page's, in the app's accent. Its tap area reaches into the gutter. */
+.back-button {
+  width: var(--tap);
+  height: var(--tap);
+  margin-inline-start: calc(-1 * var(--space-3));
+  display: grid;
+  place-items: center;
+  color: var(--lapis);
+}
+.back-button svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .screen-head h1.date { font-size: var(--text-lg); }
 
 /* Buttons */
@@ -204,7 +215,27 @@ button:disabled { opacity: 0.35; cursor: default; }
 .days strong { color: var(--ink); font-weight: 600; }
 .sources { margin-top: var(--space-6); }
 
-/* Setup */
+/* Settings */
+/* Theme: three choices in one track, the chosen one filled like a ticked Done button. */
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  margin: var(--space-2) 0 var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--leaf);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.segmented button {
+  min-height: calc(var(--tap) - 2 * var(--space-1));
+  border-radius: calc(var(--radius-lg) - var(--space-1));
+  font-size: var(--text-sm);
+  color: var(--ink-faded);
+  transition: background-color var(--motion-quick) ease, color var(--motion-quick) ease;
+}
+.segmented button[aria-pressed='true'] { background: var(--lapis); color: var(--on-lapis); }
 .field-row { display: grid; grid-template-columns: 1fr 6.5rem; gap: var(--space-3); margin-bottom: var(--space-6); }
 .field { display: grid; gap: var(--space-1); font-size: var(--text-sm); color: var(--ink-faded); }
 select, input[type='number'] {

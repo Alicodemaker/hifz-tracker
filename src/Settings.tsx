@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import BackButton from './BackButton'
 import type { Saved } from './day'
 import type { Progress } from './plan'
 import JuzRing from './JuzRing'
 import { juzProgress } from './progress'
 import RestoreButton from './RestoreButton'
 import { SURAH_COUNT, ayahCount, juzOfSurah, surahArabic, surahName } from './quran'
+import { loadTheme, saveTheme, type Theme } from './theme'
 
 // The builder's real state: an-Nas back to Fussilat memorised, next Hifz Ghafir 1.
 const DEFAULT_MEMORISED = Array.from({ length: SURAH_COUNT - 40 }, (_, i) => 41 + i)
@@ -17,12 +19,30 @@ const JUZ_GROUPS = Array.from({ length: 30 }, (_, i) => 30 - i).map((juz) => ({
   surahs: ALL_SURAHS.filter((s) => juzOfSurah(s) === juz),
 }))
 
-type Props = { initial: Progress | null; onSave: (progress: Progress) => void; onRestore: (saved: Saved) => void }
+const THEMES: { value: Theme; label: string }[] = [
+  { value: 'system', label: 'Phone' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]
 
-export default function Setup({ initial, onSave, onRestore }: Props) {
+type Props = {
+  initial: Progress | null
+  onSave: (progress: Progress) => void
+  onRestore: (saved: Saved) => void
+  onBack: (() => void) | null // back to Today without saving; none on the first run
+}
+
+export default function Settings({ initial, onSave, onRestore, onBack }: Props) {
   const [memorised, setMemorised] = useState(() => new Set(initial?.memorised ?? DEFAULT_MEMORISED))
   const [next, setNext] = useState(initial?.hifzNext ?? DEFAULT_NEXT)
   const [message, setMessage] = useState('')
+  const [theme, setTheme] = useState(loadTheme)
+
+  // The theme applies straight away; progress changes wait for Save.
+  const chooseTheme = (choice: Theme) => {
+    saveTheme(choice)
+    setTheme(choice)
+  }
 
   const toggle = (surahs: number[], on: boolean) =>
     setMemorised((prev) => {
@@ -40,10 +60,22 @@ export default function Setup({ initial, onSave, onRestore }: Props) {
   return (
     <main className="screen">
       <header className="screen-head">
-        <h1>Setup</h1>
+        <div className="title-row">
+          {onBack && <BackButton onClick={onBack} label="Back to Today without saving" />}
+          <h1>Settings</h1>
+        </div>
         {!initial && <RestoreButton className="link" onRestore={onRestore} onMessage={setMessage} />}
       </header>
       {message && <p className="notice">{message}</p>}
+
+      <h2 className="section-title">Theme</h2>
+      <div className="segmented" role="group" aria-label="Theme">
+        {THEMES.map(({ value, label }) => (
+          <button key={value} aria-pressed={theme === value} onClick={() => chooseTheme(value)}>
+            {label}
+          </button>
+        ))}
+      </div>
 
       <h2 className="section-title">Next Hifz</h2>
       <p className="faded small">The first ayah you have not memorised yet.</p>
@@ -101,7 +133,7 @@ export default function Setup({ initial, onSave, onRestore }: Props) {
 
       <div className="action-bar">
         <button className="button primary" onClick={submit} disabled={nextIsMemorised}>
-          Save setup
+          Save
         </button>
       </div>
     </main>

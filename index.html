@@ -6,6 +6,13 @@
     <!-- Mirrors --paper in src/theme.css, light and dark. -->
     <meta name="theme-color" content="#f7f1e6" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#17130f" media="(prefers-color-scheme: dark)" />
+    <!-- The theme chosen in Settings, set before the first paint so the page never flashes the other one. -->
+    <script>
+      try {
+        const theme = localStorage.getItem('hifz-theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+      } catch {}
+    </script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Hifz Tracker</title>
