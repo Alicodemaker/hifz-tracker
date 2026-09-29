@@ -37,7 +37,7 @@ _Avoid_: Para, part, sipara
 The app uses the Arab-world halaqa terms, written in the English alphabet.
 
 **Hifz**:
-The new portion being memorised for the first time today: a run of Ayahs in Memorisation order, about one Hifz amount long. It may combine several short Surahs, and it ends at a Surah's last Ayah if less than half a Hifz amount of that Surah would be left.
+The new portion being memorised for the first time today: a run of Ayahs in Memorisation order, about one Hifz amount long. It may combine several short Surahs, and it ends at a Surah's last Ayah if less than one Hifz amount of that Surah would be left.
 _Avoid_: Sabaq, lesson, new work. (Hifz here means the day's new portion; the overall practice is "memorisation".)
 
 **Hifz amount**:
