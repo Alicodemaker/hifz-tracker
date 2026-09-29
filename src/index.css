@@ -475,10 +475,13 @@ select, input[type='number'] {
    font's words), with the same ink weight as the text. */
 .m-line.bismillah { justify-content: center; }
 .basmala { font-size: 1em; line-height: 1.8; color: var(--mushaf-ink); white-space: nowrap; -webkit-text-stroke: var(--mushaf-ink-weight) currentColor; }
-.qcf-basmala { -webkit-text-stroke: 0; text-shadow: var(--qcf-ink-weight) 0 currentColor, calc(-1 * var(--qcf-ink-weight)) 0 currentColor, 0 var(--qcf-ink-weight) currentColor, 0 calc(-1 * var(--qcf-ink-weight)) currentColor; }
-/* On a full page the glyph sits high in its line: this evens the space to the badge above and the text below.
-   The first two pages' compact layout is already even. */
-.m-lines:not(.short) .qcf-basmala { position: relative; top: 0.3em; }
+.qcf-basmala { position: relative; -webkit-text-stroke: 0; text-shadow: var(--qcf-ink-weight) 0 currentColor, calc(-1 * var(--qcf-ink-weight)) 0 currentColor, 0 var(--qcf-ink-weight) currentColor, 0 calc(-1 * var(--qcf-ink-weight)) currentColor; }
+/* On a full page the banner and the basmala sit high in their lines: these nudges even out the three gaps, from the
+   line above to the banner, the banner to the basmala, and the basmala to the text. The first two pages' compact
+   layout is already even. */
+.m-lines:not(.short) .surah-badge { top: 0.17em; }
+.m-lines:not(.short) .qcf-basmala { top: 0.45em; }
+.qcf-basmala { left: 0.05em; } /* its ink sits a little left of its box */
 
 /* Thin margin marks where today's portion starts and ends. */
 .m-line.mark-start::before,
