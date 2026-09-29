@@ -217,19 +217,14 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       onPointerDown={wake}
     >
       <header className="m-head">
-        <span className="m-surah">
-          <button className="back" onClick={onBack} aria-label="Back to Today">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
-          <span className="m-label">
-            {top.surah} {surahName(top.surah)} ({ayahCount(top.surah)})
-          </span>
-        </span>
+        <button className="back" onClick={onBack} aria-label="Back to Today">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
         <span className="m-page m-label">{page}</span>
-        <span className="m-juz m-label">
-          Juz {juzOfAyah(ayahIndex(top))}
+        <span className="m-where m-label">
+          {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
         </span>
       </header>
 
