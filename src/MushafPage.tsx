@@ -13,7 +13,7 @@ let cached: MushafData | null = null
 const loadMushaf = async (): Promise<MushafData> =>
   (cached ??= (await import('./data/mushaf.json')).default as MushafData)
 
-type Props = { page: number; portion: Range[] | null; onBack: () => void }
+type Props = { page: number; portion: Range[] | null; onBack: () => void; onTurn: (page: number) => void }
 
 const firstAyah = (lines: Line[]): { surah: number; ayah: number } => {
   for (const line of lines) {
@@ -54,7 +54,9 @@ const BASE_SIZE = 20 // px, used only to measure
 const TYPICAL_WIDEST_AT_BASE = 412
 const NO_LINES: Line[] = []
 
-export default function MushafPage({ page, portion, onBack }: Props) {
+const SWIPE_MIN = 50 // px of mostly horizontal travel
+
+export default function MushafPage({ page, portion, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -97,11 +99,31 @@ export default function MushafPage({ page, portion, onBack }: Props) {
     return () => window.removeEventListener('resize', fit)
   }, [lines])
 
+  // As in a printed mushaf, the next page lies to the left: swipe right (or press ←) to reach it.
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const onTouchStart = (e: React.TouchEvent) => (touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const from = touchStart.current
+    touchStart.current = null
+    if (!from) return
+    const dx = e.changedTouches[0].clientX - from.x
+    const dy = e.changedTouches[0].clientY - from.y
+    if (Math.abs(dx) >= SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.5) onTurn(dx > 0 ? page + 1 : page - 1)
+  }
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') onTurn(page + 1)
+      if (e.key === 'ArrowRight') onTurn(page - 1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [page, onTurn])
+
   const { start, end } = portionMarks(lines, portion)
   const top = firstAyah(lines)
 
   return (
-    <main className="mushaf">
+    <main className="mushaf" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <header className="m-head">
         <button className="back" onClick={onBack} aria-label="Back to Today">
           <svg viewBox="0 0 24 24" aria-hidden="true">

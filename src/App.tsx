@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { localDate, startDay, type Day, type Saved } from './day'
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
-import { DEFAULT_HIFZ_AMOUNT, type Progress } from './plan'
+import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
+import { pageOf } from './quran'
 import Setup from './Setup'
 import { load, save } from './storage'
 import Today from './Today'
@@ -25,10 +26,16 @@ export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
   const [screen, setScreen] = useState<'today' | 'setup' | 'history'>('today')
   const [mushafPage, setMushafPage] = useState(pageFromHash)
+  const [portion, setPortion] = useState<Range[] | null>(null)
+  const openedFromToday = useRef(false)
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
-    const onHash = () => setMushafPage(pageFromHash())
+    const onHash = () => {
+      const page = pageFromHash()
+      setMushafPage(page)
+      if (!page) openedFromToday.current = false
+    }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
@@ -62,8 +69,30 @@ export default function App() {
     setScreen('history')
   }
 
+  // Opening adds a history entry, so the phone's back gesture returns to Today.
+  const openPage = (ranges: Range[]) => {
+    setPortion(ranges)
+    openedFromToday.current = true
+    window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
+  }
+  // Turning pages replaces that entry, so one back always leaves the Mushaf page.
+  const turnTo = (page: number) => {
+    if (page < 1 || page > 604) return
+    history.replaceState(null, '', `#/page/${page}`)
+    setMushafPage(page)
+  }
+  const leavePage = () => {
+    if (openedFromToday.current) history.back()
+    else {
+      // The app was opened straight onto a page: there is no Today entry behind it to go back to.
+      history.replaceState(null, '', window.location.pathname)
+      setMushafPage(null)
+    }
+    openedFromToday.current = false
+  }
+
   if (saved && mushafPage) {
-    return <MushafPage page={mushafPage} portion={null} onBack={() => (window.location.hash = '')} />
+    return <MushafPage page={mushafPage} portion={portion} onBack={leavePage} onTurn={turnTo} />
   }
 
   if (!saved || screen === 'setup') return <Setup initial={saved?.progress ?? null} onSave={saveSetup} onRestore={restore} />
@@ -82,6 +111,7 @@ export default function App() {
       estimates={finishEstimates(saved)}
       onChange={changeDay}
       onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
+      onOpenPage={openPage}
       onEditSetup={() => setScreen('setup')}
       onHistory={() => setScreen('history')}
     />

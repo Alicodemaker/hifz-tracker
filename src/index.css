@@ -142,6 +142,8 @@ button:disabled { opacity: 0.35; cursor: default; }
 
 .stepper .estimates { text-align: center; line-height: 1.4; }
 
+.opens-page { cursor: pointer; }
+
 /* Today: Rabt and Muraja'a as quiet rows under the band */
 .revision { list-style: none; padding: 0; }
 .revision li {

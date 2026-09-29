@@ -11,6 +11,7 @@ type Props = {
   estimates: FinishEstimates | null
   onChange: (day: Day) => void
   onChangeAmount: (direction: 1 | -1) => void
+  onOpenPage: (portion: Range[]) => void
   onEditSetup: () => void
   onHistory: () => void
 }
@@ -27,9 +28,11 @@ function KindLabel({ name, done }: { name: string; done: boolean }) {
   )
 }
 
-function RevisionRow({ name, ranges, done, empty }: { name: string; ranges: Range[]; done: boolean; empty: string }) {
+type RowProps = { name: string; ranges: Range[]; done: boolean; empty: string; onOpen: (e: React.MouseEvent) => void }
+
+function RevisionRow({ name, ranges, done, empty, onOpen }: RowProps) {
   return (
-    <li className={done ? 'done' : ''}>
+    <li className={`${ranges.length ? 'opens-page' : ''} ${done ? 'done' : ''}`} onClick={onOpen}>
       <KindLabel name={name} done={done} />
       {ranges.length ? (
         <>
@@ -46,10 +49,24 @@ function RevisionRow({ name, ranges, done, empty }: { name: string; ranges: Rang
   )
 }
 
-export default function Today({ day, hifzAmount, estimates, onChange, onChangeAmount, onEditSetup, onHistory }: Props) {
+export default function Today({
+  day,
+  hifzAmount,
+  estimates,
+  onChange,
+  onChangeAmount,
+  onOpenPage,
+  onEditSetup,
+  onHistory,
+}: Props) {
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
   const planEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
+
+  // Tapping an area opens its Mushaf page; its own buttons keep their jobs.
+  const openFrom = (portion: Range[]) => (event: React.MouseEvent) => {
+    if (portion.length && !(event.target as Element).closest('button')) onOpenPage(portion)
+  }
 
   const toggleHifz = () => onChange({ ...day, hifzEnd: hifzDone ? null : planEnd })
   const toggleRabt = () => onChange({ ...day, rabtDone: !day.rabtDone })
@@ -69,7 +86,7 @@ export default function Today({ day, hifzAmount, estimates, onChange, onChangeAm
         </nav>
       </header>
 
-      <section className={`hifz ${hifzDone ? 'done' : ''}`}>
+      <section className={`hifz opens-page ${hifzDone ? 'done' : ''}`} onClick={openFrom(plan.hifz)}>
         <KindLabel name="Hifz" done={hifzDone} />
         {plan.hifz.length ? (
           <>
@@ -108,8 +125,20 @@ export default function Today({ day, hifzAmount, estimates, onChange, onChangeAm
       </section>
 
       <ul className="revision">
-        <RevisionRow name="Rabt" ranges={plan.rabt} done={day.rabtDone} empty="Nothing recent to revise yet." />
-        <RevisionRow name="Muraja'a" ranges={plan.muraja} done={day.murajaDone} empty="Nothing in the rotation yet." />
+        <RevisionRow
+          name="Rabt"
+          ranges={plan.rabt}
+          done={day.rabtDone}
+          empty="Nothing recent to revise yet."
+          onOpen={openFrom(plan.rabt)}
+        />
+        <RevisionRow
+          name="Muraja'a"
+          ranges={plan.muraja}
+          done={day.murajaDone}
+          empty="Nothing in the rotation yet."
+          onOpen={openFrom(plan.muraja)}
+        />
       </ul>
 
       <div className="action-bar">
