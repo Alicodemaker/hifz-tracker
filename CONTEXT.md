@@ -41,7 +41,7 @@ Revision of the most recently memorised 5 Pages' worth of material (by Memorisat
 _Avoid_: Sabqi, recent revision, dhor
 
 **Muraja'a**:
-Revision of all memorised material outside the Rabt, worked through one Muraja'a slice a day in rotation so everything is revisited regularly.
+Revision of every memorised Surah that has no part in the Rabt, worked through one Muraja'a slice a day in rotation so everything is revisited regularly. A Surah joins the Muraja'a only once it has left the Rabt completely.
 _Avoid_: Manzil, old revision, dhor
 
 **Muraja'a slice**:

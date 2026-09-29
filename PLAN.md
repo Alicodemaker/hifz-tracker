@@ -8,7 +8,7 @@ A phone-first, offline PWA that tells me each morning what to do today (Hifz, Ra
 
 1. ✅ **Scaffold**: Vite + React + TypeScript, set up as an installable PWA that loads offline, deployed to GitHub Pages so it can be installed on the phone from day one.
 2. ✅ **Quran data**: a local data file (generated from the `quran-meta` and `quran-json` npm packages, because tanzil.net is blocked from the build environment; attribution in the file) covering the 114 surahs, their ayah counts, the page each ayah is on, the juz boundaries and ayah lengths for estimating sizes. Tests check known facts (604 pages, Juz 30 starts at page 582, Fussilat starts at page 477).
-3. **Planning rules**, written test-first as plain functions with no UI:
+3. ✅ **Planning rules**, written test-first as plain functions with no UI:
    - Hifz: about ½ page, combining short surahs and finishing a surah if less than ½ page of it would be left.
    - Rabt: the last 5 pages' worth of material.
    - Muraja'a slices: whole surahs, at most 10 pages, long surahs split by page, Juz 30 in two fixed halves, wrapping around at the end.
