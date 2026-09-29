@@ -39,8 +39,12 @@ Revision of the most recently memorised 5 Pages' worth of material (by Memorisat
 _Avoid_: Recent revision, dhor (ambiguous between regions)
 
 **Manzil**:
-Revision of all memorised material outside the Sabqi, worked through one slice a day in rotation so everything is revisited regularly.
+Revision of all memorised material outside the Sabqi, worked through one Manzil slice a day in rotation so everything is revisited regularly.
 _Avoid_: Old revision, dhor
+
+**Manzil slice**:
+One day's portion of the Manzil: whole Surahs, taken in Mushaf order from where the last slice ended, adding up to about 10 Pages. A Surah is never split across slices. After the last memorised Surah, the rotation wraps around to the first.
+_Avoid_: Portion, chunk, daily manzil
 
 ## Days
 
@@ -55,6 +59,10 @@ _Avoid_: Entry, session, check-in
 **Gap**:
 One or more days with nothing logged. A Gap never creates overdue work: the next Today's plan continues from where the last Log left off.
 _Avoid_: Missed day, streak break, backlog
+
+**Backup**:
+A single file holding all of a person's Logs and settings, which they save wherever they choose (e.g. Google Drive) and can restore from.
+_Avoid_: Sync, export, cloud save
 
 **Day**:
 A local calendar date, midnight to midnight.
