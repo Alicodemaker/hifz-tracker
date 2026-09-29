@@ -45,4 +45,5 @@ describe('Quran data (15-line Madani mushaf)', () => {
     expect(juzOfSurah(41)).toBe(24) // Fussilat
     expect(juzOfSurah(2)).toBe(1)
   })
+
 })

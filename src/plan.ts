@@ -5,13 +5,14 @@ export type Progress = {
   memorised: number[] // Surahs memorised in full
   hifzNext: AyahRef | null // next Ayah to memorise; earlier Ayahs of its Surah are memorised
   murajaNext: AyahRef | null // where the next Muraja'a slice starts
+  hifzAmount?: number // chosen daily Hifz size in Pages; ½ when absent (older saves)
 }
 
 export type Range = { surah: number; from: number; to: number } // Ayahs, inclusive
 
 export type TodaysPlan = { hifz: Range[]; rabt: Range[]; muraja: Range[] }
 
-const HIFZ_PAGES = 0.5
+export const DEFAULT_HIFZ_AMOUNT = 0.5
 const RABT_PAGES = 5
 const SLICE_PAGES = 10
 
@@ -20,29 +21,29 @@ const ayahSize = (ref: AyahRef) => sizeInPages(ref, ref)
 export const rangesSize = (ranges: Range[]): number =>
   ranges.reduce((t, r) => t + sizeInPages({ surah: r.surah, ayah: r.from }, { surah: r.surah, ayah: r.to }), 0)
 
-const planHifz = (next: AyahRef | null): Range[] => {
+const planHifz = (next: AyahRef | null, amount: number): Range[] => {
   if (!next) return []
   const { surah } = next
   let to = next.ayah
   let total = ayahSize(next)
-  // Take the Ayah that brings the total closest to half a Page.
+  // Take the Ayah that brings the total closest to the Hifz amount.
   while (to < ayahCount(surah)) {
     const extra = ayahSize({ surah, ayah: to + 1 })
-    if (Math.abs(total + extra - HIFZ_PAGES) > Math.abs(total - HIFZ_PAGES)) break
+    if (Math.abs(total + extra - amount) > Math.abs(total - amount)) break
     total += extra
     to++
   }
-  // Finish the Surah rather than leave less than half a Page of it.
-  if (to < ayahCount(surah) && sizeInPages({ surah, ayah: to + 1 }, { surah, ayah: ayahCount(surah) }) < HIFZ_PAGES) {
+  // Finish the Surah rather than leave less than one Hifz amount of it.
+  if (to < ayahCount(surah) && sizeInPages({ surah, ayah: to + 1 }, { surah, ayah: ayahCount(surah) }) < amount) {
     to = ayahCount(surah)
   }
   const hifz = [{ surah, from: next.ayah, to }]
-  // After a finished Surah, add whole following Surahs while that gets closer to half a Page.
+  // After a finished Surah, add whole following Surahs while that gets closer to the Hifz amount.
   total = rangesSize(hifz)
   for (let s = surah - 1; to === ayahCount(hifz[hifz.length - 1].surah) && s >= 1; s--) {
     const whole = { surah: s, from: 1, to: ayahCount(s) }
     const withIt = total + rangesSize([whole])
-    if (Math.abs(withIt - HIFZ_PAGES) >= Math.abs(total - HIFZ_PAGES)) break
+    if (Math.abs(withIt - amount) >= Math.abs(total - amount)) break
     hifz.push(whole)
     total = withIt
   }
@@ -156,7 +157,7 @@ const planMuraja = (progress: Progress, rabt: Range[]): Range[] => {
 
 export const planToday = (progress: Progress): TodaysPlan => {
   const rabt = planRabt(progress)
-  return { hifz: planHifz(progress.hifzNext), rabt, muraja: planMuraja(progress, rabt) }
+  return { hifz: planHifz(progress.hifzNext, progress.hifzAmount ?? DEFAULT_HIFZ_AMOUNT), rabt, muraja: planMuraja(progress, rabt) }
 }
 
 export type DayLog = {

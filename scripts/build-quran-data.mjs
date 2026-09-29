@@ -1,12 +1,15 @@
 // Generates src/data/quran.json from npm data packages. Run: npm run data
-// Page and juz data: quran-meta (MIT), Hafs riwaya, 15-line Madani mushaf.
+// Page numbers: KFGQPC 1441H 15-line Madani layout via @quran.ws/text (CC BY 4.0), the same edition the Mushaf page shows.
+// Surah and juz data: quran-meta (MIT), Hafs riwaya.
 // Ayah lengths: counted from the Uthmani text in quran-json (CC BY-SA 4.0, Risan Bagja Pradana).
 import { writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { findPage, getJuzMeta, getSurahMeta, meta } from 'quran-meta/hafs'
+import { Mushaf } from '@quran.ws/text'
+import { getJuzMeta, getSurahMeta, meta } from 'quran-meta/hafs'
 
 const require = createRequire(import.meta.url)
 const text = require('quran-json/dist/quran.json')
+const kfgqpc = await Mushaf.hafs()
 
 // Letters only: drop diacritics (combining marks), spaces and pause marks.
 const letterCount = (s) => s.normalize('NFC').replace(/[\p{M}\sۖ-ۭ]/gu, '').length
@@ -20,7 +23,7 @@ for (let s = 1; s <= meta.numSurahs; s++) {
   if (t.verses.length !== m.ayahCount) throw new Error(`Ayah count mismatch in surah ${s}`)
   surahs.push({ name: t.transliteration, arabic: m.name, ayahs: m.ayahCount })
   for (let a = 1; a <= m.ayahCount; a++) {
-    ayahPage.push(findPage(s, a))
+    ayahPage.push(kfgqpc.surah(s).ayah(a).page.number)
     ayahLetters.push(letterCount(t.verses[a - 1].text))
   }
 }
@@ -34,7 +37,7 @@ const juzStarts = []
 for (let j = 1; j <= meta.numJuzs; j++) juzStarts.push(getJuzMeta(j).first)
 
 const data = {
-  source: 'quran-meta (MIT) for pages and juz; quran-json (CC BY-SA 4.0, Risan Bagja Pradana) for ayah lengths',
+  source: 'KFGQPC 1441H pages via @quran.ws/text (CC BY 4.0); quran-meta (MIT) for surahs and juz; quran-json (CC BY-SA 4.0, Risan Bagja Pradana) for ayah lengths',
   surahs,
   juzStarts,
   ayahPage,

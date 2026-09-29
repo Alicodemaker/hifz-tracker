@@ -9,13 +9,18 @@ const base = process.env.BASE_PATH ?? '/hifz-tracker/'
 
 export default defineConfig({
   base,
+  // The Mushaf page data is one large chunk on purpose (it loads only when a page opens).
+  build: { chunkSizeWarningLimit: 1700 },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       // Precache the bundled fonts too, so Arabic names render offline.
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'] },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,ttf,webmanifest}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // the Mushaf page data is about 1.6 MB
+      },
       manifest: {
         name: 'Hifz Tracker',
         short_name: 'Hifz',
@@ -24,9 +29,10 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'portrait',
-        // Mirrors --paper and --lapis in src/theme.css (config files can't read CSS variables).
-        background_color: '#f7f1e6',
-        theme_color: '#2f5c6e',
+        // Android paints an installed app's navigation bar and splash screen from these, and a
+        // manifest can't switch with dark mode. Dark --paper from src/theme.css suits the phone's dark mode.
+        background_color: '#17130f',
+        theme_color: '#17130f',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

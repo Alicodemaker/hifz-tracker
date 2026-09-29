@@ -2,6 +2,13 @@
 @import '@fontsource/amiri/arabic-400.css';
 @import '@fontsource-variable/figtree/wght.css';
 
+/* KFGQPC HAFS Uthmanic Script, shipped unmodified (ADR-0007). Only the Mushaf page uses it. */
+@font-face {
+  font-family: 'KFGQPC Hafs';
+  src: url('/fonts/UthmanicHafs-v-3.0.ttf') format('truetype');
+  font-display: block;
+}
+
 :root {
   /* Colour: warm paper and ink, with lapis as the one accent. */
   --paper: #f7f1e6; /* page background */
@@ -39,9 +46,26 @@
   --radius-lg: 18px;
   --tap: 52px; /* minimum tap target */
   --check-size: 26px; /* checkbox boxes */
+  --icon: 26px; /* line icons in buttons */
+
+  /* Motion: two speeds only. Quick answers a tap; calm is for fades and progress. */
+  --motion-quick: 200ms;
+  --motion-calm: 400ms;
   --tap-primary: 64px; /* the Done buttons */
   --screen-max: 480px;
   --action-bar-height: 128px;
+
+  /* The Mushaf page, modelled on the builder's reference Quran app: cream paper, black ink, olive header,
+     green rosettes. It stays light even in dark mode. */
+  --mushaf-paper: #fdf9f0;
+  --mushaf-ink: #1a1a1a;
+  --mushaf-olive: #5f7a2e; /* header text and underlines, margin marks, hide button */
+  --mushaf-rosette: #4b7a3b; /* ayah rosette petals and ring */
+  --mushaf-rosette-field: #e6efd4; /* inside the rosette, behind the number */
+  --mushaf-blank: #ebe3cf; /* hidden ayahs in hide mode */
+  --mushaf-ink-weight: 0.3px; /* a hairline stroke that gives the bundled font the reference's heavier ink */
+  --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
+  --font-basmala: 'Amiri', serif; /* Amiri's calligraphic basmala ligature (U+FDFD) */
 }
 
 @media (prefers-color-scheme: dark) {

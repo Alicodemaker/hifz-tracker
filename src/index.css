@@ -140,6 +140,10 @@ button:disabled { opacity: 0.35; cursor: default; }
   box-shadow: inset 0 0 0 1px var(--rule);
 }
 
+.stepper .estimates { text-align: center; line-height: 1.4; }
+
+.opens-page { cursor: pointer; }
+
 /* Today: Rabt and Muraja'a as quiet rows under the band */
 .revision { list-style: none; padding: 0; }
 .revision li {
@@ -157,7 +161,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .tick { width: 1.1em; height: 1.1em; flex: none; }
 .tick path { stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .tick circle { fill: none; stroke: currentColor; stroke-width: 1.5; }
-.done .tick path { stroke-dasharray: 14; stroke-dashoffset: 0; animation: draw 360ms ease-out; }
+.done .tick path { stroke-dasharray: 14; stroke-dashoffset: 0; animation: draw var(--motion-calm) ease-out; }
 @keyframes draw { from { stroke-dashoffset: 14; } }
 
 .done-buttons button {
@@ -177,7 +181,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 /* Juz rings */
 .ring { display: block; }
 .ring .track { fill: none; stroke: var(--rule); }
-.ring .fill { fill: none; stroke: var(--lapis); stroke-linecap: round; transition: stroke-dasharray 400ms ease; }
+.ring .fill { fill: none; stroke: var(--lapis); stroke-linecap: round; transition: stroke-dasharray var(--motion-calm) ease; }
 .ring text { fill: var(--ink); font-family: var(--font-ui); font-weight: 600; }
 .ring.full circle.core { fill: var(--lapis); }
 .ring.full text { fill: var(--on-lapis); }
@@ -198,6 +202,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .days .date { font-weight: 600; margin-bottom: var(--space-1); }
 .days p:not(.date) { font-size: var(--text-sm); color: var(--ink-faded); }
 .days strong { color: var(--ink); font-weight: 600; }
+.sources { margin-top: var(--space-6); }
 
 /* Setup */
 .field-row { display: grid; grid-template-columns: 1fr 6.5rem; gap: var(--space-3); margin-bottom: var(--space-6); }
@@ -254,3 +259,181 @@ select, input[type='number'] {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Mushaf page: cream paper and ink whatever the phone's theme, framed like a printed page. */
+.mushaf {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-ink);
+  padding: env(safe-area-inset-top) var(--space-1) env(safe-area-inset-bottom);
+}
+
+/* Header as in the reference: surah, page and juz in olive with dotted underlines. */
+.m-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); /* the page number stays centred, as on the reference */
+  align-items: center;
+  column-gap: var(--space-2);
+  min-height: var(--tap);
+  padding-inline: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--mushaf-olive);
+  white-space: nowrap;
+}
+.m-head .m-label { text-decoration: underline dashed 1px; text-underline-offset: 5px; }
+.m-head .m-surah { justify-self: start; display: flex; align-items: center; gap: var(--space-1); }
+.m-head .m-juz { justify-self: end; }
+.mushaf .back { width: var(--space-5); height: var(--tap); margin-inline-start: calc(-1 * var(--space-1)); color: var(--mushaf-olive); display: grid; place-items: center; }
+.mushaf .back svg { width: var(--space-5); height: var(--space-5); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.m-lines {
+  flex: 1;
+  padding-inline: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-quran);
+  font-size: var(--quran-size, 20px);
+  visibility: hidden; /* until the font size is fitted */
+  min-height: 0;
+  min-width: 0;
+}
+.m-lines.fitted { visibility: visible; }
+.m-lines.short { justify-content: center; gap: var(--space-4); }
+.m-line {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 0;
+}
+.m-lines.short .m-line { flex: 0 0 auto; }
+/* Words sit closer than the font's default, as in print; justification spreads each line back to full width. */
+.m-text {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  word-spacing: -0.2em;
+  -webkit-text-stroke: var(--mushaf-ink-weight) currentColor; /* heavier ink; the font file itself is unchanged */
+  text-align: justify;
+  text-align-last: justify;
+  line-height: 1.8;
+}
+.m-lines.measuring .m-text { display: inline-block; width: auto; }
+.m-line.squeezed .m-text { width: auto; transform: scaleX(var(--squeeze)); transform-origin: right center; }
+/* Centred lines aren't spread by justification, so they keep the font's normal word spacing. */
+.m-line.center .m-text,
+.m-lines.short .m-text { text-align: center; text-align-last: center; word-spacing: normal; }
+
+/* Ayah rosettes: filled green, with the number inside, as on the reference page. */
+.rosette { width: 1.45em; height: 1.45em; vertical-align: -0.42em; }
+.rosette .petal,
+.rosette .ring { fill: var(--mushaf-rosette); }
+.rosette .field { fill: var(--mushaf-rosette-field); }
+.rosette .inner { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.8; }
+.rosette text { fill: var(--mushaf-ink); font-family: var(--font-quran); }
+
+/* Surah header: the builder's badge image across the line, with the name in its central panel. */
+.m-line.surah-band { overflow: visible; }
+.surah-badge { position: relative; width: 100%; aspect-ratio: 1400 / 190; }
+.surah-badge img { display: block; width: 100%; height: 100%; mix-blend-mode: multiply; /* its cream melts into the page */ }
+.surah-badge .b-name {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-quran);
+  font-size: calc(var(--quran-size, 20px) * 0.95);
+  color: var(--mushaf-ink);
+  -webkit-text-stroke: var(--mushaf-ink-weight) currentColor;
+}
+
+/* Basmala: Amiri's calligraphic ligature, sized to sit within the line like the reference. */
+.m-line.bismillah { justify-content: center; }
+.m-lines.measuring .basmala { font-size: 1em; }
+.basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
+
+/* Thin margin marks where today's portion starts and ends. */
+.m-line.mark-start::before,
+.m-line.mark-end::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(-1 * var(--space-2) + 2px);
+  width: 3px;
+  height: 60%;
+  border-radius: 2px;
+  background: var(--mushaf-olive);
+}
+.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
+
+/* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
+.m-lines.hiding { -webkit-user-select: none; user-select: none; }
+.m-lines.hiding .m-ayah { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-lines.hiding .m-ayah:not(.revealed) .m-words {
+  color: transparent;
+  background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
+  border-radius: 999px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.m-lines.hiding .m-ayah.revealed .m-words { animation: reveal var(--motion-quick) ease-out; }
+@keyframes reveal { from { opacity: 0; } }
+
+.hide-toggle {
+  position: fixed;
+  right: var(--space-2);
+  bottom: calc(var(--space-1) + env(safe-area-inset-bottom));
+  width: var(--tap-primary);
+  height: var(--tap-primary);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-olive);
+  box-shadow: 0 3px 14px rgb(28 26 23 / 16%), inset 0 0 0 1.5px var(--mushaf-olive);
+  transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
+}
+.hide-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
+.hide-toggle.faded-out { opacity: 0; pointer-events: none; }
+.hide-toggle svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* A clear strip at the bottom for the hide button (so it never covers text), and the font download. */
+.m-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: calc(var(--tap-primary) + var(--space-2));
+  padding-inline: var(--space-2) calc(var(--tap-primary) + var(--space-4));
+}
+.font-download {
+  min-height: var(--tap);
+  text-align: start;
+  color: var(--mushaf-olive);
+  font-size: var(--text-sm);
+  text-decoration: underline dashed 1px;
+  text-underline-offset: 4px;
+}
+.font-status { font-size: var(--text-sm); color: var(--mushaf-olive); }
+
+/* The exact QCF4 look (ADR-0009): one glyph per word, each printed line spread edge to edge. */
+.m-lines.qcf { font-family: var(--qcf-font), var(--font-quran); }
+.qcf-row { display: flex; width: 100%; justify-content: space-between; align-items: center; line-height: 1.9; white-space: nowrap; }
+.m-lines.measuring .qcf-row { display: inline-flex; width: auto; justify-content: flex-start; }
+.m-line.center .qcf-row,
+.m-lines.short .qcf-row { justify-content: center; }
+.qcf-glyph.sign { color: var(--mushaf-rosette); }
+.m-lines.hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-lines.hiding .qcf-glyph.word:not(.revealed) {
+  color: transparent;
+  background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
+  border-radius: 999px;
+}
+.m-lines.hiding .qcf-glyph.word.revealed { animation: reveal var(--motion-quick) ease-out; }
+
+/* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
+.m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }
+.m-lines.enter-prev { animation: turn-prev var(--motion-quick) ease-out; }
+@keyframes turn-next { from { transform: translateX(calc(-1 * var(--space-6))); opacity: 0.3; } }
+@keyframes turn-prev { from { transform: translateX(var(--space-6)); opacity: 0.3; } }

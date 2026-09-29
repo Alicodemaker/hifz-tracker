@@ -33,6 +33,27 @@ describe('Hifz', () => {
   })
 })
 
+describe('Hifz amount', () => {
+  it('is half a page when none has been chosen', () => {
+    expect(planToday(real).hifz).toEqual(planToday({ ...real, hifzAmount: 0.5 }).hifz)
+  })
+
+  it('makes the Hifz about the chosen amount', () => {
+    const three = size(planToday({ ...real, hifzAmount: 0.75 }).hifz)
+    const one = size(planToday({ ...real, hifzAmount: 1 }).hifz)
+    expect(three).toBeGreaterThan(size(planToday(real).hifz))
+    expect(three).toBeCloseTo(0.75, 0)
+    expect(one).toBeGreaterThan(0.8)
+    expect(one).toBeLessThan(1.2)
+  })
+
+  it('finishes the surah when less than one amount of it would be left', () => {
+    // al-Mulk is about 2.4 pages, so after two pages less than one amount is left.
+    const { hifz } = planToday({ ...real, hifzNext: { surah: 67, ayah: 1 }, hifzAmount: 2 })
+    expect(hifz[0]).toEqual({ surah: 67, from: 1, to: 30 })
+  })
+})
+
 describe('Rabt', () => {
   it('is the most recently memorised five pages, ending where memorisation stopped', () => {
     const { rabt } = planToday(real)

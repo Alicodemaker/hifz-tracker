@@ -59,3 +59,4 @@ export const ayahSizeAt = (index: number): number => data.ayahSize[index]
 
 const juzStartIndex = data.juzStarts.map(([surah, ayah]) => ayahIndex({ surah, ayah }))
 export const juzOfAyah = (index: number): number => juzStartIndex.filter((start) => start <= index).length
+
