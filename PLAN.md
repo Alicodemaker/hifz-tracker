@@ -20,7 +20,7 @@ A phone-first, offline PWA that tells me each morning what to do today (Hifz, Ra
 ## What we're NOT doing
 
 - No accounts, backend, sync or direct Google Drive integration (ADR-0004)
-- No streaks, stats, charts, badges or progress percentages
+- No streaks, stats, badges or progress percentages. Exception: the Juz rings (how much of each juz is memorised), added in the redesign at the builder's request
 - No reminders or notifications
 - No weak-juz marking or extra revision for weaker juz
 - No multiple people, parent mode or teacher mode
