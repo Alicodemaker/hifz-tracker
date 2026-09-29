@@ -64,6 +64,10 @@
   --mushaf-rosette-field: #e6efd4; /* inside the rosette, behind the number */
   --mushaf-blank: #ebe3cf; /* hidden ayahs in hide mode */
   --mushaf-ink-weight: 0.3px; /* a hairline stroke that gives the bundled font the reference's heavier ink */
+  --qcf-ink-weight: 0.25px; /* extra ink on the downloaded QCF4 font (about +100 weight), which is lighter than the reference */
+  --float-button: 44px; /* the back and hide buttons that float over the page */
+  --float-icon: 22px;
+  --float-shadow: 0 2px 10px rgb(28 26 23 / 22%);
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
   --font-basmala: 'Amiri', serif; /* Amiri's calligraphic basmala ligature (U+FDFD) */
 }
