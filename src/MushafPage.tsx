@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
-import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran'
+import { ayahCount, ayahIndex, juzEighthOfAyah, juzOfAyah, surahArabic, surahName } from './quran'
+import Rosette from './Rosette'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
 type Piece = [number, number, string, number]
@@ -57,9 +58,9 @@ const splitMarker = (piece: Piece): [string, string] => {
 }
 
 const BASE_SIZE = 20 // px, used only to measure
-// At 20px with the page's tighter word spacing, 95% of pages have no line wider than this. Sizing to it
+// At 20px (tighter word spacing, rosettes, heavier ink), most pages have no line wider than this. Sizing to it
 // keeps one text size on every page; the few wider lines are narrowed slightly to fit (at most about 12%).
-const TYPICAL_WIDEST_AT_BASE = 365
+const TYPICAL_WIDEST_AT_BASE = 385
 const NO_LINES: Line[] = []
 
 const SWIPE_MIN = 50 // px of mostly horizontal travel
@@ -166,68 +167,75 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       onPointerDown={wake}
     >
       <header className="m-head">
-        <button className="back" onClick={onBack} aria-label="Back to Today">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15 5l-7 7 7 7" />
-          </svg>
-        </button>
-        <span className="m-surah">{surahName(top.surah)}</span>
-        <span className="m-page">{page}</span>
-        <span className="m-juz">Juz {juzOfAyah(ayahIndex(top))}</span>
+        <span className="m-surah">
+          <button className="back" onClick={onBack} aria-label="Back to Today">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <span className="m-label">
+            {top.surah} {surahName(top.surah)} ({ayahCount(top.surah)})
+          </span>
+        </span>
+        <span className="m-page m-label">{page}</span>
+        <span className="m-juz m-label">
+          Juz {juzOfAyah(ayahIndex(top))} ({juzEighthOfAyah(ayahIndex(top))}/8)
+        </span>
       </header>
 
-      <div className="m-frame">
-        <div
-          ref={linesRef}
-          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
-          style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
-          lang="ar"
-          dir="rtl"
-        >
-          {lines.map((line, i) => {
-            const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
-            if (line === 'b')
-              return (
-                <div key={i} className={`m-line bismillah ${mark}`}>
-                  <span className="m-text">{data!.bismillah}</span>
-                </div>
-              )
-            if (typeof line === 'string')
-              return (
-                <div key={i} className={`m-line surah-band ${mark}`}>
-                  <span className="m-text">
-                    <span className="cartouche">سُورَةُ {surahArabic(Number(line.slice(1)))}</span>
-                  </span>
-                </div>
-              )
+      <div
+        ref={linesRef}
+        className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
+        style={fontSize ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties) : undefined}
+        lang="ar"
+        dir="rtl"
+      >
+        {lines.map((line, i) => {
+          const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
+          if (line === 'b')
             return (
-              <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
-                <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
-                  {line.map((piece) => {
-                    const [words, marker] = splitMarker(piece)
-                    const key = `${piece[0]}:${piece[1]}`
-                    return (
-                      <span
-                        key={key}
-                        className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
-                        data-ayah={key}
-                        onClick={hiding ? () => toggleAyah(key) : undefined}
-                      >
-                        <span className="m-words">{words}</span>
-                        {marker && <span className="m-marker"> {marker}</span>}{' '}
-                      </span>
-                    )
-                  })}
+              <div key={i} className={`m-line bismillah ${mark}`}>
+                <span className="m-text">{data!.bismillah}</span>
+              </div>
+            )
+          if (typeof line === 'string')
+            return (
+              <div key={i} className={`m-line surah-band ${mark}`}>
+                <span className="m-text">
+                  <span className="cartouche">سُورَةُ {surahArabic(Number(line.slice(1)))}</span>
                 </span>
               </div>
             )
-          })}
-        </div>
+          return (
+            <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
+              <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
+                {line.map((piece) => {
+                  const [words, marker] = splitMarker(piece)
+                  const key = `${piece[0]}:${piece[1]}`
+                  return (
+                    <span
+                      key={key}
+                      className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
+                      data-ayah={key}
+                      onClick={hiding ? () => toggleAyah(key) : undefined}
+                    >
+                      <span className="m-words">{words}</span>
+                      {marker && (
+                        <span className="m-marker">
+                          {' '}
+                          <Rosette ayah={piece[1]} />
+                        </span>
+                      )}{' '}
+                    </span>
+                  )
+                })}
+              </span>
+            </div>
+          )
+        })}
       </div>
 
-      <footer className="m-foot">
-        <p className="m-source">Line layout: KFGQPC 1441H edition</p>
-      </footer>
+      <div className="m-foot" aria-hidden="true" />
 
       <button
         className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}

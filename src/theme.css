@@ -55,13 +55,15 @@
   --screen-max: 480px;
   --action-bar-height: 128px;
 
-  /* The Mushaf page: cream paper, dark ink and olive ornament, like the printed mushaf, even in dark mode. */
-  --mushaf-paper: #fdf8ec;
-  --mushaf-ink: #1c1a17;
-  --mushaf-faded: #7a6f5e;
-  --mushaf-olive: #56702f; /* header, frame, ayah rosettes, surah cartouches */
+  /* The Mushaf page, modelled on the builder's reference Quran app: cream paper, black ink, olive header,
+     green rosettes. It stays light even in dark mode. */
+  --mushaf-paper: #fdf9f0;
+  --mushaf-ink: #1a1a1a;
+  --mushaf-olive: #5f7a2e; /* header text and underlines, margin marks, hide button */
   --mushaf-olive-wash: #edf0dc; /* inside the surah cartouche */
-  --mushaf-blank: #e9e0cb; /* hidden ayahs in hide mode */
+  --mushaf-rosette: #4b7a3b; /* ayah rosette petals and ring */
+  --mushaf-rosette-field: #e6efd4; /* inside the rosette, behind the number */
+  --mushaf-blank: #ebe3cf; /* hidden ayahs in hide mode */
   --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
 }
 

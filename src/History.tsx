@@ -72,6 +72,10 @@ export default function History({ saved, onRestore, onBack }: Props) {
         </ul>
       )}
 
+      <p className="faded small sources">
+        Quran text and page layout: King Fahd Glorious Quran Printing Complex (KFGQPC), via quran.ws (CC BY 4.0).
+      </p>
+
       <div className="action-bar">
         <div className="row">
           <button className="button primary" onClick={() => shareBackup(backupFile(saved, localDate()))}>

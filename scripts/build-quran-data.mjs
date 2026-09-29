@@ -5,7 +5,7 @@
 import { writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { Mushaf } from '@quran.ws/text'
-import { getJuzMeta, getSurahMeta, meta } from 'quran-meta/hafs'
+import { getJuzMeta, getRubAlHizbMeta, getSurahMeta, meta } from 'quran-meta/hafs'
 
 const require = createRequire(import.meta.url)
 const text = require('quran-json/dist/quran.json')
@@ -36,10 +36,15 @@ const ayahSize = ayahLetters.map((n, i) => Math.round((n / pageLetters[ayahPage[
 const juzStarts = []
 for (let j = 1; j <= meta.numJuzs; j++) juzStarts.push(getJuzMeta(j).first)
 
+// The 240 quarters (rub' al-hizb); each juz has 8.
+const rubStarts = []
+for (let r = 1; r <= meta.numRubAlHizbs; r++) rubStarts.push(getRubAlHizbMeta(r).first)
+
 const data = {
   source: 'KFGQPC 1441H pages via @quran.ws/text (CC BY 4.0); quran-meta (MIT) for surahs and juz; quran-json (CC BY-SA 4.0, Risan Bagja Pradana) for ayah lengths',
   surahs,
   juzStarts,
+  rubStarts,
   ayahPage,
   ayahSize,
 }

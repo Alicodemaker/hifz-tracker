@@ -202,6 +202,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .days .date { font-weight: 600; margin-bottom: var(--space-1); }
 .days p:not(.date) { font-size: var(--text-sm); color: var(--ink-faded); }
 .days strong { color: var(--ink); font-weight: 600; }
+.sources { margin-top: var(--space-6); }
 
 /* Setup */
 .field-row { display: grid; grid-template-columns: 1fr 6.5rem; gap: var(--space-3); margin-bottom: var(--space-6); }
@@ -273,31 +274,24 @@ select, input[type='number'] {
 /* Header as in the reference: surah, page and juz in olive with dotted underlines. */
 .m-head {
   display: grid;
-  grid-template-columns: auto 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); /* the page number stays centred, as on the reference */
   align-items: center;
   column-gap: var(--space-2);
   min-height: var(--tap);
-  font-size: var(--text-md);
+  padding-inline: var(--space-1);
+  font-size: var(--text-sm);
   color: var(--mushaf-olive);
+  white-space: nowrap;
 }
-.m-head span { justify-self: center; text-decoration: underline dotted 1.5px; text-underline-offset: 5px; }
-.m-head .m-surah { justify-self: start; }
+.m-head .m-label { text-decoration: underline dashed 1px; text-underline-offset: 5px; }
+.m-head .m-surah { justify-self: start; display: flex; align-items: center; gap: var(--space-1); }
 .m-head .m-juz { justify-self: end; }
-.mushaf .back { width: var(--tap); height: var(--tap); color: var(--mushaf-olive); display: grid; place-items: center; }
-.mushaf .back svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-
-/* The page frame: a thin double olive rule, as around the text of a printed mushaf. */
-.m-frame {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  border: 3px double var(--mushaf-olive);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2); /* the text breathes inside the frame */
-}
+.mushaf .back { width: var(--space-5); height: var(--tap); margin-inline-start: calc(-1 * var(--space-1)); color: var(--mushaf-olive); display: grid; place-items: center; }
+.mushaf .back svg { width: var(--space-5); height: var(--space-5); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
 .m-lines {
   flex: 1;
+  padding-inline: var(--space-2);
   display: flex;
   flex-direction: column;
   font-family: var(--font-quran);
@@ -322,6 +316,7 @@ select, input[type='number'] {
   width: 100%;
   white-space: nowrap;
   word-spacing: -0.2em;
+  -webkit-text-stroke: 0.3px currentColor; /* heavier ink, like the reference page; the font file is unchanged */
   text-align: justify;
   text-align-last: justify;
   line-height: 1.8;
@@ -333,8 +328,13 @@ select, input[type='number'] {
 .m-line.bismillah .m-text,
 .m-lines.short .m-text { text-align: center; text-align-last: center; word-spacing: normal; }
 
-/* Ayah rosettes: the font's own end-of-ayah sign, in olive and a touch larger. */
-.m-marker { color: var(--mushaf-olive); font-size: 1.08em; }
+/* Ayah rosettes: filled green, with the number inside, as on the reference page. */
+.rosette { width: 1.45em; height: 1.45em; vertical-align: -0.42em; }
+.rosette .petal,
+.rosette .ring { fill: var(--mushaf-rosette); }
+.rosette .field { fill: var(--mushaf-rosette-field); }
+.rosette .inner { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.8; }
+.rosette text { fill: var(--mushaf-ink); font-family: var(--font-quran); }
 
 /* Surah header: a pointed cartouche on a double-ruled band, with a diamond at each end. */
 .m-line.surah-band .m-text {
@@ -363,7 +363,7 @@ select, input[type='number'] {
   display: inline-block;
   padding: 0 2.2em;
   color: var(--mushaf-ink);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpath d='M8 2H92L99 20L92 38H8L1 20Z' fill='%23edf0dc' stroke='%2356702f' stroke-width='1.5' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M11 5H89L95 20L89 35H11L5 20Z' fill='none' stroke='%2356702f' stroke-width='0.75' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpath d='M8 2H92L99 20L92 38H8L1 20Z' fill='%23edf0dc' stroke='%235f7a2e' stroke-width='1.5' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M11 5H89L95 20L89 35H11L5 20Z' fill='none' stroke='%235f7a2e' stroke-width='0.75' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
 }
 
 /* Thin margin marks where today's portion starts and ends. */
@@ -410,14 +410,8 @@ select, input[type='number'] {
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
 .hide-toggle svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Footer row: the source note on the left, and room on the right for the hide button so it never covers text. */
-.m-foot {
-  display: flex;
-  align-items: center;
-  min-height: calc(var(--tap-primary) + var(--space-2));
-  padding-inline: var(--space-2);
-}
-.m-source { font-size: var(--text-sm); color: var(--mushaf-faded); }
+/* A clear strip at the bottom for the hide button, so it never covers a line of text. */
+.m-foot { flex: none; height: calc(var(--tap-primary) + var(--space-2)); }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
 .m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }

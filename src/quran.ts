@@ -59,3 +59,10 @@ export const ayahSizeAt = (index: number): number => data.ayahSize[index]
 
 const juzStartIndex = data.juzStarts.map(([surah, ayah]) => ayahIndex({ surah, ayah }))
 export const juzOfAyah = (index: number): number => juzStartIndex.filter((start) => start <= index).length
+
+// Which eighth of its Juz an Ayah is in (the rub' al-hizb within the Juz), 1–8.
+const rubStartIndex = data.rubStarts.map(([surah, ayah]) => ayahIndex({ surah, ayah }))
+export const juzEighthOfAyah = (index: number): number => {
+  const rub = rubStartIndex.filter((start) => start <= index).length
+  return ((rub - 1) % 8) + 1
+}

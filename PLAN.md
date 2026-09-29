@@ -20,7 +20,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 
 - No search, bookmarks, audio, translation or tafsir
 - No tapping on the page except to reveal or hide an ayah in hide mode (no word lookup, no word-by-word reveal)
-- No hizb or rub' fractions in the page header
+- No hizb or rub' numbering beyond the header's "Juz N (k/8)", which was added later to match the builder's reference page
 - No dark-mode page (the Mushaf page stays light, by choice)
 - No pixel-identical glyph fonts or page images (ADR-0007), and no other mushaf editions
 - No ayah-by-ayah end adjustment: the ¼-page amount is the only control
