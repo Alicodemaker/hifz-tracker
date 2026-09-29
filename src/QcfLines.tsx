@@ -5,12 +5,13 @@ import SurahBadge from './SurahBadge'
 
 // [glyph code, surah, ayah, kind: 0 word, 1 ayah end, 2 quarter mark]
 export type Glyph = [number, number, number, number]
-// "h<surah>" surah header, "b" bismillah, or the glyphs of one printed line.
+// "h<surah>" surah header, "b<code>" the bismillah glyph (in the bismillah font), or the glyphs of one printed line.
 export type QcfLine = string | Glyph[]
 
 type Props = {
   lines: QcfLine[]
   fontFamily: string
+  bismillahFont: string // QCF4_Hafs_01, which holds every printed bismillah glyph
   portion: Range[] | null
   hiding: boolean
   revealed: Set<string>
@@ -43,11 +44,10 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ lines, fontFamily, portion, hiding, revealed, onToggleAyah, className }: Props) {
+export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hiding, revealed, onToggleAyah, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
-  const [basmalaSize, setBasmalaSize] = useState<number | null>(null)
 
   // Size the font so the widest printed line exactly fills the page width.
   useLayoutEffect(() => {
@@ -60,13 +60,10 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
       const style = getComputedStyle(box)
       const available = box.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) // the text area, inside the padding
       const widest = Math.max(...widths)
-      const basmala = box.querySelector<HTMLElement>('.basmala')
-      const basmalaWidth = basmala?.offsetWidth ?? 0
       box.classList.remove('measuring')
       if (widest <= 0) return
       const size = Math.floor(((BASE_SIZE * available) / widest) * 10) / 10
       setFontSize(size)
-      if (basmalaWidth) setBasmalaSize(Math.floor(((BASE_SIZE * available * 0.6) / basmalaWidth) * 10) / 10) // 60% of the line, so its tall letters stay within it
       setCentered(new Set(widths.flatMap((w, i) => (w > 0 && w < widest * 0.75 && endsSurah(lines[i]) ? [i] : []))))
     }
     document.fonts.ready.then(fit)
@@ -83,7 +80,6 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
       style={
         {
           '--quran-size': fontSize ? `${fontSize}px` : undefined,
-          '--basmala-size': basmalaSize ? `${basmalaSize}px` : undefined,
           '--qcf-font': `'${fontFamily}'`,
         } as React.CSSProperties
       }
@@ -92,10 +88,12 @@ export default function QcfLines({ lines, fontFamily, portion, hiding, revealed,
     >
       {lines.map((line, i) => {
         const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''}`
-        if (line === 'b')
+        if (typeof line === 'string' && line.startsWith('b'))
           return (
             <div key={i} className={`m-line bismillah ${mark}`}>
-              <span className="basmala">{'﷽'}</span>
+              <span className="basmala qcf-basmala" style={{ fontFamily: `'${bismillahFont}'` }}>
+                {String.fromCodePoint(Number(line.slice(1)))}
+              </span>
             </div>
           )
         if (typeof line === 'string')

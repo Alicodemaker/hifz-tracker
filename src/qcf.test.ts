@@ -8,8 +8,8 @@ type Glyph = [number, number, number, number] // code, surah, ayah, kind (0 word
 type QcfLine = string | Glyph[]
 const pages = qcf.pages as { f: number; lines: QcfLine[] }[]
 
-// "h40", "b", or "text" — the part of a line's shape both layouts must agree on.
-const kind = (line: string | unknown[]) => (typeof line === 'string' ? line : 'text')
+// "h40", "b", or "text" — the part of a line's shape both layouts must agree on (a QCF bismillah also carries its glyph).
+const kind = (line: string | unknown[]) => (typeof line !== 'string' ? 'text' : line.startsWith('b') ? 'b' : line)
 
 describe('QCF4 page data', () => {
   it('names a font for every page, from the pinned package version', () => {
@@ -32,9 +32,17 @@ describe('QCF4 page data', () => {
   it('lays out page 282, the start of al-Isra, like the reference', () => {
     const lines = pages[281].lines
     expect(lines[0]).toBe('h17')
-    expect(lines[1]).toBe('b')
+    expect(lines[1]).toBe('b63702') // the printed bismillah glyph most surahs use
     const line3 = lines[2] as Glyph[]
     expect(line3[0].slice(1, 3)).toEqual([17, 1])
+  })
+
+  it('gives each bismillah its own printed glyph, including al-Baqarah, at-Tin and al-Qadr', () => {
+    const bismillahs = pages.flatMap((p) => p.lines.filter((l): l is string => typeof l === 'string' && l.startsWith('b')))
+    expect(bismillahs).toHaveLength(112) // every surah but al-Fatihah (its bismillah is ayah 1) and at-Tawbah
+    expect(bismillahs.every((l) => /^b\d+$/.test(l))).toBe(true)
+    expect(pages[1].lines[1]).toBe('b63709') // al-Baqarah
+    expect(new Set(bismillahs)).toEqual(new Set(['b63702', 'b63703', 'b63709']))
   })
 
   it('ends every ayah exactly once', () => {

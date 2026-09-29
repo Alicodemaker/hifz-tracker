@@ -8,16 +8,20 @@ const dir = fileURLToPath(new URL('../node_modules/quran-qcf4/', import.meta.url
 const version = JSON.parse(readFileSync(`${dir}package.json`, 'utf8')).version
 
 const KIND = { word: 0, end: 1, quarter: 2 }
+const BISMILLAH_FONT = 'QCF4_Hafs_01' // every bismillah glyph lives in the first page's font
 const fonts = []
 const pages = []
 for (let n = 1; n <= 604; n++) {
   const page = JSON.parse(readFileSync(`${dir}pages/${String(n).padStart(3, '0')}.json`, 'utf8'))
   if (!fonts.includes(page.font)) fonts.push(page.font)
-  // Each line is "h<surah>" (surah header), "b" (bismillah), or glyphs [code, surah, ayah, kind].
+  // Each line is "h<surah>" (surah header), "b<code>" (the bismillah glyph, in QCF4_Hafs_01), or glyphs [code, surah, ayah, kind].
   const lines = page.lines.map((line) => {
     const first = line.words[0]
     if (first.type === 'surah_header') return `h${first.sura}`
-    if (first.type === 'bismillah') return 'b'
+    if (first.type === 'bismillah') {
+      if (first.font !== BISMILLAH_FONT) throw new Error(`Page ${n}: bismillah in ${first.font}`)
+      return `b${first.code}`
+    }
     let last = null
     const glyphs = line.words.map((w) => {
       if (w.font !== page.font) throw new Error(`Page ${n}: glyph in ${w.font}, page font is ${page.font}`)
