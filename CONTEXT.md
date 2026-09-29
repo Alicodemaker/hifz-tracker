@@ -21,7 +21,7 @@ One verse within a Surah. The finest position a Hifz can start or end at.
 _Avoid_: Verse, line
 
 **Mushaf page**:
-One Page shown in the app as it appears in the printed 15-line Madani mushaf: the same words on each of its 15 lines, with Surah headers, the bismillah and Ayah markers.
+One Page shown in the app as it appears in the printed 15-line Madani mushaf: the same words on each of its 15 lines, with Surah headers, the bismillah and Ayah markers, always on light paper.
 _Avoid_: Reader, viewer, page view
 
 **Juz**:
@@ -37,7 +37,7 @@ The new portion being memorised for the first time today: a run of Ayahs in Memo
 _Avoid_: Sabaq, lesson, new work. (Hifz here means the day's new portion; the overall practice is "memorisation".)
 
 **Hifz amount**:
-The size of the daily Hifz the person has chosen, in Pages (¼, ½, ¾, 1 and so on). It stays until they choose another; on a single day they can still end the Hifz a few Ayahs earlier or later.
+The size of the daily Hifz the person has chosen, in quarter-Page steps (¼, ½, ¾, 1, 1¼ …). It stays until they choose another; on a single day they can still end the Hifz a few Ayahs earlier or later.
 _Avoid_: Daily target, quota, sabaq size
 
 **Pace**:
