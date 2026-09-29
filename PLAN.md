@@ -19,6 +19,8 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 
 9. **Page tools** (added at the builder's request): when a page is opened from Today, a "Hifz done" (or Rabt, Muraja'a) button floats at the bottom left. It ticks that area and goes back to Today; if it is already ticked, it only undoes. Opened from Hifz, a counter beside it counts today's read-throughs (− to undo), which Today's Hifz card also shows. They fade with the hide button. Once the exact font is in use, only its page data loads.
 
+10. **Buttons and celebrations** (added at the builder's request): on the Mushaf page, all buttons (back, hide, Done, counter) show and hide together; a tap on the page toggles them, and they still fade after 5 seconds. Ticking a kind done plays a small anime-style burst of sparkles and flower petals from the tap; ticking the last one of the day plays a big one with manga focus lines, falling petals and "ما شاء الله". Undoing never celebrates.
+
 ## What we're NOT doing
 
 - No search, bookmarks, audio, translation or tafsir

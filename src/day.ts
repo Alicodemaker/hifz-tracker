@@ -44,5 +44,18 @@ export const toggleDone = (day: Day, kind: Kind): Day => {
 // One more (or one fewer) read-through of today's Hifz, never below none.
 export const countRep = (day: Day, change: 1 | -1): Day => ({ ...day, hifzReps: Math.max(0, (day.hifzReps ?? 0) + change) })
 
+const doneKinds = (day: Day): number => Number(day.hifzEnd !== null) + Number(day.rabtDone) + Number(day.murajaDone)
+// Everything planned today is ticked; a kind with nothing planned counts as done.
+const allDone = (day: Day): boolean =>
+  (day.hifzEnd !== null || !day.plan.hifz.length) &&
+  (day.rabtDone || !day.plan.rabt.length) &&
+  (day.murajaDone || !day.plan.muraja.length)
+
+// A small celebration when a kind is ticked done, a big one when that finishes the day; none for undoing.
+export const celebrationFor = (before: Day, after: Day): 'small' | 'big' | null => {
+  if (doneKinds(after) <= doneKinds(before)) return null
+  return allDone(after) ? 'big' : 'small'
+}
+
 export const localDate = (now = new Date()): string =>
   `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
