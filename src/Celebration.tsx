@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
-// Anime-style "kira-kira": sparkles and sakura petals. Small bursts from the tap when one kind is done;
+// Anime-style "kira-kira": sparkles and flower petals. Small bursts from the tap when one kind is done;
 // big adds manga focus lines, a rain of petals and a "ma sha' Allah" when the whole day is done.
 type Props = { size: 'small' | 'big'; origin: { x: number; y: number }; onEnd: () => void }
 
@@ -11,6 +11,16 @@ function Sparkle() {
   return (
     <svg viewBox="0 0 20 20" aria-hidden="true">
       <path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0Z" />
+    </svg>
+  )
+}
+
+// A flower petal: a broad rounded top narrowing to the base, with a soft crease down the middle.
+function Petal() {
+  return (
+    <svg viewBox="0 0 20 24" aria-hidden="true">
+      <path d="M10 23C4 18 1 12 2 7 3 2 7 0 10 3 13 0 17 2 18 7 19 12 16 18 10 23Z" />
+      <path className="crease" d="M10 21C9 15 9.5 9 10 4" />
     </svg>
   )
 }
@@ -65,13 +75,13 @@ export default function Celebration({ size, origin, onEnd }: Props) {
         <span className="flash" />
         {burst.map((p, i) => (
           <span key={i} className={p.petal ? 'petal' : 'sparkle'} style={p.style}>
-            {!p.petal && <Sparkle />}
+            {p.petal ? <Petal /> : <Sparkle />}
           </span>
         ))}
       </div>
       {rain.map((p, i) => (
         <span key={i} className={`falling ${p.sparkle ? 'sparkle' : 'petal'}`} style={p.style}>
-          {p.sparkle && <Sparkle />}
+          {p.sparkle ? <Sparkle /> : <Petal />}
         </span>
       ))}
       {size === 'big' && (

@@ -263,15 +263,13 @@ select, input[type='number'] {
 .celebration .petal { position: absolute; left: 0; top: 0; }
 .celebration .sparkle svg { display: block; width: 20px; height: 20px; margin: -10px 0 0 -10px; fill: var(--celebrate-gold); filter: drop-shadow(0 0 4px var(--celebrate-gold)); }
 .celebration .burst .sparkle:nth-child(4n) svg { fill: var(--lapis); filter: drop-shadow(0 0 4px var(--lapis)); }
-.celebration .petal::before {
-  content: '';
-  display: block;
-  width: 12px;
-  height: 9px;
-  margin: -5px 0 0 -6px;
-  border-radius: 12px 0; /* a sakura petal: a leaf with one notched tip */
-  background: linear-gradient(135deg, var(--celebrate-petal-light), var(--celebrate-petal));
-}
+.celebration .petal svg { display: block; width: 16px; height: 19px; margin: -10px 0 0 -8px; }
+.celebration .petal path { fill: var(--petal); }
+.celebration .petal .crease { fill: none; stroke: color-mix(in srgb, var(--petal) 55%, white); stroke-width: 1.2; stroke-linecap: round; }
+.celebration .petal { --petal: var(--celebrate-rose); }
+.celebration .petal:nth-child(4n + 1) { --petal: var(--celebrate-pink); }
+.celebration .petal:nth-child(4n + 2) { --petal: var(--celebrate-peach); }
+.celebration .petal:nth-child(4n + 3) { --petal: var(--celebrate-lilac); }
 .celebration .burst > .sparkle,
 .celebration .burst > .petal { animation: kira 900ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 .celebration.big .burst > .sparkle,
