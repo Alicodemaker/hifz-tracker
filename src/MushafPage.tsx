@@ -155,11 +155,11 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       const widths = [...box.children].map((el) =>
         el.classList.contains('surah-band') ? 0 : (el.querySelector<HTMLElement>('.m-text')?.offsetWidth ?? 0),
       )
-      // The basmala ligature is very wide: size it to about 80% of the line, as on the reference page.
+      // The basmala ligature is very wide and tall: size it to 60% of the line, so its letters stay within the line.
       const basmala = box.querySelector<HTMLElement>('.basmala')
       if (basmala) {
         basmala.style.fontSize = `${size}px`
-        setBasmalaSize(Math.floor(((size * available * 0.8) / basmala.offsetWidth) * 10) / 10)
+        setBasmalaSize(Math.floor(((size * available * 0.6) / basmala.offsetWidth) * 10) / 10)
         basmala.style.fontSize = ''
       }
       box.classList.remove('measuring')
@@ -240,7 +240,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       <header className="m-head">
         <button className="back" onClick={onBack} aria-label="Back to Today">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15 5l-7 7 7 7" />
+            <path d="M15.5 5l-7 7 7 7" />
           </svg>
         </button>
         <span className="m-page m-label">{page}</span>
@@ -350,8 +350,10 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           </button>
           {reps && (
             <div className="tool rep-tool">
-              <button onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
-                −
+              <button className="rep-less" onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 12h12" />
+                </svg>
               </button>
               <button className="rep-count" onClick={() => reps.onCount(1)} aria-label={`Read ${reps.count} times. Tap to count one more`} tabIndex={buttonVisible ? 0 : -1}>
                 {reps.count}×
