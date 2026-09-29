@@ -18,7 +18,7 @@ export default defineConfig({
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       // Precache the bundled fonts too, so Arabic names render offline.
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,ttf,webmanifest}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // the Mushaf page data is about 1.6 MB
       },
       manifest: {

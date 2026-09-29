@@ -15,6 +15,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 5. ✅ **Mushaf page screen**: light paper even in dark mode; header with English surah name, page number and juz; each line justified; surah header bands; lapis ayah markers; thin margin marks where today's portion starts and ends. Offline.
 6. ✅ **Opening and moving**: tapping an area (not its buttons) opens the page where that portion starts. Swiping right goes to the next page, across all 604. The back link and the phone's back gesture return to Today.
 7. ✅ **Hide mode**: a medium-sized round button floats at the bottom right and fades out after about 10 seconds without a touch; any touch brings it back. It turns hide mode on or off across all pages: ayah text becomes faint blank shapes in exactly its place and width, while headers, the bismillah and ayah markers stay visible. Tapping an ayah reveals it, tapping again hides it, and each page starts fully hidden whenever it is shown.
+8. **Exact mushaf font** (added at the builder's request): bundle the `quran-qcf4` page data (MIT). A "Download exact mushaf font (36 MB)" button on the Mushaf page fetches the 48 QCF4 fonts once from jsDelivr (pinned to 1.1.0) and keeps them on the phone; pages then render in QCF4 like the reference, and fall back to the bundled font until then. The surah badge and Amiri basmala are shared by both looks.
 
 ## What we're NOT doing
 
@@ -22,7 +23,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 - No tapping on the page except to reveal or hide an ayah in hide mode (no word lookup, no word-by-word reveal)
 - No hizb or rub' numbering beyond the header's "Juz N (k/8)", which was added later to match the builder's reference page
 - No dark-mode page (the Mushaf page stays light, by choice)
-- No pixel-identical glyph fonts or page images (ADR-0007), and no other mushaf editions
+- No page images, and no other mushaf editions. The exact QCF4 glyph fonts are an optional one-time download (step 8, ADR-0009), never bundled
 - No ayah-by-ayah end adjustment: the ¼-page amount is the only control
 - No settings screen for Rabt size or Muraja'a slice size; they stay 5 and 10 pages
 - No changes to the Rabt and Muraja'a rules, Setup, History or Backup

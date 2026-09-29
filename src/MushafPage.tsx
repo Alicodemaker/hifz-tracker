@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, ayahIndex, juzEighthOfAyah, juzOfAyah, surahArabic, surahName } from './quran'
+import QcfLines, { type QcfLine } from './QcfLines'
+import { QCF_FONT_COUNT, downloadQcfFonts, loadQcfFont, qcfFontsReady } from './qcfFonts'
+import qcfFonts from './data/qcf-fonts.json'
 import Rosette from './Rosette'
 import SurahBadge from './SurahBadge'
 
@@ -14,6 +17,15 @@ type MushafData = { bismillah: string; pages: Line[][] }
 let cached: MushafData | null = null
 const loadMushaf = async (): Promise<MushafData> =>
   (cached ??= (await import('./data/mushaf.json')).default as MushafData)
+
+// The QCF4 page data (ADR-0009) likewise loads only once the exact fonts are on the phone.
+type QcfData = { pages: { f: number; lines: QcfLine[] }[] }
+let qcfCached: QcfData | null = null
+const loadQcf = async (): Promise<QcfData> => (qcfCached ??= (await import('./data/qcf.json')).default as QcfData)
+
+type FontState = 'checking' | 'absent' | 'downloading' | 'failed' | 'ready'
+// Remembered across page turns, so the check happens once per app start.
+let knownFontState: FontState = 'checking'
 
 type Props = {
   page: number
@@ -79,6 +91,34 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     if (!data) loadMushaf().then(setData)
   }, [data])
 
+  // The exact QCF4 look, once its fonts are downloaded; the bundled font until then (ADR-0009).
+  const [fontState, setFontState] = useState<FontState>(knownFontState)
+  const [downloaded, setDownloaded] = useState(0)
+  const [qcf, setQcf] = useState<QcfData | null>(qcfCached)
+  const [pageFontReady, setPageFontReady] = useState(false)
+  const setState = (state: FontState) => {
+    knownFontState = state
+    setFontState(state)
+  }
+  useEffect(() => {
+    if (knownFontState === 'checking') qcfFontsReady().then((ready) => setState(ready ? 'ready' : 'absent'))
+  }, [])
+  useEffect(() => {
+    if (fontState === 'ready' && !qcf) loadQcf().then(setQcf)
+  }, [fontState, qcf])
+  useEffect(() => {
+    if (fontState === 'ready' && qcf) loadQcfFont(qcf.pages[page - 1].f).then(setPageFontReady)
+  }, [fontState, qcf, page])
+  const download = () => {
+    setState('downloading')
+    setDownloaded(0)
+    downloadQcfFonts(setDownloaded).then(
+      () => setState('ready'),
+      () => setState('failed'),
+    )
+  }
+  const qcfPage = fontState === 'ready' && qcf && pageFontReady ? qcf.pages[page - 1] : null
+
   const lines = data ? data.pages[page - 1] : NO_LINES
 
   // Fit the font so the widest printed line fills the page width without wrapping.
@@ -86,7 +126,8 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     const box = linesRef.current
     if (!box || !lines.length) return
     const fit = () => {
-      const available = box.clientWidth
+      const style = getComputedStyle(box)
+      const available = box.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) // the text area, inside the padding
       const size = Math.floor(((BASE_SIZE * available) / TYPICAL_WIDEST_AT_BASE) * 10) / 10
       // Measure each line's natural width at that size.
       box.classList.add('measuring')
@@ -192,63 +233,91 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
         </span>
       </header>
 
-      <div
-        ref={linesRef}
-        className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
-        style={
-          fontSize
-            ? ({ '--quran-size': `${fontSize}px`, '--basmala-size': basmalaSize ? `${basmalaSize}px` : undefined } as React.CSSProperties)
-            : undefined
-        }
-        lang="ar"
-        dir="rtl"
-      >
-        {lines.map((line, i) => {
-          const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
-          if (line === 'b')
+      {qcfPage ? (
+        <QcfLines
+          lines={qcfPage.lines}
+          fontFamily={qcfFonts.fonts[qcfPage.f]}
+          portion={portion}
+          hiding={hiding}
+          revealed={revealed}
+          onToggleAyah={toggleAyah}
+          className={arrivedFrom ? `enter-${arrivedFrom}` : ''}
+        />
+      ) : (
+        <div
+          ref={linesRef}
+          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
+          style={
+            fontSize
+              ? ({ '--quran-size': `${fontSize}px`, '--basmala-size': basmalaSize ? `${basmalaSize}px` : undefined } as React.CSSProperties)
+              : undefined
+          }
+          lang="ar"
+          dir="rtl"
+        >
+          {lines.map((line, i) => {
+            const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
+            if (line === 'b')
+              return (
+                <div key={i} className={`m-line bismillah ${mark}`}>
+                  <span className="basmala" lang="ar">
+                    {'\uFDFD'}
+                  </span>
+                </div>
+              )
+            if (typeof line === 'string')
+              return (
+                <div key={i} className={`m-line surah-band ${mark}`}>
+                  <SurahBadge name={surahArabic(Number(line.slice(1)))} />
+                </div>
+              )
             return (
-              <div key={i} className={`m-line bismillah ${mark}`}>
-                <span className="basmala" lang="ar">
-                  {'\uFDFD'}
+              <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
+                <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
+                  {line.map((piece) => {
+                    const [words, marker] = splitMarker(piece)
+                    const key = `${piece[0]}:${piece[1]}`
+                    return (
+                      <span
+                        key={key}
+                        className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
+                        data-ayah={key}
+                        onClick={hiding ? () => toggleAyah(key) : undefined}
+                      >
+                        <span className="m-words">{words}</span>
+                        {marker && (
+                          <span className="m-marker">
+                            {' '}
+                            <Rosette ayah={piece[1]} />
+                          </span>
+                        )}{' '}
+                      </span>
+                    )
+                  })}
                 </span>
               </div>
             )
-          if (typeof line === 'string')
-            return (
-              <div key={i} className={`m-line surah-band ${mark}`}>
-                <SurahBadge name={surahArabic(Number(line.slice(1)))} />
-              </div>
-            )
-          return (
-            <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
-              <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
-                {line.map((piece) => {
-                  const [words, marker] = splitMarker(piece)
-                  const key = `${piece[0]}:${piece[1]}`
-                  return (
-                    <span
-                      key={key}
-                      className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
-                      data-ayah={key}
-                      onClick={hiding ? () => toggleAyah(key) : undefined}
-                    >
-                      <span className="m-words">{words}</span>
-                      {marker && (
-                        <span className="m-marker">
-                          {' '}
-                          <Rosette ayah={piece[1]} />
-                        </span>
-                      )}{' '}
-                    </span>
-                  )
-                })}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+          })}
+        </div>
+      )}
 
-      <div className="m-foot" aria-hidden="true" />
+      <div className="m-foot">
+        {fontState === 'absent' && (
+          <button className="font-download" onClick={download}>
+            Download exact mushaf font (36 MB)
+          </button>
+        )}
+        {fontState === 'downloading' && (
+          <p className="font-status">
+            Downloading font {downloaded} of {QCF_FONT_COUNT}…
+          </p>
+        )}
+        {fontState === 'failed' && (
+          <button className="font-download" onClick={download}>
+            Download stopped. Check your connection and tap to resume
+          </button>
+        )}
+      </div>
 
       <button
         className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}

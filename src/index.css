@@ -316,7 +316,7 @@ select, input[type='number'] {
   width: 100%;
   white-space: nowrap;
   word-spacing: -0.2em;
-  -webkit-text-stroke: 0.3px currentColor; /* heavier ink, like the reference page; the font file is unchanged */
+  -webkit-text-stroke: var(--mushaf-ink-weight) currentColor; /* heavier ink; the font file itself is unchanged */
   text-align: justify;
   text-align-last: justify;
   line-height: 1.8;
@@ -335,20 +335,24 @@ select, input[type='number'] {
 .rosette .inner { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.8; }
 .rosette text { fill: var(--mushaf-ink); font-family: var(--font-quran); }
 
-/* Surah header: our ornate badge, filling the line like the reference. */
+/* Surah header: the builder's badge image across the line, with the name in its central panel. */
 .m-line.surah-band { overflow: visible; }
-.surah-badge { display: block; width: 100%; height: auto; }
-.surah-badge .b-frame { fill: var(--mushaf-badge-frame); stroke: var(--mushaf-rosette); stroke-width: 1.5; }
-.surah-badge .b-leaf { fill: var(--mushaf-badge-leaf); }
-.surah-badge .b-accent { fill: var(--mushaf-badge-accent); }
-.surah-badge .b-panel { fill: var(--mushaf-badge-panel); stroke: var(--mushaf-rosette); stroke-width: 1.2; }
-.surah-badge .b-line { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.6; }
-.surah-badge .b-stem { fill: none; stroke: var(--mushaf-badge-leaf); stroke-width: 0.8; }
-.surah-badge .b-name { font-family: var(--font-quran); font-size: 17px; fill: var(--mushaf-ink); }
-.surah-badge .b-word { font-family: var(--font-quran); font-size: 10px; fill: var(--mushaf-rosette); }
+.surah-badge { position: relative; width: 100%; aspect-ratio: 1400 / 190; }
+.surah-badge img { display: block; width: 100%; height: 100%; mix-blend-mode: multiply; /* its cream melts into the page */ }
+.surah-badge .b-name {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-quran);
+  font-size: calc(var(--quran-size, 20px) * 0.95);
+  color: var(--mushaf-ink);
+  -webkit-text-stroke: var(--mushaf-ink-weight) currentColor;
+}
 
 /* Basmala: Amiri's calligraphic ligature, sized to sit within the line like the reference. */
 .m-line.bismillah { justify-content: center; }
+.m-lines.measuring .basmala { font-size: 1em; }
 .basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
 
 /* Thin margin marks where today's portion starts and ends. */
@@ -395,8 +399,38 @@ select, input[type='number'] {
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
 .hide-toggle svg { width: var(--icon); height: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* A clear strip at the bottom for the hide button, so it never covers a line of text. */
-.m-foot { flex: none; height: calc(var(--tap-primary) + var(--space-2)); }
+/* A clear strip at the bottom for the hide button (so it never covers text), and the font download. */
+.m-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: calc(var(--tap-primary) + var(--space-2));
+  padding-inline: var(--space-2) calc(var(--tap-primary) + var(--space-4));
+}
+.font-download {
+  min-height: var(--tap);
+  text-align: start;
+  color: var(--mushaf-olive);
+  font-size: var(--text-sm);
+  text-decoration: underline dashed 1px;
+  text-underline-offset: 4px;
+}
+.font-status { font-size: var(--text-sm); color: var(--mushaf-olive); }
+
+/* The exact QCF4 look (ADR-0009): one glyph per word, each printed line spread edge to edge. */
+.m-lines.qcf { font-family: var(--qcf-font), var(--font-quran); }
+.qcf-row { display: flex; width: 100%; justify-content: space-between; align-items: center; line-height: 1.9; white-space: nowrap; }
+.m-lines.measuring .qcf-row { display: inline-flex; width: auto; justify-content: flex-start; }
+.m-line.center .qcf-row,
+.m-lines.short .qcf-row { justify-content: center; }
+.qcf-glyph.sign { color: var(--mushaf-rosette); }
+.m-lines.hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-lines.hiding .qcf-glyph.word:not(.revealed) {
+  color: transparent;
+  background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
+  border-radius: 999px;
+}
+.m-lines.hiding .qcf-glyph.word.revealed { animation: reveal var(--motion-quick) ease-out; }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
 .m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }

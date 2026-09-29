@@ -74,6 +74,8 @@ export default function History({ saved, onRestore, onBack }: Props) {
 
       <p className="faded small sources">
         Quran text and page layout: King Fahd Glorious Quran Printing Complex (KFGQPC), via quran.ws (CC BY 4.0).
+        Exact mushaf font: KFGQPC QCF4 (calligraphy by Uthman Taha), downloaded from quran-qcf4 by Mohamad Hajj
+        Rabee, whose page data is used under the MIT licence.
       </p>
 
       <div className="action-bar">
