@@ -412,6 +412,37 @@ select, input[type='number'] {
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
 .hide-toggle svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
+/* Page tools, bottom left: Done for the area of Today that opened the page, and the Hifz read-through counter.
+   They float and fade with the hide button. */
+.page-tools {
+  position: fixed;
+  left: var(--space-3);
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  display: flex;
+  gap: var(--space-2);
+  transition: opacity var(--motion-calm) ease;
+}
+.page-tools.faded-out { opacity: 0; pointer-events: none; }
+/* While the font download strip shows, sit just above it. */
+.mushaf:has(.m-foot) .page-tools { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
+.tool {
+  height: var(--float-button);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-olive);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
+  font-size: var(--mushaf-head-size);
+  white-space: nowrap;
+}
+.done-tool { gap: var(--space-1); padding-inline: var(--space-3) var(--space-4); background: var(--mushaf-olive); color: var(--mushaf-paper); }
+.done-tool.on { background: var(--mushaf-paper); color: var(--mushaf-olive); }
+.done-tool svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.rep-tool button { height: 100%; color: inherit; }
+.rep-tool button:first-child { padding-inline: var(--space-3) var(--space-2); font-size: var(--text-lg); font-weight: 400; }
+.rep-tool .rep-count { min-width: var(--float-button); padding-inline: var(--space-2) var(--space-4); font-size: var(--text-md); font-variant-numeric: tabular-nums; }
+
 /* A strip at the bottom for the font download, shown only until the exact font is in place. */
 .m-foot {
   flex: none;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { startDay, type Saved } from './day'
+import { countRep, startDay, toggleDone, type Saved } from './day'
 import { planToday, type Progress } from './plan'
 
 const progress: Progress = {
@@ -49,5 +49,38 @@ describe('startDay', () => {
     const yesterday = { ...opened.today!, hifzEnd: { surah: 40, ayah: 5 } }
     const saved = startDay({ ...opened, today: yesterday }, '2026-09-30')
     expect(saved.today!.plan.muraja).toEqual(opened.today!.plan.muraja)
+  })
+})
+
+describe('toggleDone', () => {
+  const day = startDay(fresh, '2026-09-29').today!
+
+  it("ticks Hifz as done up to the end of today's Hifz, and back", () => {
+    const done = toggleDone(day, 'hifz')
+    expect(done.hifzEnd).toEqual({ surah: 40, ayah: day.plan.hifz.at(-1)!.to })
+    expect(toggleDone(done, 'hifz').hifzEnd).toBeNull()
+  })
+
+  it("ticks Rabt and Muraja'a, and back", () => {
+    expect(toggleDone(day, 'rabt').rabtDone).toBe(true)
+    expect(toggleDone(toggleDone(day, 'rabt'), 'rabt').rabtDone).toBe(false)
+    expect(toggleDone(day, 'muraja').murajaDone).toBe(true)
+  })
+})
+
+describe('countRep', () => {
+  const day = startDay(fresh, '2026-09-29').today!
+
+  it('counts Hifz repetitions up and down from none, never below none', () => {
+    expect(day.hifzReps ?? 0).toBe(0)
+    const twice = countRep(countRep(day, 1), 1)
+    expect(twice.hifzReps).toBe(2)
+    expect(countRep(twice, -1).hifzReps).toBe(1)
+    expect(countRep(day, -1).hifzReps).toBe(0)
+  })
+
+  it('starts each new day at none', () => {
+    const counted = { ...fresh, today: countRep(day, 1) }
+    expect(startDay(counted, '2026-09-30').today!.hifzReps ?? 0).toBe(0)
   })
 })

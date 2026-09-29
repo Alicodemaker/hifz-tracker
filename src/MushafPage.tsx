@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { Kind } from './day'
 import type { Range } from './plan'
 import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran'
 import QcfLines, { type QcfLine } from './QcfLines'
@@ -35,13 +36,27 @@ type Props = {
   onToggleHiding: () => void
   onBack: () => void
   onTurn: (page: number) => void
+  task: { kind: Kind; done: boolean; onToggle: () => void } | null // the area of Today that opened the page
+  reps: { count: number; onCount: (change: 1 | -1) => void } | null // Hifz read-throughs, when opened from Hifz
 }
+
+const KIND_NAMES: Record<Kind, string> = { hifz: 'Hifz', rabt: 'Rabt', muraja: "Muraja'a" }
 
 const firstAyah = (lines: Line[]): { surah: number; ayah: number } => {
   for (const line of lines) {
     if (typeof line === 'string') {
       if (line.startsWith('h')) return { surah: Number(line.slice(1)), ayah: 1 }
     } else return { surah: line[0][0], ayah: line[0][1] }
+  }
+  return { surah: 1, ayah: 1 }
+}
+
+// The same, from the QCF4 page data.
+const firstQcfAyah = (lines: QcfLine[]): { surah: number; ayah: number } => {
+  for (const line of lines) {
+    if (typeof line === 'string') {
+      if (line.startsWith('h')) return { surah: Number(line.slice(1)), ayah: 1 }
+    } else return { surah: line[0][1], ayah: line[0][2] }
   }
   return { surah: 1, ayah: 1 }
 }
@@ -79,17 +94,13 @@ const NO_LINES: Line[] = []
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
 
-export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
+export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn, task, reps }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
   const [squeezed, setSqueezed] = useState<Map<number, number>>(new Map())
   const [basmalaSize, setBasmalaSize] = useState<number | null>(null)
   const linesRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!data) loadMushaf().then(setData)
-  }, [data])
 
   // The exact QCF4 look, once its fonts are downloaded; the bundled font until then (ADR-0009).
   const [fontState, setFontState] = useState<FontState>(knownFontState)
@@ -107,8 +118,17 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     if (fontState === 'ready' && !qcf) loadQcf().then(setQcf)
   }, [fontState, qcf])
   useEffect(() => {
-    if (fontState === 'ready' && qcf) loadQcfFont(qcf.pages[page - 1].f).then(setPageFontReady)
+    if (fontState === 'ready' && qcf)
+      loadQcfFont(qcf.pages[page - 1].f).then((ready) => {
+        setPageFontReady(ready)
+        if (!ready) setState('absent') // the downloaded fonts are gone (e.g. storage cleared): offer the download again
+      })
   }, [fontState, qcf, page])
+  // The bundled layout is only needed while the exact font isn't in use; it is as large as the QCF data.
+  const needsBundled = fontState === 'absent' || fontState === 'downloading' || fontState === 'failed'
+  useEffect(() => {
+    if (needsBundled && !data) loadMushaf().then(setData)
+  }, [needsBundled, data])
   const download = () => {
     setState('downloading')
     setDownloaded(0)
@@ -208,7 +228,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
   }, [arrivedFrom]) // fixed for each visit, since the page remounts every time
 
   const { start, end } = portionMarks(lines, portion)
-  const top = firstAyah(lines)
+  const top = qcfPage ? firstQcfAyah(qcfPage.lines) : lines.length ? firstAyah(lines) : null
 
   return (
     <main
@@ -224,9 +244,11 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           </svg>
         </button>
         <span className="m-page m-label">{page}</span>
-        <span className="m-where m-label">
-          {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
-        </span>
+        {top && (
+          <span className="m-where m-label">
+            {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
+          </span>
+        )}
       </header>
 
       {qcfPage ? (
@@ -314,6 +336,27 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
             <button className="font-download" onClick={download}>
               Download stopped. Check your connection and tap to resume
             </button>
+          )}
+        </div>
+      )}
+
+      {task && (
+        <div className={`page-tools ${buttonVisible ? '' : 'faded-out'}`}>
+          <button className={`tool done-tool ${task.done ? 'on' : ''}`} onClick={task.onToggle} aria-pressed={task.done} tabIndex={buttonVisible ? 0 : -1}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+            {KIND_NAMES[task.kind]} done
+          </button>
+          {reps && (
+            <div className="tool rep-tool">
+              <button onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
+                −
+              </button>
+              <button className="rep-count" onClick={() => reps.onCount(1)} aria-label={`Read ${reps.count} times. Tap to count one more`} tabIndex={buttonVisible ? 0 : -1}>
+                {reps.count}×
+              </button>
+            </div>
           )}
         </div>
       )}
