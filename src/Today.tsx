@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { Day } from './day'
-import { describeRanges, describeSize } from './format'
+import { describeRanges, describeSize, hifzUpTo } from './format'
 import type { Range } from './plan'
 import { type AyahRef, ayahCount } from './quran'
 
-type Props = { day: Day; onChange: (day: Day) => void; onEditSetup: () => void }
+type Props = { day: Day; onChange: (day: Day) => void; onEditSetup: () => void; onHistory: () => void }
 
 // Every Ayah the Hifz could end on: through today's suggestion, up to the end of its last Surah.
 const hifzEndChoices = (hifz: Range[]): AyahRef[] => {
@@ -16,18 +16,7 @@ const hifzEndChoices = (hifz: Range[]): AyahRef[] => {
   return choices
 }
 
-// The Hifz ranges cut off at a chosen end Ayah.
-const hifzUpTo = (hifz: Range[], end: AyahRef): Range[] => {
-  const cut: Range[] = []
-  for (const r of hifz) {
-    if (r.surah === end.surah) return [...cut, { ...r, to: end.ayah }]
-    cut.push(r)
-  }
-  const last = hifz[hifz.length - 1]
-  return [...cut.slice(0, -1), { ...last, to: end.ayah }]
-}
-
-export default function Today({ day, onChange, onEditSetup }: Props) {
+export default function Today({ day, onChange, onEditSetup, onHistory }: Props) {
   const { plan } = day
   const suggestedEnd = plan.hifz.length ? { surah: plan.hifz.at(-1)!.surah, ayah: plan.hifz.at(-1)!.to } : null
   const choices = hifzEndChoices(plan.hifz)
@@ -47,9 +36,14 @@ export default function Today({ day, onChange, onEditSetup }: Props) {
     <main className="screen with-action-bar tall">
       <header className="top">
         <h1>Today</h1>
-        <button className="link" onClick={onEditSetup}>
-          Edit setup
-        </button>
+        <nav>
+          <button className="link" onClick={onHistory}>
+            History
+          </button>
+          <button className="link" onClick={onEditSetup}>
+            Setup
+          </button>
+        </nav>
       </header>
 
       <section className={`card kind ${hifzDone ? 'done' : ''}`}>

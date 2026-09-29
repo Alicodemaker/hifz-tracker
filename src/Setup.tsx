@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import type { Saved } from './day'
 import type { Progress } from './plan'
+import RestoreButton from './RestoreButton'
 import { SURAH_COUNT, ayahCount, juzOfSurah, surahName, surahSize } from './quran'
 
 // The builder's real state: an-Nas back to Fussilat memorised, next Hifz Ghafir 1.
@@ -13,11 +15,12 @@ const JUZ_GROUPS = Array.from({ length: 30 }, (_, i) => 30 - i).map((juz) => ({
   surahs: ALL_SURAHS.filter((s) => juzOfSurah(s) === juz),
 }))
 
-type Props = { initial: Progress | null; onSave: (progress: Progress) => void }
+type Props = { initial: Progress | null; onSave: (progress: Progress) => void; onRestore: (saved: Saved) => void }
 
-export default function Setup({ initial, onSave }: Props) {
+export default function Setup({ initial, onSave, onRestore }: Props) {
   const [memorised, setMemorised] = useState(() => new Set(initial?.memorised ?? DEFAULT_MEMORISED))
   const [next, setNext] = useState(initial?.hifzNext ?? DEFAULT_NEXT)
+  const [message, setMessage] = useState('')
 
   const toggle = (surahs: number[], on: boolean) =>
     setMemorised((prev) => {
@@ -33,7 +36,11 @@ export default function Setup({ initial, onSave }: Props) {
 
   return (
     <main className="screen with-action-bar">
-      <h1>Set up</h1>
+      <header className="top">
+        <h1>Set up</h1>
+        {!initial && <RestoreButton className="link" onRestore={onRestore} onMessage={setMessage} />}
+      </header>
+      {message && <p className="notice">{message}</p>}
 
       <section className="card">
         <h2>Next Hifz</h2>

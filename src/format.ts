@@ -1,5 +1,5 @@
 import { rangesSize, type Range } from './plan'
-import { ayahCount, pageOf, surahName } from './quran'
+import { type AyahRef, ayahCount, pageOf, surahName } from './quran'
 
 const isWhole = (r: Range) => r.from === 1 && r.to === ayahCount(r.surah)
 
@@ -19,4 +19,10 @@ export const describeSize = (ranges: Range[]): string => {
   const last = pageOf({ surah: lastRange.surah, ayah: lastRange.to })
   const where = first === last ? `p. ${first}` : `pp. ${Math.min(first, last)}–${Math.max(first, last)}`
   return `${pages.toFixed(1)} pages · ${where}`
+}
+
+// The Hifz ranges cut off at the Ayah where memorisation actually ended.
+export const hifzUpTo = (hifz: Range[], end: AyahRef): Range[] => {
+  const i = hifz.findIndex((r) => r.surah === end.surah)
+  return [...hifz.slice(0, i), { ...hifz[i], to: end.ayah }]
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { localDate, startDay, type Day, type Saved } from './day'
 import type { Progress } from './plan'
+import History from './History'
 import Setup from './Setup'
 import { load, save } from './storage'
 import Today from './Today'
@@ -14,7 +15,7 @@ const openToday = (saved: Saved | null) => {
 
 export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
-  const [editing, setEditing] = useState(false)
+  const [screen, setScreen] = useState<'today' | 'setup' | 'history'>('today')
 
   const update = (next: Saved) => {
     save(next)
@@ -34,12 +35,30 @@ export default function App() {
   const saveSetup = (progress: Progress) => {
     // New setup replaces today's plan; ticks made today under the old setup are dropped.
     update(startDay({ version: 1, progress, today: null, history: saved?.history ?? [] }, localDate()))
-    setEditing(false)
+    setScreen('today')
   }
 
-  if (!saved || editing) return <Setup initial={saved?.progress ?? null} onSave={saveSetup} />
+  // A restored Backup may be from an earlier date; start today's Day from it.
+  const restore = (backup: Saved) => {
+    update(startDay(backup, localDate()))
+    setScreen('history')
+  }
+
+  if (!saved || screen === 'setup') return <Setup initial={saved?.progress ?? null} onSave={saveSetup} onRestore={restore} />
+
+  if (screen === 'history') {
+    return <History saved={saved} onRestore={restore} onBack={() => setScreen('today')} />
+  }
 
   const changeDay = (day: Day) => update({ ...saved, today: day })
 
-  return <Today key={saved.today!.date} day={saved.today!} onChange={changeDay} onEditSetup={() => setEditing(true)} />
+  return (
+    <Today
+      key={saved.today!.date}
+      day={saved.today!}
+      onChange={changeDay}
+      onEditSetup={() => setScreen('setup')}
+      onHistory={() => setScreen('history')}
+    />
+  )
 }
