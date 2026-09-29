@@ -91,6 +91,7 @@ const BASE_SIZE = 20 // px, used only to measure
 const TYPICAL_WIDEST_AT_BASE = 385
 const NO_LINES: Line[] = []
 
+const BISMILLAH_FONT = 0 // QCF4_Hafs_01, the first font in qcf-fonts.json
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
 
@@ -99,7 +100,6 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
   const [squeezed, setSqueezed] = useState<Map<number, number>>(new Map())
-  const [basmalaSize, setBasmalaSize] = useState<number | null>(null)
   const linesRef = useRef<HTMLDivElement>(null)
 
   // The exact QCF4 look, once its fonts are downloaded; the bundled font until then (ADR-0009).
@@ -119,7 +119,9 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
   }, [fontState, qcf])
   useEffect(() => {
     if (fontState === 'ready' && qcf)
-      loadQcfFont(qcf.pages[page - 1].f).then((ready) => {
+      // The page's own font, and the first page's, which holds the bismillah glyphs.
+      Promise.all([loadQcfFont(qcf.pages[page - 1].f), loadQcfFont(BISMILLAH_FONT)]).then((loaded) => {
+        const ready = loaded.every(Boolean)
         setPageFontReady(ready)
         if (!ready) setState('absent') // the downloaded fonts are gone (e.g. storage cleared): offer the download again
       })
@@ -155,13 +157,6 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       const widths = [...box.children].map((el) =>
         el.classList.contains('surah-band') ? 0 : (el.querySelector<HTMLElement>('.m-text')?.offsetWidth ?? 0),
       )
-      // The basmala ligature is very wide and tall: size it to 60% of the line, so its letters stay within the line.
-      const basmala = box.querySelector<HTMLElement>('.basmala')
-      if (basmala) {
-        basmala.style.fontSize = `${size}px`
-        setBasmalaSize(Math.floor(((size * available * 0.6) / basmala.offsetWidth) * 10) / 10)
-        basmala.style.fontSize = ''
-      }
       box.classList.remove('measuring')
       setFontSize(size)
       // As printed, a short line that ends a surah sits centred; every other line is justified edge to edge.
@@ -210,7 +205,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     setReveals({ scope, keys })
   }
 
-  // All the page's buttons (back, hide, Done, counter) show and hide together: a tap on the page (not a swipe)
+  // The floating buttons (hide, Done, counter) show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
   // They show when the page is opened, but not after a page turn.
   const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null)
@@ -247,7 +242,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       onClick={onPageTap}
     >
       <header className="m-head">
-        <button className={`back ${buttonVisible ? '' : 'faded-out'}`} onClick={onBack} aria-label="Back to Today" tabIndex={buttonVisible ? 0 : -1}>
+        <button className="back" onClick={onBack} aria-label="Back to Today">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M15.5 5l-7 7 7 7" />
           </svg>
@@ -264,6 +259,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
         <QcfLines
           lines={qcfPage.lines}
           fontFamily={qcfFonts.fonts[qcfPage.f]}
+          bismillahFont={qcfFonts.fonts[BISMILLAH_FONT]}
           portion={portion}
           hiding={hiding}
           revealed={revealed}
@@ -276,7 +272,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
           style={
             fontSize
-              ? ({ '--quran-size': `${fontSize}px`, '--basmala-size': basmalaSize ? `${basmalaSize}px` : undefined } as React.CSSProperties)
+              ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties)
               : undefined
           }
           lang="ar"
@@ -288,7 +284,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
               return (
                 <div key={i} className={`m-line bismillah ${mark}`}>
                   <span className="basmala" lang="ar">
-                    {'\uFDFD'}
+                    {data?.bismillah}
                   </span>
                 </div>
               )

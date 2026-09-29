@@ -390,11 +390,11 @@ select, input[type='number'] {
 .m-head .m-label { text-decoration: underline dashed 1px; text-underline-offset: 5px; }
 .m-head .back { justify-self: start; }
 .m-head .m-where { justify-self: end; overflow: hidden; text-overflow: ellipsis; }
-/* Back: a filled olive disc in the top-left corner that reads as a floating button. */
+/* Back: a filled olive disc in the top-left corner, sized to the header row, always showing. */
 .mushaf .back {
   flex: none;
-  width: var(--float-button);
-  height: var(--float-button);
+  width: var(--head-button);
+  height: var(--head-button);
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -402,9 +402,7 @@ select, input[type='number'] {
   color: var(--mushaf-paper);
   box-shadow: var(--float-shadow);
 }
-.mushaf .back { transition: opacity var(--motion-calm) ease; }
-.mushaf .back.faded-out { opacity: 0; pointer-events: none; }
-.mushaf .back svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.mushaf .back svg { width: var(--head-icon); height: var(--head-icon); fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 
 .m-lines {
   flex: 1;
@@ -473,10 +471,14 @@ select, input[type='number'] {
   -webkit-text-stroke: var(--mushaf-ink-weight) currentColor;
 }
 
-/* Basmala: Amiri's calligraphic ligature, sized to sit within the line like the reference. */
+/* Basmala: the printed mushaf's own, level and centred in its line at text size (the exact font's glyph, or the bundled
+   font's words), with the same ink weight as the text. */
 .m-line.bismillah { justify-content: center; }
-.m-lines.measuring .basmala { font-size: 1em; }
-.basmala { font-family: var(--font-basmala); font-size: var(--basmala-size, 1em); line-height: 1; color: var(--mushaf-ink); white-space: nowrap; }
+.basmala { font-size: 1em; line-height: 1.8; color: var(--mushaf-ink); white-space: nowrap; -webkit-text-stroke: var(--mushaf-ink-weight) currentColor; }
+.qcf-basmala { -webkit-text-stroke: 0; text-shadow: var(--qcf-ink-weight) 0 currentColor, calc(-1 * var(--qcf-ink-weight)) 0 currentColor, 0 var(--qcf-ink-weight) currentColor, 0 calc(-1 * var(--qcf-ink-weight)) currentColor; }
+/* On a full page the glyph sits high in its line: this evens the space to the badge above and the text below.
+   The first two pages' compact layout is already even. */
+.m-lines:not(.short) .qcf-basmala { position: relative; top: 0.3em; }
 
 /* Thin margin marks where today's portion starts and ends. */
 .m-line.mark-start::before,
