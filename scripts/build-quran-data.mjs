@@ -14,6 +14,9 @@ const kfgqpc = await Mushaf.hafs()
 // Letters only: drop diacritics (combining marks), spaces and pause marks.
 const letterCount = (s) => s.normalize('NFC').replace(/[\p{M}\sۖ-ۭ]/gu, '').length
 
+// quran-json misspells two names; use the usual spellings.
+const NAME_FIXES = { 21: 'Al-Anbiya', 42: 'Ash-Shura' }
+
 const surahs = []
 const ayahPage = []
 const ayahLetters = []
@@ -21,7 +24,7 @@ for (let s = 1; s <= meta.numSurahs; s++) {
   const m = getSurahMeta(s)
   const t = text[s - 1]
   if (t.verses.length !== m.ayahCount) throw new Error(`Ayah count mismatch in surah ${s}`)
-  surahs.push({ name: t.transliteration, arabic: m.name, ayahs: m.ayahCount })
+  surahs.push({ name: NAME_FIXES[s] ?? t.transliteration, arabic: m.name, ayahs: m.ayahCount })
   for (let a = 1; a <= m.ayahCount; a++) {
     ayahPage.push(kfgqpc.surah(s).ayah(a).page.number)
     ayahLetters.push(letterCount(t.verses[a - 1].text))

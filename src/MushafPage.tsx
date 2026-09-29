@@ -77,7 +77,7 @@ const TYPICAL_WIDEST_AT_BASE = 385
 const NO_LINES: Line[] = []
 
 const SWIPE_MIN = 50 // px of mostly horizontal travel
-const BUTTON_FADE_MS = 10_000
+const BUTTON_FADE_MS = 5_000
 
 export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
@@ -190,8 +190,9 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     setReveals({ scope, keys })
   }
 
-  // The hide button fades after ten seconds without a touch; any touch brings it back.
-  const [buttonVisible, setButtonVisible] = useState(true)
+  // The hide button fades after five seconds, and only a tap on the screen (not a swipe) brings it back.
+  // It shows when the page is opened, but not after a page turn.
+  const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null)
   const fadeTimer = useRef<number | undefined>(undefined)
   const startFadeTimer = () => {
     window.clearTimeout(fadeTimer.current)
@@ -202,9 +203,9 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     startFadeTimer()
   }
   useEffect(() => {
-    startFadeTimer()
+    if (arrivedFrom === null) startFadeTimer()
     return () => window.clearTimeout(fadeTimer.current)
-  }, [])
+  }, [arrivedFrom]) // fixed for each visit, since the page remounts every time
 
   const { start, end } = portionMarks(lines, portion)
   const top = firstAyah(lines)
@@ -214,7 +215,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
       className="mushaf"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      onPointerDown={wake}
+      onClick={wake}
     >
       <header className="m-head">
         <button className="back" onClick={onBack} aria-label="Back to Today">

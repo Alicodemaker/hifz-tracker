@@ -310,6 +310,8 @@ select, input[type='number'] {
   visibility: hidden; /* until the font size is fitted */
   min-height: 0;
   min-width: 0;
+  overflow-y: auto; /* in landscape the page is taller than the screen: it scrolls rather than crushing lines */
+  overflow-x: hidden;
 }
 .m-lines.fitted { visibility: visible; }
 .m-lines.short { justify-content: center; gap: var(--space-4); }
@@ -318,7 +320,7 @@ select, input[type='number'] {
   display: flex;
   align-items: center;
   position: relative;
-  min-height: 0;
+  min-height: 1.6em; /* never so short that lines overlap */
 }
 .m-lines.short .m-line { flex: 0 0 auto; }
 /* Words sit closer than the font's default, as in print; justification spreads each line back to full width. */
