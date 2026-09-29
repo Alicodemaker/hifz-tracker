@@ -43,7 +43,7 @@ Revision of all memorised material outside the Sabqi, worked through one Manzil 
 _Avoid_: Old revision, dhor
 
 **Manzil slice**:
-One day's portion of the Manzil: whole Surahs, taken in Mushaf order from where the last slice ended, adding up to about 10 Pages. A Surah is never split across slices. After the last memorised Surah, the rotation wraps around to the first.
+One day's portion of the Manzil, taken in Mushaf order from where the last slice ended, wrapping around after the last memorised Surah. It is made of whole Surahs totalling at most 10 Pages. A Surah longer than 10 Pages is split at Page boundaries into pieces of about 10 Pages. Juz 30 is always two fixed slices: an-Naba to al-Layl, and ad-Duha to an-Nas.
 _Avoid_: Portion, chunk, daily manzil
 
 ## Days
