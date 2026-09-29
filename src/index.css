@@ -256,3 +256,79 @@ select, input[type='number'] {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Mushaf page: light paper and ink whatever the phone's theme, 15 printed lines filling the screen. */
+.mushaf {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-ink);
+  padding: env(safe-area-inset-top) var(--space-3) env(safe-area-inset-bottom);
+}
+.mushaf .back { width: var(--tap); height: var(--tap); margin-inline-start: calc(-1 * var(--space-3)); color: var(--mushaf-lapis); }
+.mushaf .back svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.m-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--mushaf-lapis);
+  border-bottom: 1px solid var(--rule);
+}
+.m-head .m-surah { text-align: start; }
+.m-head .m-page { text-align: center; font-weight: 600; }
+.m-head .m-juz { text-align: end; }
+
+.m-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-quran);
+  font-size: var(--quran-size, 20px);
+  visibility: hidden; /* until the font size is fitted */
+  padding-block: var(--space-2);
+  min-height: 0;
+}
+.m-lines.fitted { visibility: visible; }
+.m-lines.measuring .m-text { display: inline-block; width: auto; }
+.m-line.squeezed .m-text { width: auto; transform: scaleX(var(--squeeze)); transform-origin: right center; }
+.m-lines.short { justify-content: center; gap: var(--space-3); }
+.m-line {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 0;
+}
+.m-lines.short .m-line { flex: 0 0 auto; }
+/* Pages 1 and 2 are printed as a narrow centred block inside the ornamental frame. */
+.m-lines.short .m-text { text-align: center; text-align-last: center; }
+.m-text { display: block; width: 100%; white-space: nowrap; text-align: justify; text-align-last: justify; line-height: 1.9; }
+.m-line.center .m-text,
+.m-line.bismillah .m-text { text-align: center; text-align-last: center; }
+.m-marker { color: var(--mushaf-lapis); }
+
+.m-line.surah-band .m-text {
+  text-align: center;
+  text-align-last: center;
+  border-block: 3px double var(--mushaf-lapis);
+  line-height: 1.6;
+}
+
+/* Thin margin marks where today's portion starts and ends (on the right, where Arabic lines begin). */
+.m-line.mark-start::before,
+.m-line.mark-end::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(-1 * var(--space-2));
+  width: 3px;
+  height: 60%;
+  border-radius: 2px;
+  background: var(--mushaf-lapis);
+}
+.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2)); }
+
+.m-source { text-align: center; font-size: 0.75rem; color: var(--mushaf-faded); padding-bottom: var(--space-2); }

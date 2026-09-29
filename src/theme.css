@@ -2,6 +2,13 @@
 @import '@fontsource/amiri/arabic-400.css';
 @import '@fontsource-variable/figtree/wght.css';
 
+/* KFGQPC HAFS Uthmanic Script, shipped unmodified (ADR-0007). Only the Mushaf page uses it. */
+@font-face {
+  font-family: 'KFGQPC Hafs';
+  src: url('/fonts/UthmanicHafs-v-3.0.ttf') format('truetype');
+  font-display: block;
+}
+
 :root {
   /* Colour: warm paper and ink, with lapis as the one accent. */
   --paper: #f7f1e6; /* page background */
@@ -42,6 +49,13 @@
   --tap-primary: 64px; /* the Done buttons */
   --screen-max: 480px;
   --action-bar-height: 128px;
+
+  /* The Mushaf page: always light paper and dark ink, like the printed mushaf, even in dark mode. */
+  --mushaf-paper: #fdf9ef;
+  --mushaf-ink: #1c1a17;
+  --mushaf-faded: #7a6f5e;
+  --mushaf-lapis: #2f5c6e;
+  --font-quran: 'KFGQPC Hafs', 'Amiri', serif;
 }
 
 @media (prefers-color-scheme: dark) {

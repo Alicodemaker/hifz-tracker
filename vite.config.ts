@@ -9,13 +9,18 @@ const base = process.env.BASE_PATH ?? '/hifz-tracker/'
 
 export default defineConfig({
   base,
+  // The Mushaf page data is one large chunk on purpose (it loads only when a page opens).
+  build: { chunkSizeWarningLimit: 1700 },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       // Precache the bundled fonts too, so Arabic names render offline.
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'] },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf,webmanifest}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // the Mushaf page data is about 1.6 MB
+      },
       manifest: {
         name: 'Hifz Tracker',
         short_name: 'Hifz',

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { localDate, startDay, type Day, type Saved } from './day'
 import History from './History'
+import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { DEFAULT_HIFZ_AMOUNT, type Progress } from './plan'
 import Setup from './Setup'
@@ -14,9 +15,23 @@ const openToday = (saved: Saved | null) => {
   return next
 }
 
+const pageFromHash = (): number | null => {
+  const match = /^#\/page\/(\d+)$/.exec(window.location.hash)
+  const page = match ? Number(match[1]) : null
+  return page && page >= 1 && page <= 604 ? page : null
+}
+
 export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
   const [screen, setScreen] = useState<'today' | 'setup' | 'history'>('today')
+  const [mushafPage, setMushafPage] = useState(pageFromHash)
+
+  // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
+  useEffect(() => {
+    const onHash = () => setMushafPage(pageFromHash())
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
 
   const update = (next: Saved) => {
     save(next)
@@ -45,6 +60,10 @@ export default function App() {
   const restore = (backup: Saved) => {
     update(startDay(backup, localDate()))
     setScreen('history')
+  }
+
+  if (saved && mushafPage) {
+    return <MushafPage page={mushafPage} portion={null} onBack={() => (window.location.hash = '')} />
   }
 
   if (!saved || screen === 'setup') return <Setup initial={saved?.progress ?? null} onSave={saveSetup} onRestore={restore} />
