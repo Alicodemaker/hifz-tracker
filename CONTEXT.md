@@ -37,7 +37,7 @@ The new portion being memorised for the first time today: a run of Ayahs in Memo
 _Avoid_: Sabaq, lesson, new work. (Hifz here means the day's new portion; the overall practice is "memorisation".)
 
 **Hifz amount**:
-The size of the daily Hifz the person has chosen, in quarter-Page steps (¼, ½, ¾, 1, 1¼ …). It stays until they choose another; on a single day they can still end the Hifz a few Ayahs earlier or later.
+The size of the daily Hifz the person has chosen, in quarter-Page steps (¼, ½, ¾, 1, 1¼ …). It starts at ½ Page and stays until they choose another. Today's Hifz ends at the Ayah that brings it closest to the Hifz amount, so changing the amount is also how today's end is adjusted.
 _Avoid_: Daily target, quota, sabaq size
 
 **Pace**:
