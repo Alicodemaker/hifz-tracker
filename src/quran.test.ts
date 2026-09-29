@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import data from './data/quran.json'
-import { AYAH_COUNT, PAGE_COUNT, ayahCount, ayahIndex, juzEighthOfAyah, juzOfSurah, juzStartPage, pageOf, sizeInPages, surahName, surahSize } from './quran'
+import { AYAH_COUNT, PAGE_COUNT, ayahCount, juzOfSurah, juzStartPage, pageOf, sizeInPages, surahName, surahSize } from './quran'
 
 describe('Quran data (15-line Madani mushaf)', () => {
   it('has 114 surahs, 6236 ayahs and 604 pages', () => {
@@ -46,9 +46,4 @@ describe('Quran data (15-line Madani mushaf)', () => {
     expect(juzOfSurah(2)).toBe(1)
   })
 
-  it('knows which eighth of its juz an ayah is in', () => {
-    expect(juzEighthOfAyah(ayahIndex({ surah: 16, ayah: 73 }))).toBe(5) // page 275: "Juz 14 (5/8)"
-    expect(juzEighthOfAyah(ayahIndex({ surah: 1, ayah: 1 }))).toBe(1)
-    expect(juzEighthOfAyah(ayahIndex({ surah: 114, ayah: 6 }))).toBe(8)
-  })
 })

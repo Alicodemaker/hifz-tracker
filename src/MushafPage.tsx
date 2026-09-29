@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
-import { ayahCount, ayahIndex, juzEighthOfAyah, juzOfAyah, surahArabic, surahName } from './quran'
+import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran'
 import QcfLines, { type QcfLine } from './QcfLines'
 import { QCF_FONT_COUNT, downloadQcfFonts, loadQcfFont, qcfFontsReady } from './qcfFonts'
 import qcfFonts from './data/qcf-fonts.json'
@@ -229,7 +229,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
         </span>
         <span className="m-page m-label">{page}</span>
         <span className="m-juz m-label">
-          Juz {juzOfAyah(ayahIndex(top))} ({juzEighthOfAyah(ayahIndex(top))}/8)
+          Juz {juzOfAyah(ayahIndex(top))}
         </span>
       </header>
 

@@ -21,7 +21,7 @@ Three changes from using the live app. Tapping the Hifz, Rabt or Muraja'a area o
 
 - No search, bookmarks, audio, translation or tafsir
 - No tapping on the page except to reveal or hide an ayah in hide mode (no word lookup, no word-by-word reveal)
-- No hizb or rub' numbering beyond the header's "Juz N (k/8)", which was added later to match the builder's reference page
+- No hizb or rub' fractions in the page header
 - No dark-mode page (the Mushaf page stays light, by choice)
 - No page images, and no other mushaf editions. The exact QCF4 glyph fonts are an optional one-time download (step 8, ADR-0009), never bundled
 - No ayah-by-ayah end adjustment: the ¼-page amount is the only control
