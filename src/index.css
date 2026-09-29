@@ -474,12 +474,12 @@ select, input[type='number'] {
   display: grid;
   place-items: center;
   font-family: var(--font-quran);
-  font-size: calc(var(--quran-size, 20px) * 0.8);
+  font-size: calc(var(--quran-size, 20px) * 0.7);
   line-height: 1;
   color: var(--mushaf-ink);
   -webkit-text-stroke: var(--mushaf-ink-weight) currentColor;
 }
-.surah-badge .qcf-name { font-family: 'QCF4_QBSML', var(--font-quran); font-size: calc(var(--quran-size, 20px) * 0.9); -webkit-text-stroke: 0; }
+.surah-badge .qcf-name { font-family: 'QCF4_QBSML', var(--font-quran); font-size: calc(var(--quran-size, 20px) * 0.78); -webkit-text-stroke: 0; }
 
 /* Basmala: the printed mushaf's own, level and centred in its line at text size (the exact font's glyph, or the bundled
    font's words), with the same ink weight as the text. */
