@@ -6,8 +6,10 @@ import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
 import { pageOf } from './quran'
+import { setRating } from './ratings'
 import Settings from './Settings'
 import { load, save } from './storage'
+import Surahs from './Surahs'
 import Today from './Today'
 
 // Start today's Day if the date has changed, and remember it. Saving the same state twice is harmless.
@@ -27,7 +29,7 @@ const pageFromHash = (): number | null => {
 
 export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
-  const [screen, setScreen] = useState<'today' | 'settings' | 'history'>('today')
+  const [screen, setScreen] = useState<'today' | 'settings' | 'history' | 'surahs'>('today')
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
   const openedFromToday = useRef(false)
@@ -80,7 +82,9 @@ export default function App() {
     // Saved progress settings replace today's plan; ticks made today under the old ones are dropped.
     // Settings don't show the Hifz amount, so keep the one already chosen.
     const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
-    update(startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [] }, localDate()))
+    update(
+      startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [], ratings: saved?.ratings }, localDate()),
+    )
     setScreen('today')
   }
 
@@ -144,6 +148,12 @@ export default function App() {
       return <History saved={saved} onRestore={restore} onBack={() => setScreen('today')} />
     }
 
+    if (screen === 'surahs') {
+      return (
+        <Surahs saved={saved} onRate={(surah, rating) => update(setRating(saved, surah, rating))} onBack={() => setScreen('today')} />
+      )
+    }
+
     return (
       <Today
         key={saved.today!.date}
@@ -155,6 +165,7 @@ export default function App() {
         onOpenPage={openPage}
         onSettings={() => setScreen('settings')}
         onHistory={() => setScreen('history')}
+        onSurahs={() => setScreen('surahs')}
       />
     )
   }

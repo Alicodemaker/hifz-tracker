@@ -45,7 +45,8 @@ h2 { font-size: var(--text-md); font-weight: 600; }
   gap: var(--space-3);
   margin-bottom: var(--space-5);
 }
-.screen-head nav { display: flex; gap: var(--space-1); }
+.screen-head nav { display: flex; }
+.screen-head nav .link { padding-inline: var(--space-1); }
 .title-row { display: flex; align-items: center; gap: var(--space-1); }
 /* The chevron back to Today, drawn like the Mushaf page's, in the app's accent. Its tap area reaches into the gutter. */
 .back-button {
@@ -249,6 +250,34 @@ select, input[type='number'] {
   width: 100%;
 }
 .section-title { margin-bottom: var(--space-1); }
+
+/* Surahs: memorised surahs grouped by rating; a tapped row opens its four rating choices. */
+.stars { display: inline-flex; gap: 1px; }
+.stars svg { width: 1em; height: 1em; }
+.stars .star-outline { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.stars .star-fill { fill: currentColor; }
+.stars svg.empty { opacity: 0.35; }
+.surahs-intro { margin-bottom: var(--space-5); }
+.rating-group { margin-bottom: var(--space-6); }
+.rating-title { display: flex; align-items: center; gap: var(--space-2); color: var(--lapis); }
+.surah-list { list-style: none; padding: 0; }
+.surah-list li { border-top: 1px solid var(--rule); }
+.surah-list li:last-child { border-bottom: 1px solid var(--rule); }
+.surah-row {
+  width: 100%;
+  min-height: var(--tap);
+  display: grid;
+  grid-template-columns: 2.25rem 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: start;
+  font-weight: 550;
+}
+.surah-number { font-size: var(--text-sm); font-variant-numeric: tabular-nums; font-weight: 500; }
+.surah-row .arabic { font-size: var(--arabic-list); }
+.rating-choices { margin: 0 0 var(--space-3); }
+.rating-choices button { display: grid; justify-items: center; gap: 2px; padding: var(--space-2) var(--space-1); line-height: 1.2; font-size: 0.8125rem; }
+
 .section-title + p { margin-bottom: var(--space-3); }
 .section-title + p + .segmented { margin-top: 0; }
 

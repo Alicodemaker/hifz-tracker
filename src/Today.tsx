@@ -14,6 +14,7 @@ type Props = {
   onOpenPage: (kind: Kind, portion: Range[]) => void
   onSettings: () => void
   onHistory: () => void
+  onSurahs: () => void
 }
 
 const longDate = (date: string) =>
@@ -58,6 +59,7 @@ export default function Today({
   onOpenPage,
   onSettings,
   onHistory,
+  onSurahs,
 }: Props) {
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
@@ -74,6 +76,9 @@ export default function Today({
       <header className="screen-head">
         <h1 className="date">{longDate(day.date)}</h1>
         <nav>
+          <button className="link" onClick={onSurahs}>
+            Surahs
+          </button>
           <button className="link" onClick={onHistory}>
             History
           </button>

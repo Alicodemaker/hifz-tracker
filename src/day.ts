@@ -1,6 +1,7 @@
 // A Day's plan stays fixed until the date changes; taps are only ticks until then, so they can be undone.
 import { planToday, recordDay, type Progress, type TodaysPlan } from './plan'
 import type { AyahRef } from './quran'
+import type { Rating } from './ratings'
 
 export type Day = {
   date: string // local date, YYYY-MM-DD
@@ -17,6 +18,7 @@ export type Saved = {
   progress: Progress // as of the start of `today`
   today: Day | null
   history: Day[] // most recent first; only Days with something done
+  ratings?: Partial<Record<number, Rating>> // by Surah number; absent in older saves
 }
 
 const somethingDone = (day: Day) => day.hifzEnd !== null || day.rabtDone || day.murajaDone
