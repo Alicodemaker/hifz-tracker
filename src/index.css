@@ -575,18 +575,28 @@ select, input[type='number'] {
 .m-lines:not(.short) .qcf-basmala { top: 0.37em; }
 .qcf-basmala { left: 0.05em; } /* its ink sits a little left of its box */
 
-/* Thin margin marks where today's portion starts and ends. */
-.m-line.mark-start::before,
-.m-line.mark-end::after {
+/* Today's portion: a small olive pin points down at the ayah sign just before it (or, with none on the page, at
+   its first word) and at its own last ayah sign. The text itself is never tinted. */
+.qcf-glyph.pin,
+.m-sign.pin,
+.m-words.pin { position: relative; }
+.qcf-glyph.pin::before,
+.m-sign.pin::before,
+.m-words.pin::before {
   content: '';
   position: absolute;
-  inset-inline-start: calc(-1 * var(--space-2) + 2px);
-  width: 3px;
-  height: 60%;
-  border-radius: 2px;
+  width: 0.5em;
+  height: 0.36em;
   background: var(--mushaf-olive);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  pointer-events: none;
 }
-.m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
+/* Over a sign, centred on it. A QCF4 glyph's box is the whole line, with the sign's ink in its middle. */
+.qcf-glyph.sign.pin::before { left: 50%; transform: translateX(-50%); bottom: calc(50% + 0.62em); }
+.m-sign.pin::before { left: 50%; transform: translateX(-50%); bottom: 1.72em; } /* the rosette's top, measured */
+/* Over a first word, at the edge where it starts. */
+.qcf-glyph.word.pin::before { inset-inline-start: 0; bottom: calc(50% + 0.62em); }
+.m-words.pin::before { inset-inline-start: 0; bottom: calc(100% - 0.1em); }
 
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar.
    Tapping it reveals it, and tapping again hides it. */
@@ -683,8 +693,10 @@ select, input[type='number'] {
 .step-tool.faded-out { opacity: 0; pointer-events: none; }
 /* While the font download strip shows, sit just above it. */
 .mushaf:has(.m-foot) .step-tool { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
-/* The pen sits just left of the hide button. */
-.pen-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
+/* Hide, used far more, sits just left of the pen, nearer the thumb; the pen takes the corner. */
+.hide-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
+/* With no pen (ayah by ayah), hide takes the corner. */
+.mushaf:not(:has(.pen-toggle)) .hide-toggle { right: var(--space-3); }
 .hide-toggle.on,
 .pen-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .hide-toggle.faded-out,
@@ -693,7 +705,7 @@ select, input[type='number'] {
 /* Clear page, while drawing: a round button stacked above the pen. */
 .clear-tool {
   position: fixed;
-  right: calc(var(--space-3) + var(--float-button) + var(--space-2));
+  right: var(--space-3);
   bottom: calc(var(--space-3) + var(--float-button) + var(--space-2) + env(safe-area-inset-bottom));
   width: var(--float-button);
   height: var(--float-button);

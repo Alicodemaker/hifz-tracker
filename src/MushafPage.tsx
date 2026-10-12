@@ -8,6 +8,7 @@ import AyahFocus from './AyahFocus'
 import Drawing from './Drawing'
 import { drawingKey, type Stroke } from './drawings'
 import PageRating from './PageRating'
+import { portionPins } from './pins'
 import type { Rating } from './ratings'
 import Rosette from './Rosette'
 import SurahBadge from './SurahBadge'
@@ -69,22 +70,6 @@ const firstQcfAyah = (lines: QcfLine[]): { surah: number; ayah: number } => {
   return { surah: 1, ayah: 1 }
 }
 
-const sameAyah = (piece: Piece, surah: number, ayah: number) => piece[0] === surah && piece[1] === ayah
-
-// Which lines hold the start and the end of today's portion, for the margin marks.
-const portionMarks = (lines: Line[], portion: Range[] | null): { start: number; end: number } => {
-  let start = -1
-  let end = -1
-  if (!portion?.length) return { start, end }
-  const first = portion[0]
-  const last = portion[portion.length - 1]
-  lines.forEach((line, i) => {
-    if (typeof line === 'string') return
-    if (start < 0 && line.some((p) => sameAyah(p, first.surah, first.from))) start = i
-    if (line.some((p) => sameAyah(p, last.surah, last.to) && p[3] === 1)) end = i
-  })
-  return { start, end }
-}
 
 // Split a piece into its words and the end-of-ayah sign, so the sign can be tinted.
 const splitMarker = (piece: Piece): [string, string] => {
@@ -344,7 +329,15 @@ export default function MushafPage({
     return () => window.clearTimeout(fadeTimer.current)
   }, []) // once per visit, since the page remounts every time
 
-  const { start, end } = portionMarks(lines, portion)
+  // Today's portion: pins on the ayah sign before it (or above its first word) and on its last ayah sign.
+  const pins = portionPins(
+    portion,
+    page,
+    new Set(lines.flatMap((line) => (typeof line === 'string' ? [] : line.filter((p) => p[3] === 1).map((p) => `${p[0]}:${p[1]}`)))),
+  )
+  // The first piece of the portion's first ayah, when the pin goes above it: [line, piece].
+  const startLine = lines.findIndex((line) => typeof line !== 'string' && line.some((p) => `${p[0]}:${p[1]}` === pins.startWord))
+  const startPiece = startLine < 0 ? -1 : (lines[startLine] as Piece[]).findIndex((p) => `${p[0]}:${p[1]}` === pins.startWord)
   const top = qcfPage ? firstQcfAyah(qcfPage.lines) : lines.length ? firstAyah(lines) : null
 
   return (
@@ -396,6 +389,7 @@ export default function MushafPage({
 
       {qcfPage ? (
         <QcfLines
+          page={page}
           lines={qcfPage.lines}
           fontFamily={qcfFonts.fonts[qcfPage.f]}
           bismillahFont={qcfFonts.fonts[BISMILLAH_FONT]}
@@ -417,10 +411,9 @@ export default function MushafPage({
           dir="rtl"
         >
           {lines.map((line, i) => {
-            const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''} ${centered.has(i) ? 'center' : ''}`
             if (line === 'b')
               return (
-                <div key={i} className={`m-line bismillah ${mark}`}>
+                <div key={i} className="m-line bismillah">
                   <span className="basmala" lang="ar">
                     {data?.bismillah}
                   </span>
@@ -428,14 +421,14 @@ export default function MushafPage({
               )
             if (typeof line === 'string')
               return (
-                <div key={i} className={`m-line surah-band ${mark}`}>
+                <div key={i} className="m-line surah-band">
                   <SurahBadge surah={Number(line.slice(1))} name={surahArabic(Number(line.slice(1)))} glyph={null} />
                 </div>
               )
             return (
-              <div key={i} className={`m-line ${mark} ${squeezed.has(i) ? 'squeezed' : ''}`}>
+              <div key={i} className={`m-line ${centered.has(i) ? 'center' : ''} ${squeezed.has(i) ? 'squeezed' : ''}`}>
                 <span className="m-text" style={squeezed.has(i) ? ({ '--squeeze': squeezed.get(i) } as React.CSSProperties) : undefined}>
-                  {line.map((piece) => {
+                  {line.map((piece, j) => {
                     const [words, marker] = splitMarker(piece)
                     const key = `${piece[0]}:${piece[1]}`
                     return (
@@ -444,11 +437,13 @@ export default function MushafPage({
                         className={`m-ayah ${hidden(key) ? 'hidden' : ''}`}
                         data-ayah={key}
                       >
-                        <span className="m-words">{words}</span>
+                        <span className={`m-words ${i === startLine && j === startPiece ? 'pin' : ''}`}>{words}</span>
                         {marker && (
                           <span className="m-marker">
                             {' '}
-                            <Rosette ayah={piece[1]} />
+                            <span className={`m-sign ${pins.signs.has(key) ? 'pin' : ''}`}>
+                              <Rosette ayah={piece[1]} />
+                            </span>
                           </span>
                         )}{' '}
                       </span>

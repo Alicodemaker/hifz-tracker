@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, surahArabic } from './quran'
+import { portionPins } from './pins'
 import { loadQcfNameFont, qcfNameGlyph } from './qcfFonts'
 import SurahBadge from './SurahBadge'
 
@@ -10,6 +11,7 @@ export type Glyph = [number, number, number, number]
 export type QcfLine = string | Glyph[]
 
 type Props = {
+  page: number
   lines: QcfLine[]
   fontFamily: string
   bismillahFont: string // QCF4_Hafs_01, which holds every printed bismillah glyph
@@ -21,21 +23,6 @@ type Props = {
 
 const BASE_SIZE = 20 // px, used only to measure
 
-// Which lines hold the start and the end of today's portion, for the margin marks.
-const portionMarks = (lines: QcfLine[], portion: Range[] | null) => {
-  let start = -1
-  let end = -1
-  if (!portion?.length) return { start, end }
-  const first = portion[0]
-  const last = portion[portion.length - 1]
-  lines.forEach((line, i) => {
-    if (typeof line === 'string') return
-    if (start < 0 && line.some(([, s, a]) => s === first.surah && a === first.from)) start = i
-    if (line.some(([, s, a, kind]) => s === last.surah && a === last.to && kind === 1)) end = i
-  })
-  return { start, end }
-}
-
 // As printed, a short line that ends a surah sits centred; every other line fills the width.
 const endsSurah = (line: QcfLine) => {
   if (typeof line === 'string') return false
@@ -44,7 +31,7 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hiding, hidden, className }: Props) {
+export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -75,7 +62,15 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
     return () => window.removeEventListener('resize', fit)
   }, [lines, fontFamily])
 
-  const { start, end } = portionMarks(lines, portion)
+  // Today's portion: pins on the ayah sign before it (or above its first word) and on its last ayah sign.
+  const pins = portionPins(
+    portion,
+    page,
+    new Set(lines.flatMap((line) => (typeof line === 'string' ? [] : line.filter(([, , , kind]) => kind === 1).map(([, s, a]) => `${s}:${a}`)))),
+  )
+  // The first glyph of the portion's first ayah, when the pin goes above it: [line, glyph].
+  const startLine = lines.findIndex((line) => typeof line !== 'string' && line.some(([, s, a]) => `${s}:${a}` === pins.startWord))
+  const startGlyph = startLine < 0 ? -1 : (lines[startLine] as Glyph[]).findIndex(([, s, a]) => `${s}:${a}` === pins.startWord)
 
   return (
     <div
@@ -91,10 +86,9 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
       dir="rtl"
     >
       {lines.map((line, i) => {
-        const mark = `${i === start ? 'mark-start' : ''} ${i === end ? 'mark-end' : ''}`
         if (typeof line === 'string' && line.startsWith('b'))
           return (
-            <div key={i} className={`m-line bismillah ${mark}`}>
+            <div key={i} className="m-line bismillah">
               <span className="basmala qcf-basmala" style={{ fontFamily: `'${bismillahFont}'` }}>
                 {String.fromCodePoint(Number(line.slice(1)))}
               </span>
@@ -102,7 +96,7 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
           )
         if (typeof line === 'string')
           return (
-            <div key={i} className={`m-line surah-band ${mark}`}>
+            <div key={i} className="m-line surah-band">
               <SurahBadge
                 surah={Number(line.slice(1))}
                 name={surahArabic(Number(line.slice(1)))}
@@ -111,15 +105,16 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
             </div>
           )
         return (
-          <div key={i} className={`m-line qcf-text ${mark} ${centered.has(i) ? 'center' : ''}`}>
+          <div key={i} className={`m-line qcf-text ${centered.has(i) ? 'center' : ''}`}>
             <span className="qcf-row">
               {line.map(([code, surah, ayah, kind], k) => {
                 const key = `${surah}:${ayah}`
                 const isWord = kind === 0
+                const pinned = (kind === 1 && pins.signs.has(key)) || (i === startLine && k === startGlyph)
                 return (
                   <span
                     key={k}
-                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''}`}
+                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''} ${pinned ? 'pin' : ''}`}
                     data-ayah={key}
                   >
                     {String.fromCodePoint(code)}
