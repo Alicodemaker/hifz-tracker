@@ -4,6 +4,7 @@ import { celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
+import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
 import { pageOf } from './quran'
 import { setRating } from './ratings'
@@ -35,6 +36,7 @@ export default function App() {
   const openedFromToday = useRef(false)
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
+  const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
   const [stepping, setStepping] = useState(false) // opened from Hifz: pages show today's Hifz ayah by ayah
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
@@ -87,7 +89,7 @@ export default function App() {
     // Settings don't show the Hifz amount, so keep the one already chosen.
     const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
     update(
-      startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [], ratings: saved?.ratings }, localDate()),
+      startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [], ratings: saved?.ratings, drawings: saved?.drawings }, localDate()),
     )
     setScreen('today')
   }
@@ -134,6 +136,11 @@ export default function App() {
           stepping={stepping}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
+          penOn={penOn}
+          onTogglePen={() => setPenOn((on) => !on)}
+          drawings={saved.drawings}
+          onStroke={(key, stroke) => update(addStroke(saved, key, stroke))}
+          onClearDrawing={(key) => update(clearDrawing(saved, key))}
           onBack={leavePage}
           onTurn={turnTo}
         />

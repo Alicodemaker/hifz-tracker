@@ -1,6 +1,7 @@
 // A Day's plan stays fixed until the date changes; taps are only ticks until then, so they can be undone.
 import { planToday, recordDay, type Progress, type TodaysPlan } from './plan'
 import type { AyahRef } from './quran'
+import type { Stroke } from './drawings'
 import type { Rating } from './ratings'
 
 export type Day = {
@@ -20,6 +21,7 @@ export type Saved = {
   history: Day[] // most recent first; only Days with something done
   ratings?: Partial<Record<number, Rating>> // by Surah number; absent in older saves
   beforeNextDay?: { progress: Progress; today: Day } // the moment before the last tick moved on to the next Day, for undo
+  drawings?: Record<string, Stroke[]> // pen strokes by drawingKey; absent in older saves
 }
 
 const somethingDone = (day: Day) => day.hifzEnd !== null || day.rabtDone || day.murajaDone

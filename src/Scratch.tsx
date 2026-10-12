@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
+import { resetCanvas, watchLinesBox } from './linesBox'
 
 type Props = {
   rootRef: React.RefObject<HTMLElement | null> // the Mushaf page
-  scratchedRef: React.RefObject<boolean> // set once a drag rubs something away, so that drag isn't also a tap
+  draggedRef: React.RefObject<boolean> // set once a drag rubs something away, so that drag isn't also a tap
+  paused: boolean // while the pen is on, a drag draws instead
 }
 
 const SCRATCH_MIN = 4 // px a finger must travel before it starts rubbing, so a tap reveals nothing
@@ -10,8 +12,12 @@ const SCRATCH_MIN = 4 // px a finger must travel before it starts rubbing, so a 
 // Hide mode as a scratch card: a canvas over the page covers every word with a blank bar, and dragging
 // a finger over it rubs the cover away where the finger passes. It is painted fresh on every visit, and
 // again whenever the page's layout changes.
-export default function Scratch({ rootRef, scratchedRef }: Props) {
+export default function Scratch({ rootRef, draggedRef, paused }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const pausedRef = useRef(paused)
+  useEffect(() => {
+    pausedRef.current = paused
+  }, [paused])
 
   useEffect(() => {
     const root = rootRef.current
@@ -20,11 +26,9 @@ export default function Scratch({ rootRef, scratchedRef }: Props) {
     if (!root || !canvas || !ctx) return
     let box: HTMLElement | null = null
 
-    const paint = () => {
-      const dpr = window.devicePixelRatio || 1
-      canvas.width = canvas.clientWidth * dpr
-      canvas.height = canvas.clientHeight * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    const paint = (current: HTMLElement | null) => {
+      box = current
+      resetCanvas(canvas, ctx)
       if (!box?.classList.contains('fitted')) return // not laid out yet
       const style = getComputedStyle(root)
       const area = box.getBoundingClientRect()
@@ -47,36 +51,13 @@ export default function Scratch({ rootRef, scratchedRef }: Props) {
       }
       ctx.restore()
     }
-
-    // Follow the lines box, which is replaced when the exact font takes over, and repaint when it changes.
-    const resized = new ResizeObserver(paint)
-    const changed = new MutationObserver(paint)
-    const attach = () => {
-      const next = root.querySelector<HTMLElement>('.m-lines')
-      if (next === box) return
-      box?.removeEventListener('scroll', paint)
-      box?.removeEventListener('animationend', paint)
-      resized.disconnect()
-      changed.disconnect()
-      box = next
-      if (box) {
-        resized.observe(box)
-        changed.observe(box, { attributes: true, attributeFilter: ['class', 'style'] })
-        box.addEventListener('scroll', paint) // landscape pages scroll
-        box.addEventListener('animationend', paint) // after the page-turn slide
-      }
-      paint()
-    }
-    const children = new MutationObserver(attach)
-    children.observe(root, { childList: true })
-    attach()
-    document.fonts.ready.then(paint)
-    window.addEventListener('resize', paint)
+    const stopWatching = watchLinesBox(root, paint)
 
     let start: { x: number; y: number } | null = null
     let last: { x: number; y: number } | null = null
     const down = (e: PointerEvent) => {
-      scratchedRef.current = false
+      if (pausedRef.current) return
+      draggedRef.current = false
       start = box?.contains(e.target as Node) ? { x: e.clientX, y: e.clientY } : null
       last = null
     }
@@ -98,7 +79,7 @@ export default function Scratch({ rootRef, scratchedRef }: Props) {
       ctx.stroke()
       ctx.restore()
       last = at
-      scratchedRef.current = true
+      draggedRef.current = true
     }
     const up = () => {
       start = null
@@ -110,18 +91,13 @@ export default function Scratch({ rootRef, scratchedRef }: Props) {
     root.addEventListener('pointercancel', up)
 
     return () => {
-      resized.disconnect()
-      changed.disconnect()
-      children.disconnect()
-      box?.removeEventListener('scroll', paint)
-      box?.removeEventListener('animationend', paint)
-      window.removeEventListener('resize', paint)
+      stopWatching()
       root.removeEventListener('pointerdown', down)
       root.removeEventListener('pointermove', move)
       root.removeEventListener('pointerup', up)
       root.removeEventListener('pointercancel', up)
     }
-  }, [rootRef, scratchedRef])
+  }, [rootRef, draggedRef])
 
   return <canvas ref={canvasRef} className="scratch-cover" aria-hidden="true" />
 }

@@ -28,6 +28,14 @@ _Avoid_: Reader, viewer, page view
 A way of testing memorisation on the Mushaf page, like a scratch card: the Ayah text is covered by blank shapes of the same size and place, while Surah headers, the bismillah and Ayah markers stay visible. Dragging a finger over the cover rubs it away where the finger passes; a tap reveals nothing. While it is on, a drag never turns the page (buttons do). Once switched on it stays on across pages until switched off, and every page starts fully covered each time it is shown.
 _Avoid_: Test mode, quiz, blur mode
 
+**Drawing**:
+Red pen marks a person makes over a Mushaf page to note weak spots. Each page keeps its drawing until it is cleared, separately for the bundled and the exact font, since they place words differently.
+_Avoid_: Annotation, highlight, note
+
+**Surah rating**:
+How well the person says they hold a memorised Surah: strong (★★★), holes (★★, gaps in places), last page missing (★½, the last page or two) or weak (★, at least a page missing). Set and changed only by the person; planning never reads it.
+_Avoid_: Score, grade, strength level
+
 **Juz**:
 One of the 30 standard divisions of the Quran; in the Mushaf, exactly 20 Pages.
 _Avoid_: Para, part, sipara

@@ -540,8 +540,9 @@ select, input[type='number'] {
 /* Ayahs not shown yet (ayah by ayah) become a soft bar through the middle of their line, like text seen from afar.
    Hide mode paints the same bars on a canvas over the page, which a finger rubs away. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
-.mushaf.scratching { touch-action: none; }
-.scratch-cover { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.mushaf.free-drag { touch-action: none; }
+.scratch-cover,
+.drawing-ink { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .m-ayah.hidden .m-words {
   color: transparent;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
@@ -550,7 +551,8 @@ select, input[type='number'] {
   box-decoration-break: clone;
 }
 
-.hide-toggle {
+.hide-toggle,
+.pen-toggle {
   position: fixed;
   right: var(--space-3);
   bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
@@ -605,9 +607,32 @@ select, input[type='number'] {
 .step-tool.faded-out { opacity: 0; pointer-events: none; }
 /* While the font download strip shows, sit just above it. */
 .mushaf:has(.m-foot) .step-tool { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
-.hide-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
-.hide-toggle.faded-out { opacity: 0; pointer-events: none; }
-.hide-toggle svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* The pen sits just left of the hide button. */
+.pen-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
+.hide-toggle.on,
+.pen-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
+.hide-toggle.faded-out,
+.pen-toggle.faded-out { opacity: 0; pointer-events: none; }
+.pen-toggle.on { background: var(--mushaf-pen); box-shadow: var(--float-shadow); }
+/* Clear page, while drawing: a round button stacked above the pen. */
+.clear-tool {
+  position: fixed;
+  right: calc(var(--space-3) + var(--float-button) + var(--space-2));
+  bottom: calc(var(--space-3) + var(--float-button) + var(--space-2) + env(safe-area-inset-bottom));
+  width: var(--float-button);
+  height: var(--float-button);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-pen);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-pen);
+  transition: opacity var(--motion-calm) ease;
+}
+.clear-tool.faded-out { opacity: 0; pointer-events: none; }
+.clear-tool svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hide-toggle svg,
+.pen-toggle svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 /* A strip at the bottom for the font download, shown only until the exact font is in place. */
 .m-foot {
@@ -615,7 +640,7 @@ select, input[type='number'] {
   display: flex;
   align-items: center;
   height: calc(var(--float-button) + var(--space-3));
-  padding-inline: var(--space-2) calc(var(--float-button) + var(--space-4));
+  padding-inline: var(--space-2) calc(2 * var(--float-button) + var(--space-2) + var(--space-4)); /* clear of the pen and hide buttons */
 }
 .font-download {
   min-height: var(--tap);
