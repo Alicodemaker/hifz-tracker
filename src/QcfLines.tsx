@@ -15,8 +15,6 @@ type Props = {
   bismillahFont: string // QCF4_Hafs_01, which holds every printed bismillah glyph
   portion: Range[] | null
   hiding: boolean
-  revealed: Set<string>
-  onToggleAyah: (key: string) => void
   className: string
 }
 
@@ -45,7 +43,7 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hiding, revealed, onToggleAyah, className }: Props) {
+export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hiding, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -120,9 +118,8 @@ export default function QcfLines({ lines, fontFamily, bismillahFont, portion, hi
                 return (
                   <span
                     key={k}
-                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && revealed.has(key) ? 'revealed' : ''}`}
+                    className={`qcf-glyph ${isWord ? 'word' : 'sign'}`}
                     data-ayah={key}
-                    onClick={hiding && isWord ? () => onToggleAyah(key) : undefined}
                   >
                     {String.fromCodePoint(code)}
                   </span>

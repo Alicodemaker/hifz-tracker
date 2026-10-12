@@ -10,10 +10,12 @@ type Props = {
   hifzAmount: number
   estimates: FinishEstimates | null
   onChange: (day: Day) => void
+  onUndoNextDay: (() => void) | null // only just after finishing a Day moved on to the next
   onChangeAmount: (direction: 1 | -1) => void
   onOpenPage: (kind: Kind, portion: Range[]) => void
   onSettings: () => void
   onHistory: () => void
+  onSurahs: () => void
 }
 
 const longDate = (date: string) =>
@@ -54,14 +56,15 @@ export default function Today({
   hifzAmount,
   estimates,
   onChange,
+  onUndoNextDay,
   onChangeAmount,
   onOpenPage,
   onSettings,
   onHistory,
+  onSurahs,
 }: Props) {
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
-  const reps = day.hifzReps ?? 0
 
   // Tapping an area opens its Mushaf page; its own buttons keep their jobs.
   const openFrom = (kind: Kind, portion: Range[]) => (event: React.MouseEvent) => {
@@ -75,6 +78,9 @@ export default function Today({
       <header className="screen-head">
         <h1 className="date">{longDate(day.date)}</h1>
         <nav>
+          <button className="link" onClick={onSurahs}>
+            Surahs
+          </button>
           <button className="link" onClick={onHistory}>
             History
           </button>
@@ -94,10 +100,7 @@ export default function Today({
               </p>
             </div>
             <p className="range">{describeRanges(plan.hifz)}</p>
-            <p className="faded small">
-              {describeSize(plan.hifz)}
-              {reps > 0 && `, read ${reps}×`}
-            </p>
+            <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (
               <div className="stepper">
                 <button disabled={hifzAmount <= 0.25} onClick={() => onChangeAmount(-1)} aria-label="Quarter of a page less each day">
@@ -154,7 +157,16 @@ export default function Today({
             Muraja'a
           </button>
         </div>
-        <p className="faded small hint">Tap when done. Tap again to undo.</p>
+        {onUndoNextDay ? (
+          <p className="faded small hint">
+            All done. This is your next plan.{' '}
+            <button className="link" onClick={onUndoNextDay}>
+              Undo
+            </button>
+          </p>
+        ) : (
+          <p className="faded small hint">Tap when done. Tap again to undo.</p>
+        )}
       </div>
     </main>
   )

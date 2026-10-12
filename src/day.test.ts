@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { celebrationFor, countRep, startDay, toggleDone, type Saved } from './day'
+import { celebrationFor, startDay, toggleDone, undoNextDay, updateToday, type Saved } from './day'
 import { planToday, type Progress } from './plan'
 
 const progress: Progress = {
@@ -68,23 +68,6 @@ describe('toggleDone', () => {
   })
 })
 
-describe('countRep', () => {
-  const day = startDay(fresh, '2026-09-29').today!
-
-  it('counts Hifz repetitions up and down from none, never below none', () => {
-    expect(day.hifzReps ?? 0).toBe(0)
-    const twice = countRep(countRep(day, 1), 1)
-    expect(twice.hifzReps).toBe(2)
-    expect(countRep(twice, -1).hifzReps).toBe(1)
-    expect(countRep(day, -1).hifzReps).toBe(0)
-  })
-
-  it('starts each new day at none', () => {
-    const counted = { ...fresh, today: countRep(day, 1) }
-    expect(startDay(counted, '2026-09-30').today!.hifzReps ?? 0).toBe(0)
-  })
-})
-
 describe('celebrationFor', () => {
   const day = startDay(fresh, '2026-09-29').today!
 
@@ -106,6 +89,66 @@ describe('celebrationFor', () => {
   it('is nothing for an undo, or for a change that ticks nothing', () => {
     const rabt = toggleDone(day, 'rabt')
     expect(celebrationFor(rabt, toggleDone(rabt, 'rabt'))).toBeNull()
-    expect(celebrationFor(day, countRep(day, 1))).toBeNull()
+    expect(celebrationFor(day, { ...day })).toBeNull()
+  })
+})
+
+describe('updateToday', () => {
+  const opened = startDay(fresh, '2026-09-29')
+  const tick = (saved: Saved, kind: 'hifz' | 'rabt' | 'muraja') => updateToday(saved, toggleDone(saved.today!, kind))
+  const two = tick(tick(opened, 'hifz'), 'rabt')
+
+  it('only records the tick while something is left', () => {
+    expect(two.today).toEqual(toggleDone(toggleDone(opened.today!, 'hifz'), 'rabt'))
+    expect(two.history).toEqual([])
+    expect(two.progress).toBe(opened.progress)
+  })
+
+  it('logs the day and moves straight on to the next plan once all three are ticked', () => {
+    const done = tick(two, 'muraja')
+    expect(done.history).toEqual([toggleDone(two.today!, 'muraja')])
+    expect(done.progress.hifzNext!.ayah).toBeGreaterThan(1) // past today's Hifz
+    expect(done.today).toEqual({
+      date: '2026-09-29', // still the same date
+      plan: planToday(done.progress),
+      hifzEnd: null,
+      rabtDone: false,
+      murajaDone: false,
+    })
+    expect(done.today!.plan.hifz[0].from).toBe(done.progress.hifzNext!.ayah)
+    expect(done.today!.plan.muraja).not.toEqual(opened.today!.plan.muraja)
+  })
+
+  it('counts a kind with nothing planned as done', () => {
+    const noMuraja = { ...opened, today: { ...opened.today!, plan: { ...opened.today!.plan, muraja: [] } } }
+    const done = tick(tick(noMuraja, 'hifz'), 'rabt')
+    expect(done.history).toHaveLength(1)
+  })
+
+  it('logs each round on the same date separately', () => {
+    const first = tick(two, 'muraja')
+    const second = tick(tick(tick(first, 'hifz'), 'rabt'), 'muraja')
+    expect(second.history.map((d) => d.date)).toEqual(['2026-09-29', '2026-09-29'])
+  })
+})
+
+describe('undoNextDay', () => {
+  const opened = startDay(fresh, '2026-09-29')
+  const tick = (saved: Saved, kind: 'hifz' | 'rabt' | 'muraja') => updateToday(saved, toggleDone(saved.today!, kind))
+  const two = tick(tick(opened, 'hifz'), 'rabt')
+  const done = tick(two, 'muraja')
+
+  it('brings back the day as it was before the last tick', () => {
+    const undone = undoNextDay(done)
+    expect(undone.today).toEqual(two.today)
+    expect(undone.progress).toEqual(two.progress)
+    expect(undone.history).toEqual([])
+    expect(undoNextDay(undone)).toBe(undone) // nothing more to undo
+  })
+
+  it('is no longer possible once something else is ticked, or the date changes', () => {
+    expect(undoNextDay(tick(done, 'rabt'))).toEqual(tick(done, 'rabt'))
+    const tomorrow = startDay(done, '2026-09-30')
+    expect(undoNextDay(tomorrow)).toBe(tomorrow)
   })
 })

@@ -54,29 +54,77 @@ describe('Hifz amount', () => {
   })
 })
 
+// The Rabt rotation for a run of days: each day's Rabt, ticked done.
+const rabtDays = (start: Progress, days: number): Range[][] => {
+  const seen: Range[][] = []
+  let progress = start
+  for (let i = 0; i < days; i++) {
+    seen.push(planToday(progress).rabt)
+    progress = recordDay(progress, { rabtDone: true })
+  }
+  return seen
+}
+
+// Hifz in al-Mulk, the first surah of Juz 29 (al-Mulk to al-Mursalat); everything after it memorised.
+const mulk: Progress = { memorised: surahs(68, 114), hifzNext: { surah: 67, ayah: 5 }, murajaNext: null }
+
 describe('Rabt', () => {
-  it('is the most recently memorised five pages, ending where memorisation stopped', () => {
-    const { rabt } = planToday(real)
-    expect(rabt).toHaveLength(1)
-    expect(rabt[0]).toMatchObject({ surah: 41, to: 54 }) // the end of Fussilat
-    expect(rabt[0].from).toBeGreaterThan(1) // Fussilat is 6 pages, so not all of it
-    expect(size(rabt)).toBeCloseTo(5, 0)
+  it('is one whole surah, starting at the surah after the one being memorised', () => {
+    expect(planToday(mulk).rabt).toEqual([{ surah: 68, from: 1, to: 52 }]) // al-Qalam
+    // Ghafir is in Juz 24; Fussilat starts there too, so it is all of it (even its end in Juz 25).
+    expect(planToday(real).rabt).toEqual([{ surah: 41, from: 1, to: 54 }])
   })
 
-  it('includes today-so-far of a surah being memorised, listed in mushaf order', () => {
-    const { rabt } = planToday({ ...real, hifzNext: { surah: 40, ayah: 7 } })
-    expect(rabt[0]).toEqual({ surah: 40, from: 1, to: 6 }) // Ghafir comes before Fussilat in the mushaf
-    expect(rabt[1]).toMatchObject({ surah: 41, to: 54 })
-    expect(size(rabt)).toBeCloseTo(5, 0)
+  it('moves one surah on each day it is ticked, and loops at the end of the juz', () => {
+    const days = rabtDays(mulk, 12).map((rabt) => rabt.map((r) => r.surah))
+    expect(days).toEqual([[68], [69], [70], [71], [72], [73], [74], [75], [76], [77], [68], [69]])
+  })
+
+  it('stays on the same surah when it is not ticked', () => {
+    expect(planToday(recordDay(mulk, {})).rabt).toEqual(planToday(mulk).rabt)
+  })
+
+  it('starts again after the new surah when Hifz moves to the next surah', () => {
+    const later = recordDay(recordDay(mulk, { rabtDone: true }), { rabtDone: true }) // Rabt now at al-Ma'arij
+    // Finishing al-Mulk: Hifz moves to at-Tahrim (Juz 28). No memorised surah starts in Juz 28 after it,
+    // so the Rabt is the surah just finished.
+    const next = recordDay(later, { hifzEnd: { surah: 67, ayah: 30 }, rabtDone: true })
+    expect(next.hifzNext).toEqual({ surah: 66, ayah: 1 })
+    expect(planToday(next).rabt).toEqual([{ surah: 67, from: 1, to: 30 }])
+  })
+
+  it('takes a surah longer than ten pages in pieces of about ten pages, cut at page boundaries', () => {
+    // Hifz in al-Isra (Juz 15); al-Kahf (about 11.5 pages) starts in Juz 15 and is memorised.
+    const isra: Progress = { memorised: [18, ...surahs(41, 114)], hifzNext: { surah: 17, ayah: 50 }, murajaNext: null }
+    const [first, second, third] = rabtDays(isra, 3)
+    expect(first).toHaveLength(1)
+    expect(first[0]).toMatchObject({ surah: 18, from: 1 })
+    expect(size(first)).toBeLessThanOrEqual(10.5)
+    expect(pageOf({ surah: 18, ayah: first[0].to + 1 })).not.toBe(pageOf({ surah: 18, ayah: first[0].to }))
+    expect(second).toEqual([{ surah: 18, from: first[0].to + 1, to: 110 }])
+    expect(third).toEqual(first) // al-Kahf is the only surah in the rotation
+  })
+
+  it('is empty when nothing is memorised yet', () => {
+    expect(planToday({ memorised: [], hifzNext: { surah: 114, ayah: 1 }, murajaNext: null }).rabt).toEqual([])
   })
 })
 
 const isWhole = (r: Range) => r.from === 1 && r.to === ayahCount(r.surah)
 
 describe("Muraja'a", () => {
+  it('leaves out every surah in the Rabt rotation, not only today\'s', () => {
+    const { muraja } = planToday(mulk)
+    expect(muraja[0].surah).toBe(78) // al-Qalam to al-Mursalat (Juz 29) are all Rabt
+    for (let day = 0, progress = mulk; day < 6; day++) {
+      expect(planToday(progress).muraja.some((r) => r.surah >= 68 && r.surah <= 77)).toBe(false)
+      progress = recordDay(progress, { murajaDone: true })
+    }
+  })
+
   it('starts with the first surah fully out of the Rabt, in whole surahs up to ten pages', () => {
     const { muraja } = planToday(real)
-    // Fussilat is still partly in the Rabt, so the rotation starts at ash-Shura.
+    // Fussilat is in the Rabt rotation, so the Muraja'a starts at ash-Shura.
     expect(muraja[0]).toEqual({ surah: 42, from: 1, to: 53 })
     expect(muraja.every(isWhole)).toBe(true)
     expect(size(muraja)).toBeLessThanOrEqual(10)

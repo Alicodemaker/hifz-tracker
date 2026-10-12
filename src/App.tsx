@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Celebration from './Celebration'
-import { celebrationFor, countRep, localDate, startDay, toggleDone, type Day, type Kind, type Saved } from './day'
+import { celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
+import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
 import { pageOf } from './quran'
+import { setRating } from './ratings'
 import Settings from './Settings'
 import { load, save } from './storage'
+import Surahs from './Surahs'
 import Today from './Today'
 
 // Start today's Day if the date has changed, and remember it. Saving the same state twice is harmless.
@@ -27,13 +30,14 @@ const pageFromHash = (): number | null => {
 
 export default function App() {
   const [saved, setSaved] = useState<Saved | null>(() => openToday(load()))
-  const [screen, setScreen] = useState<'today' | 'settings' | 'history'>('today')
+  const [screen, setScreen] = useState<'today' | 'settings' | 'history' | 'surahs'>('today')
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
-  const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
   const openedFromToday = useRef(false)
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
+  const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
+  const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function App() {
     if (!saved) return
     const size = saved.today && celebrationFor(saved.today, day)
     if (size) setCelebration((last) => ({ size, origin: lastTap.current, id: (last?.id ?? 0) + 1 })) // a new id restarts a running one
-    update({ ...saved, today: day })
+    update(updateToday(saved, day))
   }
 
   // Coming back to the app on a new date starts a new Day.
@@ -84,7 +88,9 @@ export default function App() {
     // Saved progress settings replace today's plan; ticks made today under the old ones are dropped.
     // Settings don't show the Hifz amount, so keep the one already chosen.
     const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
-    update(startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [] }, localDate()))
+    update(
+      startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [], ratings: saved?.ratings, drawings: saved?.drawings }, localDate()),
+    )
     setScreen('today')
   }
 
@@ -121,37 +127,31 @@ export default function App() {
 
   const screenContent = () => {
     if (saved && mushafPage) {
-      const today = saved.today
-      // Done on the page ticks the area it was opened from and goes back to Today; tapped again, it only undoes.
-      const done =
-        today && (openedKind === 'hifz' ? today.hifzEnd !== null : openedKind === 'rabt' ? today.rabtDone : today.murajaDone)
-      const task =
-        today && openedKind
-          ? {
-              kind: openedKind,
-              done: Boolean(done),
-              onToggle: () => {
-                changeToday(toggleDone(today, openedKind))
-                if (!done) leavePage()
-              },
-            }
-          : null
       return (
         <MushafPage
           key={mushafPage} // a fresh page on every visit, so hide mode starts fully hidden each time
           page={mushafPage}
           arrivedFrom={arrivedFrom}
           portion={portion}
+          stepping={openedKind === 'hifz'}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
-          onBack={leavePage}
-          onTurn={turnTo}
-          task={task}
-          reps={
-            today && openedKind === 'hifz'
-              ? { count: today.hifzReps ?? 0, onCount: (change) => changeToday(countRep(today, change)) }
+          penOn={penOn}
+          onTogglePen={() => setPenOn((on) => !on)}
+          drawings={saved.drawings}
+          onStroke={(key, stroke) => update(addStroke(saved, key, stroke))}
+          onClearDrawing={(key) => update(clearDrawing(saved, key))}
+          rating={
+            openedKind === 'muraja'
+              ? {
+                  memorised: saved.progress.memorised,
+                  ratings: saved.ratings,
+                  onRate: (surah, rating) => update(setRating(saved, surah, rating)),
+                }
               : null
           }
+          onBack={leavePage}
+          onTurn={turnTo}
         />
       )
     }
@@ -170,6 +170,12 @@ export default function App() {
       return <History saved={saved} onRestore={restore} onBack={() => setScreen('today')} />
     }
 
+    if (screen === 'surahs') {
+      return (
+        <Surahs saved={saved} onRate={(surah, rating) => update(setRating(saved, surah, rating))} onBack={() => setScreen('today')} />
+      )
+    }
+
     return (
       <Today
         key={saved.today!.date}
@@ -177,10 +183,12 @@ export default function App() {
         hifzAmount={saved.progress.hifzAmount ?? DEFAULT_HIFZ_AMOUNT}
         estimates={finishEstimates(saved)}
         onChange={changeToday}
+        onUndoNextDay={saved.beforeNextDay ? () => update(undoNextDay(saved)) : null}
         onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
         onOpenPage={openPage}
         onSettings={() => setScreen('settings')}
         onHistory={() => setScreen('history')}
+        onSurahs={() => setScreen('surahs')}
       />
     )
   }
