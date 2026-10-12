@@ -4,16 +4,16 @@ The finished plans are in `docs/plans/` (`PLAN-v1.md`, `PLAN-v1.1.md`).
 
 ## What we're doing
 
-Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page missing, ★★ holes, ★★★ strong) and see at a glance which ones are strong enough for salah. Rabt becomes one Surah from the current juz. When all three kinds are ticked, the app moves straight on to the next day's plan, with an undo. On the Mushaf page, the Done button and the counter go, and three tools come in: ayah-by-ayah Hifz, scratch-to-reveal in hide mode, and a drawing pen to mark weak spots.
+Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page missing, ★★ holes, ★★★ strong) and see at a glance which ones are strong enough for salah. Rabt becomes one Surah from the current juz. When all three kinds are ticked, the app moves straight on to the next day's plan, with an undo. On the Mushaf page, the Done button and the counter go. Hifz opens one ayah at a time, hide mode becomes a scratch card, and a drawing pen marks weak spots.
 
 ## Steps
 
 1. **Mushaf page clean-up**: remove the floating Done button and the read-through counter, and the count on Today's Hifz card. Hide and back stay; older saves with a count still load.
 2. **Surah ratings and Surahs screen**: a Surahs screen (linked from Today) lists memorised Surahs grouped by rating, strongest first, with unrated ones last. Tapping a Surah's stars sets its rating, and tapping the same rating again clears it. Ratings are kept on the phone and go into the Backup. Planning never reads them.
-3. **Rabt is one Surah** (test-first): each day's Rabt is one memorised Surah of the juz the next Hifz is in, rotating in Mushaf order (only its part in that juz), never the Surah being memorised. The rotation moves on only when Rabt is ticked. When nothing qualifies, it is the most recently finished Surah. Surahs outside the current juz are Muraja'a. Update `CONTEXT.md` and add an ADR.
+3. **Rabt is one Surah** (test-first): each day's Rabt is one Surah, or 10 Pages of a Surah longer than 10 Pages (split at Page boundaries). It starts at the Surah after the current Hifz Surah in Mushaf order (Hifz in al-Mulk → Rabt starts at al-Qalam) and moves one Surah (or piece) on each time Rabt is ticked. After the end of the current Hifz's juz, it loops back to the start. Only the part of a Surah inside that juz counts. When nothing qualifies, it is the most recently finished Surah. Surahs outside the current juz are Muraja'a. Update `CONTEXT.md` and add an ADR.
 4. **All three done → next day** (test-first): ticking the last kind (a kind with nothing planned counts as done) logs the day to History, moves progress on and shows the next plan at once, after the big celebration. An "Undo" button brings back the day as it was, with that last kind unticked, until something else is ticked or the date changes. Several rounds on one date show as separate History entries, and Pace counts each round.
-5. **Ayah by ayah**: opened from Hifz, a third round button, the same size as hide, starts ayah-by-ayah mode. Only the first ayah of today's Hifz shows, and the rest of the page is blank shapes. A "Next ayah" button adds the following ayah, until the whole Hifz shows.
-6. **Scratch to reveal**: in hide mode, dragging a finger over a blank ayah rubs it away where the finger passes; a tap still reveals or hides the whole ayah. While hide mode or the pen is on, a drag never turns the page, and small ‹ › buttons with the other floating buttons do it instead.
+5. **Ayah by ayah**: opened from Hifz, the page shows only the first ayah of today's Hifz; the Hifz ayahs after it are blank shapes, and the rest of the page shows as usual. A "Next ayah" button adds the following ayah to what's shown (across a page turn if the Hifz continues), and goes away once the whole Hifz shows. Every time the page is opened from Hifz, it starts at one ayah again. There is no new mode button.
+6. **Scratch to reveal**: hide mode no longer reveals on tap. With hide mode on, dragging a finger over a blank ayah rubs it away where the finger passes, like a scratch card. A tap only shows or hides the floating buttons, as now. While hide mode or the pen is on, a drag never turns the page, and small ‹ › buttons with the other floating buttons do it instead. Update hide mode in `CONTEXT.md`.
 7. **Drawing pen**: a pen button the same size as hide sits beside it. When it's on, a finger draws over the page in red, and a "Clear page" button appears. Drawings are kept for each page and each font look (they don't line up across looks), stay until cleared, and go into the Backup.
 
 ## What we're NOT doing
@@ -24,10 +24,11 @@ Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page 
 - No revision of earlier pages of the current Hifz Surah in the app (done by hand during Hifz)
 - No colours, pen sizes or eraser for drawing; only Clear page
 - No tomorrow preview before all three are done
+- No tap-to-reveal in hide mode, and no separate ayah-by-ayah button
 - No Arabic-script labels or new settings
 
 ## How we'll know it works
 
 1. Rate al-Mulk ★★★ and al-Qalam ★: the Surahs screen shows al-Mulk under strong and al-Qalam under weak, and both are still there after a Backup and restore.
 2. Tick Hifz, Rabt and Muraja'a: Today shows the next Hifz, a different single Rabt Surah and the next Muraja'a slice, and History shows the finished round. Undo removes that History entry and brings back the ticks with Muraja'a unticked.
-3. On the Mushaf page, with hide mode on, rubbing an ayah reveals it and the page doesn't turn. With the pen on, a line drawn on page 562 is still there after going back and reopening the page.
+3. Opened from Hifz, the page shows one ayah, and "Next ayah" adds the next. With hide mode on, tapping an ayah does nothing, rubbing it reveals it, and the page doesn't turn. With the pen on, a line drawn on page 562 is still there after going back and reopening the page.
