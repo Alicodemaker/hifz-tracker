@@ -172,7 +172,7 @@ export default function App() {
           onStroke={(key, stroke) => update(addStroke(saved, key, stroke))}
           onClearDrawing={(key) => update(clearDrawing(saved, key))}
           rating={
-            openedKind === 'muraja'
+            openedKind === 'muraja' || openedKind === 'rabt'
               ? {
                   memorised: saved.progress.memorised,
                   ratings: saved.ratings,

@@ -46,7 +46,7 @@ type Props = {
   drawings: Record<string, Stroke[]> | undefined // pen strokes by drawingKey
   onStroke: (key: string, stroke: Stroke) => void
   onClearDrawing: (key: string) => void
-  rating: { memorised: number[]; ratings: Partial<Record<number, Rating>> | undefined; onRate: (surah: number, rating: Rating) => void } | null // opened from Muraja'a
+  rating: { memorised: number[]; ratings: Partial<Record<number, Rating>> | undefined; onRate: (surah: number, rating: Rating) => void } | null // opened from Rabt or Muraja'a
   onBack: () => void
   onTurn: (page: number) => void
 }
@@ -292,7 +292,7 @@ export default function MushafPage({
     ))
   }
 
-  // Rating, when opened from Muraja'a: the stars at the top right rate the memorised Surahs on this page.
+  // Rating, when opened from Rabt or Muraja'a: the stars at the top right rate the memorised Surahs on this page.
   const [ratingOpen, setRatingOpen] = useState(false)
   const pageSurahs = [...new Set(pageAyahs.map((key) => Number(key.split(':')[0])))]
   const ratableSurahs = rating ? pageSurahs.filter((s) => rating.memorised.includes(s)) : []
