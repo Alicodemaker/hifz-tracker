@@ -99,6 +99,8 @@ button:disabled { opacity: 0.35; cursor: default; }
 }
 .action-bar > * { max-width: calc(var(--screen-max) - 2 * var(--space-4)); margin-inline: auto; }
 .action-bar .hint { text-align: center; margin-top: var(--space-2); }
+/* Undo after finishing a day: a roomy tap area that keeps the hint line its usual height. */
+.action-bar .hint .link { min-height: auto; padding: var(--space-2); margin-block: calc(-1 * var(--space-2)); }
 .action-bar .row { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-2); }
 
 .notice {

@@ -67,8 +67,8 @@ export default function History({ saved, onRestore, onBack }: Props) {
         <p className="faded">Days appear here once you tap Done on the Today screen.</p>
       ) : (
         <ul className="days">
-          {days.map((day) => (
-            <DayRow key={day.date} day={day} />
+          {days.map((day, i) => (
+            <DayRow key={`${day.date}-${days.length - i}`} day={day} />
           ))}
         </ul>
       )}

@@ -10,6 +10,7 @@ type Props = {
   hifzAmount: number
   estimates: FinishEstimates | null
   onChange: (day: Day) => void
+  onUndoNextDay: (() => void) | null // only just after finishing a Day moved on to the next
   onChangeAmount: (direction: 1 | -1) => void
   onOpenPage: (kind: Kind, portion: Range[]) => void
   onSettings: () => void
@@ -55,6 +56,7 @@ export default function Today({
   hifzAmount,
   estimates,
   onChange,
+  onUndoNextDay,
   onChangeAmount,
   onOpenPage,
   onSettings,
@@ -155,7 +157,16 @@ export default function Today({
             Muraja'a
           </button>
         </div>
-        <p className="faded small hint">Tap when done. Tap again to undo.</p>
+        {onUndoNextDay ? (
+          <p className="faded small hint">
+            All done. This is your next plan.{' '}
+            <button className="link" onClick={onUndoNextDay}>
+              Undo
+            </button>
+          </p>
+        ) : (
+          <p className="faded small hint">Tap when done. Tap again to undo.</p>
+        )}
       </div>
     </main>
   )

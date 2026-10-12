@@ -45,7 +45,7 @@ The size of the daily Hifz the person has chosen, in quarter-Page steps (¼, ½,
 _Avoid_: Daily target, quota, sabaq size
 
 **Pace**:
-How fast memorisation moves: the Hifz amount multiplied by how many days a week Hifz is actually logged. It is used to estimate when the current Surah and the whole Quran will be finished.
+How fast memorisation moves: the Hifz amount multiplied by how many times a week a Hifz is actually logged (two rounds on one date count twice). It is used to estimate when the current Surah and the whole Quran will be finished.
 _Avoid_: Speed, rate, velocity
 
 **Memorisation order**:
@@ -67,7 +67,7 @@ _Avoid_: Manzil slice, portion, chunk
 ## Days
 
 **Today's plan**:
-The Hifz, Rabt and Muraja'a the app suggests for today. A suggestion, not an obligation: the person confirms or adjusts each part.
+The Hifz, Rabt and Muraja'a the app suggests for today. A suggestion, not an obligation: the person confirms or adjusts each part. Once every planned part is ticked, the Log is kept and the next plan follows at once, on the same date (with an undo until anything else is ticked).
 _Avoid_: Schedule, assignment, target
 
 **Log**:

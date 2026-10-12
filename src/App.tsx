@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Celebration from './Celebration'
-import { celebrationFor, localDate, startDay, type Day, type Kind, type Saved } from './day'
+import { celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
@@ -65,7 +65,7 @@ export default function App() {
     if (!saved) return
     const size = saved.today && celebrationFor(saved.today, day)
     if (size) setCelebration((last) => ({ size, origin: lastTap.current, id: (last?.id ?? 0) + 1 })) // a new id restarts a running one
-    update({ ...saved, today: day })
+    update(updateToday(saved, day))
   }
 
   // Coming back to the app on a new date starts a new Day.
@@ -161,6 +161,7 @@ export default function App() {
         hifzAmount={saved.progress.hifzAmount ?? DEFAULT_HIFZ_AMOUNT}
         estimates={finishEstimates(saved)}
         onChange={changeToday}
+        onUndoNextDay={saved.beforeNextDay ? () => update(undoNextDay(saved)) : null}
         onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
         onOpenPage={openPage}
         onSettings={() => setScreen('settings')}
