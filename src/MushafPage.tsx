@@ -5,6 +5,7 @@ import QcfLines, { type QcfLine } from './QcfLines'
 import { QCF_FONT_COUNT, downloadQcfFonts, loadQcfFont, qcfFontsReady } from './qcfFonts'
 import qcfFonts from './data/qcf-fonts.json'
 import Rosette from './Rosette'
+import Scratch from './Scratch'
 import SurahBadge from './SurahBadge'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
@@ -171,12 +172,13 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
   }, [lines])
 
   // As in a printed mushaf, the next page lies to the left: swipe right (or press ←) to reach it.
+  // In hide mode a drag scratches instead, and the ‹ › buttons turn the page.
   const touchStart = useRef<{ x: number; y: number } | null>(null)
   const onTouchStart = (e: React.TouchEvent) => (touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })
   const onTouchEnd = (e: React.TouchEvent) => {
     const from = touchStart.current
     touchStart.current = null
-    if (!from) return
+    if (!from || hiding) return
     const dx = e.changedTouches[0].clientX - from.x
     const dy = e.changedTouches[0].clientY - from.y
     if (Math.abs(dx) >= SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.5) onTurn(dx > 0 ? page + 1 : page - 1)
@@ -190,16 +192,9 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
     return () => window.removeEventListener('keydown', onKey)
   }, [page, onTurn])
 
-  // Hide mode: every page starts fully hidden each time it is shown; tapping an ayah reveals or hides it.
-  // The page remounts on every visit; revealed ayahs also reset when hide mode is switched.
-  const scope = String(hiding)
-  const [reveals, setReveals] = useState<{ scope: string; keys: Set<string> }>({ scope, keys: new Set() })
-  const revealed = reveals.scope === scope ? reveals.keys : new Set<string>()
-  const toggleAyah = (key: string) => {
-    const keys = new Set(revealed)
-    if (!keys.delete(key)) keys.add(key)
-    setReveals({ scope, keys })
-  }
+  // Hide mode is a scratch card over the page (Scratch): every page starts fully covered each time it is shown.
+  const mainRef = useRef<HTMLElement>(null)
+  const scratchedRef = useRef(false)
 
   // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, then one more
   // for each "+1 ayah", until the page's last ayah; then the whole page shows. Each visit starts again.
@@ -226,12 +221,12 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
     const i = position.get(key) ?? -1
     return stepActive && (i < stepStart || i > stepEnd)
   }
-  const hidden = (key: string) => (hiding && !revealed.has(key)) || stepHidden(key)
+  const hidden = stepHidden
 
   // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
-  // They show when the page is opened, but not after a page turn.
-  const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null)
+  // They show when the page is opened, but not after a page turn (unless in hide mode, for the ‹ › buttons).
+  const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null || hiding)
   const fadeTimer = useRef<number | undefined>(undefined)
   const startFadeTimer = () => {
     window.clearTimeout(fadeTimer.current)
@@ -244,22 +239,23 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
   const onPageTap = (e: React.MouseEvent) => {
     const target = e.target as Element
     if (target.closest('button')) return wake() // using a button keeps them all showing
-    if (hiding && target.closest('.m-ayah, .qcf-glyph.word')) return // that tap reveals or hides an ayah
+    if (scratchedRef.current) return // the end of a scratch, not a tap
     if (!buttonVisible) return wake()
     window.clearTimeout(fadeTimer.current)
     setButtonVisible(false)
   }
   useEffect(() => {
-    if (arrivedFrom === null) startFadeTimer()
+    startFadeTimer() // harmless when they start hidden
     return () => window.clearTimeout(fadeTimer.current)
-  }, [arrivedFrom]) // fixed for each visit, since the page remounts every time
+  }, []) // once per visit, since the page remounts every time
 
   const { start, end } = portionMarks(lines, portion)
   const top = qcfPage ? firstQcfAyah(qcfPage.lines) : lines.length ? firstAyah(lines) : null
 
   return (
     <main
-      className="mushaf"
+      ref={mainRef}
+      className={`mushaf ${hiding ? 'scratching' : ''}`}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onClick={onPageTap}
@@ -286,7 +282,6 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
           portion={portion}
           hiding={hiding}
           hidden={hidden}
-          onToggleAyah={toggleAyah}
           className={arrivedFrom ? `enter-${arrivedFrom}` : ''}
         />
       ) : (
@@ -328,7 +323,6 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
                         key={key}
                         className={`m-ayah ${hidden(key) ? 'hidden' : ''}`}
                         data-ayah={key}
-                        onClick={hiding ? () => toggleAyah(key) : undefined}
                       >
                         <span className="m-words">{words}</span>
                         {marker && (
@@ -346,6 +340,8 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
           })}
         </div>
       )}
+
+      {hiding && <Scratch key={qcfPage ? 'qcf' : 'bundled'} rootRef={mainRef} scratchedRef={scratchedRef} />}
 
       {/* Only while the exact font isn't in place; otherwise the text runs to the bottom under the floating button. */}
       {(fontState === 'absent' || fontState === 'downloading' || fontState === 'failed') && (
@@ -365,6 +361,21 @@ export default function MushafPage({ page, arrivedFrom, portion, stepping, hidin
               Download stopped. Check your connection and tap to resume
             </button>
           )}
+        </div>
+      )}
+
+      {hiding && (
+        <div className={`page-turns ${buttonVisible ? '' : 'faded-out'}`}>
+          <button onClick={() => onTurn(page + 1)} disabled={page >= 604} aria-label="Next page" tabIndex={buttonVisible ? 0 : -1}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15.5 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <button onClick={() => onTurn(page - 1)} disabled={page <= 1} aria-label="Previous page" tabIndex={buttonVisible ? 0 : -1}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8.5 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       )}
 

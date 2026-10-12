@@ -537,9 +537,11 @@ select, input[type='number'] {
 }
 .m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
 
-/* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
+/* Ayahs not shown yet (ayah by ayah) become a soft bar through the middle of their line, like text seen from afar.
+   Hide mode paints the same bars on a canvas over the page, which a finger rubs away. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
-.m-lines.hiding .m-ayah { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.mushaf.scratching { touch-action: none; }
+.scratch-cover { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .m-ayah.hidden .m-words {
   color: transparent;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
@@ -547,8 +549,6 @@ select, input[type='number'] {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.m-lines.hiding .m-ayah:not(.hidden) .m-words { animation: reveal var(--motion-quick) ease-out; }
-@keyframes reveal { from { opacity: 0; } }
 
 .hide-toggle {
   position: fixed;
@@ -564,6 +564,30 @@ select, input[type='number'] {
   box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
   transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
 }
+/* In hide mode, where a drag scratches, the page turns with ‹ › at the bottom centre; the next page is to the left. */
+.page-turns {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+  transition: opacity var(--motion-calm) ease;
+}
+.page-turns.faded-out { opacity: 0; pointer-events: none; }
+.mushaf:has(.m-foot) .page-turns { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
+.page-turns button {
+  width: var(--float-button);
+  height: var(--float-button);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-olive);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
+}
+.page-turns svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
 /* Ayah by ayah: "+1 ayah" floats at the bottom left, opposite the hide button, and fades with it. */
 .step-tool {
   position: fixed;
@@ -615,13 +639,11 @@ select, input[type='number'] {
 .m-line.center .qcf-row,
 .m-lines.short .qcf-row { justify-content: center; }
 .qcf-glyph.sign { color: var(--mushaf-rosette); }
-.m-lines.hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .qcf-glyph.word.hidden {
   color: transparent;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
   border-radius: 999px;
 }
-.m-lines.hiding .qcf-glyph.word:not(.hidden) { animation: reveal var(--motion-quick) ease-out; }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
 .m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }
