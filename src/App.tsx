@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { backupDue, backupFile, describeLastBackup, shareBackup } from './backup'
 import Celebration from './Celebration'
-import { celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
+import { applySettings, celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
@@ -12,6 +13,7 @@ import Settings from './Settings'
 import { load, save } from './storage'
 import Surahs from './Surahs'
 import Today from './Today'
+import { useWakeLock } from './wakeLock'
 
 // Start today's Day if the date has changed, and remember it. Saving the same state twice is harmless.
 const openToday = (saved: Saved | null) => {
@@ -83,15 +85,36 @@ export default function App() {
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [])
+  // So does midnight while the app stays open, so a tick just after it counts for the new date.
+  const todayDate = saved?.today?.date
+  useEffect(() => {
+    if (!todayDate) return
+    const now = new Date()
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1)
+    const timer = window.setTimeout(() => setSaved(openToday), midnight.getTime() - now.getTime())
+    return () => window.clearTimeout(timer)
+  }, [todayDate])
 
+  // The screen stays on while a Mushaf page is open, for memorising from it.
+  useWakeLock(Boolean(saved && mushafPage))
+
+  // Saved Settings re-plan today, keeping any tick whose part of the plan is unchanged.
   const saveSettings = (progress: Progress) => {
-    // Saved progress settings replace today's plan; ticks made today under the old ones are dropped.
-    // Settings don't show the Hifz amount, so keep the one already chosen.
-    const withAmount = { ...progress, hifzAmount: saved?.progress.hifzAmount }
-    update(
-      startDay({ version: 1, progress: withAmount, today: null, history: saved?.history ?? [], ratings: saved?.ratings, drawings: saved?.drawings }, localDate()),
-    )
+    update(saved ? applySettings(saved, progress, localDate()) : startDay({ version: 1, progress, today: null, history: [] }, localDate()))
     setScreen('today')
+  }
+
+  // A Backup carries its own date, and once handed over (not cancelled) it is remembered for the reminder.
+  const backUp = async () => {
+    if (!saved) return
+    const date = localDate()
+    if (!(await shareBackup(backupFile({ ...saved, lastBackup: date }, date)))) return
+    setSaved((current) => {
+      if (!current) return current
+      const next = { ...current, lastBackup: date }
+      save(next)
+      return next
+    })
   }
 
   // A restored Backup may be from an earlier date; start today's Day from it.
@@ -173,7 +196,7 @@ export default function App() {
       )
 
     if (screen === 'history') {
-      return <History saved={saved} onRestore={restore} onBack={() => setScreen('today')} />
+      return <History saved={saved} onBackUp={backUp} onRestore={restore} onBack={() => setScreen('today')} />
     }
 
     if (screen === 'surahs') {
@@ -190,6 +213,8 @@ export default function App() {
         estimates={finishEstimates(saved)}
         onChange={changeToday}
         onUndoNextDay={saved.beforeNextDay ? () => update(undoNextDay(saved)) : null}
+        backupReminder={backupDue(saved, saved.today!.date) ? describeLastBackup(saved.lastBackup, saved.today!.date) : null}
+        onBackUp={backUp}
         onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
         onOpenPage={openPage}
         onSettings={() => setScreen('settings')}

@@ -484,6 +484,22 @@ select, input[type='number'] {
   color: var(--mushaf-paper);
   box-shadow: var(--float-shadow);
 }
+/* Every small Mushaf button answers a 44px tap area around it, larger than it is drawn: the hide and pen
+   buttons, 36px with 8px between them, then just meet. */
+.mushaf .back,
+.mushaf .rate,
+.page-turns button { position: relative; }
+.mushaf .back::after,
+.mushaf .rate::after,
+.page-turns button::after,
+.hide-toggle::after,
+.pen-toggle::after,
+.clear-tool::after,
+.step-tool::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, (100% - 44px) / 2);
+}
 .mushaf .back svg { width: var(--head-icon); height: var(--head-icon); fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 
 .m-lines {

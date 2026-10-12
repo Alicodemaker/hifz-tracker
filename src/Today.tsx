@@ -12,6 +12,8 @@ type Props = {
   estimates: FinishEstimates | null
   onChange: (day: Day) => void
   onUndoNextDay: (() => void) | null // only just after finishing a Day moved on to the next
+  backupReminder: string | null // "Last backup 16 days ago", when a Backup is due
+  onBackUp: () => void
   onChangeAmount: (direction: 1 | -1) => void
   onOpenPage: (kind: Kind, portion: Range[]) => void
   onSettings: () => void
@@ -60,6 +62,8 @@ export default function Today({
   estimates,
   onChange,
   onUndoNextDay,
+  backupReminder,
+  onBackUp,
   onChangeAmount,
   onOpenPage,
   onSettings,
@@ -92,6 +96,15 @@ export default function Today({
           </button>
         </nav>
       </header>
+
+      {backupReminder && (
+        <p className="notice backup-reminder">
+          {backupReminder}.{' '}
+          <button className="link" onClick={onBackUp}>
+            Back up now
+          </button>
+        </p>
+      )}
 
       <section className={`hifz opens-page ${hifzDone ? 'done' : ''}`} onClick={openFrom('hifz', plan.hifz)}>
         <KindLabel name="Hifz" done={hifzDone} />
