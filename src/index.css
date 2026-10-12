@@ -683,8 +683,10 @@ select, input[type='number'] {
 .step-tool.faded-out { opacity: 0; pointer-events: none; }
 /* While the font download strip shows, sit just above it. */
 .mushaf:has(.m-foot) .step-tool { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
-/* The pen sits just left of the hide button. */
-.pen-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
+/* Hide, used far more, sits just left of the pen, nearer the thumb; the pen takes the corner. */
+.hide-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
+/* With no pen (ayah by ayah), hide takes the corner. */
+.mushaf:not(:has(.pen-toggle)) .hide-toggle { right: var(--space-3); }
 .hide-toggle.on,
 .pen-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .hide-toggle.faded-out,
@@ -693,7 +695,7 @@ select, input[type='number'] {
 /* Clear page, while drawing: a round button stacked above the pen. */
 .clear-tool {
   position: fixed;
-  right: calc(var(--space-3) + var(--float-button) + var(--space-2));
+  right: var(--space-3);
   bottom: calc(var(--space-3) + var(--float-button) + var(--space-2) + env(safe-area-inset-bottom));
   width: var(--float-button);
   height: var(--float-button);
