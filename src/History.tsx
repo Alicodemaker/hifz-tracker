@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import BackButton from './BackButton'
-import { backupFile, shareBackup } from './backup'
+import { describeLastBackup } from './backup'
 import { localDate, type Day, type Saved } from './day'
 import { hifzUpTo } from './format'
 import RangeText from './RangeText'
@@ -8,7 +8,7 @@ import JuzRing from './JuzRing'
 import { juzProgress } from './progress'
 import RestoreButton from './RestoreButton'
 
-type Props = { saved: Saved; onRestore: (saved: Saved) => void; onBack: () => void }
+type Props = { saved: Saved; onBackUp: () => void; onRestore: (saved: Saved) => void; onBack: () => void }
 
 const dateLabel = (date: string) =>
   new Date(`${date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -36,7 +36,7 @@ function DayRow({ day }: { day: Day }) {
   )
 }
 
-export default function History({ saved, onRestore, onBack }: Props) {
+export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
   const [message, setMessage] = useState('')
   const today = saved.today
   const days = today && (today.hifzEnd || today.rabtDone || today.murajaDone) ? [today, ...saved.history] : saved.history
@@ -52,6 +52,12 @@ export default function History({ saved, onRestore, onBack }: Props) {
         </div>
       </header>
       {message && <p className="notice">{message}</p>}
+
+      <h2 className="section-title">Backup</h2>
+      <p className="faded small backup-why">
+        Your progress is saved only on this phone, inside Chrome. Clearing Chrome's data, or losing or replacing the
+        phone, deletes it. A backup file in Google Drive lets you restore everything.
+      </p>
 
       <h2 className="section-title">Juz memorised</h2>
       <p className="faded small juz-summary">
@@ -82,12 +88,14 @@ export default function History({ saved, onRestore, onBack }: Props) {
 
       <div className="action-bar">
         <div className="row">
-          <button className="button primary" onClick={() => shareBackup(backupFile(saved, localDate()))}>
+          <button className="button primary" onClick={onBackUp}>
             Back up
           </button>
           <RestoreButton className="button quiet" onRestore={onRestore} onMessage={setMessage} />
         </div>
-        <p className="faded small hint">In the share menu, pick Save to Drive.</p>
+        <p className="faded small hint">
+          {describeLastBackup(saved.lastBackup, localDate())}. In the share menu, pick Save to Drive.
+        </p>
       </div>
     </main>
   )

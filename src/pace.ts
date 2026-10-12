@@ -1,5 +1,5 @@
 // Hifz amount changes and the finish estimates they drive (ADR-0008).
-import type { Saved } from './day'
+import { daysBetween, type Saved } from './day'
 import { DEFAULT_HIFZ_AMOUNT, isMemorised, planToday, type Progress } from './plan'
 import { AYAH_COUNT, ayahAt, ayahCount, ayahSizeAt, sizeInPages } from './quran'
 
@@ -22,9 +22,6 @@ const pagesNotMemorised = (progress: Progress): number => {
   for (let i = 0; i < AYAH_COUNT; i++) if (!isMemorised(ayahAt(i), progress)) pages += ayahSizeAt(i)
   return pages
 }
-
-const daysBetween = (from: string, to: string) =>
-  Math.round((Date.parse(`${to}T12:00:00`) - Date.parse(`${from}T12:00:00`)) / 86_400_000)
 
 // Hifz days per week over the last four weeks, or every day until four weeks of history exist.
 const hifzDaysPerWeek = (saved: Saved, date: string): { perWeek: number; fromHistory: boolean } => {

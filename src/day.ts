@@ -1,5 +1,5 @@
 // A Day's plan stays fixed until the date changes; taps are only ticks until then, so they can be undone.
-import { planToday, recordDay, type Progress, type TodaysPlan } from './plan'
+import { planToday, recordDay, type Progress, type Range, type TodaysPlan } from './plan'
 import type { AyahRef } from './quran'
 import type { Stroke } from './drawings'
 import type { Rating } from './ratings'
@@ -22,6 +22,7 @@ export type Saved = {
   ratings?: Partial<Record<number, Rating>> // by Surah number; absent in older saves
   beforeNextDay?: { progress: Progress; today: Day } // the moment before the last tick moved on to the next Day, for undo
   drawings?: Record<string, Stroke[]> // pen strokes by drawingKey; absent in older saves
+  lastBackup?: string // local date of the last Backup handed to the share sheet; absent before the first
 }
 
 const somethingDone = (day: Day) => day.hifzEnd !== null || day.rabtDone || day.murajaDone
@@ -37,6 +38,33 @@ export const startDay = (saved: Saved, date: string): Saved => {
   }
   const today: Day = { date, plan: planToday(progress), hifzEnd: null, rabtDone: false, murajaDone: false }
   return { ...rest, progress, history, today }
+}
+
+const sameRanges = (a: Range[], b: Range[]) => JSON.stringify(a) === JSON.stringify(b)
+const sameMemorisation = (a: Progress, b: Progress) =>
+  JSON.stringify(a.hifzNext) === JSON.stringify(b.hifzNext) && JSON.stringify([...a.memorised].sort()) === JSON.stringify([...b.memorised].sort())
+
+// Saved Settings re-plan today. A tick stays when its part of the plan is unchanged, so work already done today is
+// never lost; the Rabt keeps its place unless the memorisation itself changed. The Hifz amount isn't in Settings.
+export const applySettings = (saved: Saved, settings: Progress, date: string): Saved => {
+  const { beforeNextDay: _, ...rest } = saved
+  const progress: Progress = {
+    ...saved.progress,
+    ...settings,
+    hifzAmount: saved.progress.hifzAmount,
+    rabtNext: sameMemorisation(saved.progress, settings) ? saved.progress.rabtNext : null,
+  }
+  const old = saved.today
+  if (!old || old.date !== date) return startDay({ ...rest, progress, today: null }, date)
+  const plan = planToday(progress)
+  const today: Day = {
+    date,
+    plan,
+    hifzEnd: sameRanges(plan.hifz, old.plan.hifz) ? old.hifzEnd : null,
+    rabtDone: sameRanges(plan.rabt, old.plan.rabt) && old.rabtDone,
+    murajaDone: sameRanges(plan.muraja, old.plan.muraja) && old.murajaDone,
+  }
+  return { ...rest, progress, today }
 }
 
 // Tick a kind of work done, or undo the tick. Hifz counts as done up to the end of today's Hifz.
@@ -77,6 +105,10 @@ export const celebrationFor = (before: Day, after: Day): 'small' | 'big' | null 
   if (doneKinds(after) <= doneKinds(before)) return null
   return allDone(after) ? 'big' : 'small'
 }
+
+// Whole days from one local date (YYYY-MM-DD) to another.
+export const daysBetween = (from: string, to: string): number =>
+  Math.round((Date.parse(`${to}T12:00:00`) - Date.parse(`${from}T12:00:00`)) / 86_400_000)
 
 export const localDate = (now = new Date()): string =>
   `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`

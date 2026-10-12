@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { celebrationFor, startDay, toggleDone, undoNextDay, updateToday, type Saved } from './day'
+import { applySettings, celebrationFor, startDay, toggleDone, undoNextDay, updateToday, type Saved } from './day'
 import { planToday, type Progress } from './plan'
 
 const progress: Progress = {
@@ -150,5 +150,46 @@ describe('undoNextDay', () => {
     expect(undoNextDay(tick(done, 'rabt'))).toEqual(tick(done, 'rabt'))
     const tomorrow = startDay(done, '2026-09-30')
     expect(undoNextDay(tomorrow)).toBe(tomorrow)
+  })
+})
+
+describe('applySettings', () => {
+  const date = '2026-09-29'
+  const started = startDay({ ...fresh, progress: { ...progress, rabtNext: { surah: 41, ayah: 1 }, hifzAmount: 1 } }, date)
+  const opened: Saved = { ...started, today: toggleDone(toggleDone(toggleDone(started.today!, 'hifz'), 'rabt'), 'muraja') }
+  const settings = (changes: Partial<Progress>): Progress => ({
+    memorised: progress.memorised,
+    hifzNext: progress.hifzNext,
+    murajaNext: null,
+    ...changes,
+  })
+
+  it("keeps today's ticks and the Rabt place when only the Muraja'a size changes", () => {
+    const saved = applySettings(opened, settings({ murajaPages: 5 }), date)
+    expect(saved.today!.hifzEnd).toEqual(opened.today!.hifzEnd)
+    expect(saved.today!.rabtDone).toBe(true)
+    expect(saved.today!.plan.muraja).not.toEqual(opened.today!.plan.muraja)
+    expect(saved.today!.murajaDone).toBe(false) // a different slice: not revised yet
+    expect(saved.progress.rabtNext).toEqual({ surah: 41, ayah: 1 })
+    expect(saved.progress.hifzAmount).toBe(1) // not shown in Settings, so kept
+    expect(saved.progress.murajaPages).toBe(5)
+  })
+
+  it('keeps every tick when nothing changes', () => {
+    const saved = applySettings(opened, settings({}), date)
+    expect(saved.today).toEqual(opened.today)
+    expect(saved.progress).toEqual(opened.progress)
+  })
+
+  it('drops the Hifz tick and restarts the Rabt when the next Hifz changes', () => {
+    const saved = applySettings(opened, settings({ hifzNext: { surah: 40, ayah: 10 } }), date)
+    expect(saved.today!.hifzEnd).toBeNull()
+    expect(saved.today!.plan.hifz[0]).toMatchObject({ surah: 40, from: 10 })
+    expect(saved.progress.rabtNext).toBeNull()
+  })
+
+  it('ends the chance to undo moving on to the next day', () => {
+    const withUndo = { ...opened, beforeNextDay: { progress: opened.progress, today: opened.today! } }
+    expect(applySettings(withUndo, settings({}), date).beforeNextDay).toBeUndefined()
   })
 })
