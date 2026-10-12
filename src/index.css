@@ -540,14 +540,14 @@ select, input[type='number'] {
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
 .m-lines.hiding .m-ayah { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.m-lines.hiding .m-ayah:not(.revealed) .m-words {
+.m-ayah.hidden .m-words {
   color: transparent;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
   border-radius: 999px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.m-lines.hiding .m-ayah.revealed .m-words { animation: reveal var(--motion-quick) ease-out; }
+.m-lines.hiding .m-ayah:not(.hidden) .m-words { animation: reveal var(--motion-quick) ease-out; }
 @keyframes reveal { from { opacity: 0; } }
 
 .hide-toggle {
@@ -564,6 +564,23 @@ select, input[type='number'] {
   box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
   transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
 }
+/* Ayah by ayah: "+1 ayah" floats at the bottom left, opposite the hide button, and fades with it. */
+.step-tool {
+  position: fixed;
+  left: var(--space-3);
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  height: var(--float-button);
+  padding-inline: var(--space-4);
+  border-radius: 999px;
+  background: var(--mushaf-olive);
+  color: var(--mushaf-paper);
+  box-shadow: var(--float-shadow);
+  font-size: var(--mushaf-head-size);
+  transition: opacity var(--motion-calm) ease;
+}
+.step-tool.faded-out { opacity: 0; pointer-events: none; }
+/* While the font download strip shows, sit just above it. */
+.mushaf:has(.m-foot) .step-tool { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
 .hide-toggle.on { background: var(--mushaf-olive); color: var(--mushaf-paper); }
 .hide-toggle.faded-out { opacity: 0; pointer-events: none; }
 .hide-toggle svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -599,12 +616,12 @@ select, input[type='number'] {
 .m-lines.short .qcf-row { justify-content: center; }
 .qcf-glyph.sign { color: var(--mushaf-rosette); }
 .m-lines.hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.m-lines.hiding .qcf-glyph.word:not(.revealed) {
+.qcf-glyph.word.hidden {
   color: transparent;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
   border-radius: 999px;
 }
-.m-lines.hiding .qcf-glyph.word.revealed { animation: reveal var(--motion-quick) ease-out; }
+.m-lines.hiding .qcf-glyph.word:not(.hidden) { animation: reveal var(--motion-quick) ease-out; }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
 .m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }

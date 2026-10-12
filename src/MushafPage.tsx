@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran'
 import QcfLines, { type QcfLine } from './QcfLines'
@@ -31,6 +31,7 @@ type Props = {
   page: number
   arrivedFrom: 'next' | 'prev' | null // which way the last page turn went, for the slide
   portion: Range[] | null
+  stepping: boolean // opened from Hifz: today's Hifz shows ayah by ayah
   hiding: boolean
   onToggleHiding: () => void
   onBack: () => void
@@ -90,7 +91,7 @@ const BISMILLAH_FONT = 0 // QCF4_Hafs_01, the first font in qcf-fonts.json
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
 
-export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
+export default function MushafPage({ page, arrivedFrom, portion, stepping, hiding, onToggleHiding, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -200,6 +201,33 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     setReveals({ scope, keys })
   }
 
+  // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, then one more
+  // for each "+1 ayah", until the page's last ayah; then the whole page shows. Each visit starts again.
+  const pageAyahs = useMemo(() => {
+    const keys: string[] = []
+    const add = (surah: number, ayah: number) => {
+      const key = `${surah}:${ayah}`
+      if (keys[keys.length - 1] !== key) keys.push(key)
+    }
+    if (qcfPage) qcfPage.lines.forEach((line) => typeof line !== 'string' && line.forEach(([, s, a]) => add(s, a)))
+    else lines.forEach((line) => typeof line !== 'string' && line.forEach(([s, a]) => add(s, a)))
+    return keys
+  }, [qcfPage, lines])
+  const inHifz = (key: string) => {
+    const [surah, ayah] = key.split(':').map(Number)
+    return Boolean(portion?.some((r) => r.surah === surah && ayah >= r.from && ayah <= r.to))
+  }
+  const stepStart = stepping ? pageAyahs.findIndex(inHifz) : -1
+  const [stepsTaken, setStepsTaken] = useState(0)
+  const stepEnd = stepStart + stepsTaken
+  const stepActive = stepStart >= 0 && stepEnd < pageAyahs.length - 1
+  const position = useMemo(() => new Map(pageAyahs.map((key, i) => [key, i])), [pageAyahs])
+  const stepHidden = (key: string) => {
+    const i = position.get(key) ?? -1
+    return stepActive && (i < stepStart || i > stepEnd)
+  }
+  const hidden = (key: string) => (hiding && !revealed.has(key)) || stepHidden(key)
+
   // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
   // They show when the page is opened, but not after a page turn.
@@ -257,7 +285,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
           bismillahFont={qcfFonts.fonts[BISMILLAH_FONT]}
           portion={portion}
           hiding={hiding}
-          revealed={revealed}
+          hidden={hidden}
           onToggleAyah={toggleAyah}
           className={arrivedFrom ? `enter-${arrivedFrom}` : ''}
         />
@@ -298,7 +326,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
                     return (
                       <span
                         key={key}
-                        className={`m-ayah ${revealed.has(key) ? 'revealed' : ''}`}
+                        className={`m-ayah ${hidden(key) ? 'hidden' : ''}`}
                         data-ayah={key}
                         onClick={hiding ? () => toggleAyah(key) : undefined}
                       >
@@ -338,6 +366,12 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
             </button>
           )}
         </div>
+      )}
+
+      {stepActive && (
+        <button className={`step-tool ${buttonVisible ? '' : 'faded-out'}`} onClick={() => setStepsTaken((n) => n + 1)} tabIndex={buttonVisible ? 0 : -1}>
+          +1 ayah
+        </button>
       )}
 
       <button

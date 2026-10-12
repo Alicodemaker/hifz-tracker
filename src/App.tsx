@@ -35,13 +35,17 @@ export default function App() {
   const openedFromToday = useRef(false)
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
+  const [stepping, setStepping] = useState(false) // opened from Hifz: pages show today's Hifz ayah by ayah
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
     const onHash = () => {
       const page = pageFromHash()
       setMushafPage(page)
-      if (!page) openedFromToday.current = false
+      if (!page) {
+        openedFromToday.current = false
+        setStepping(false)
+      }
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
@@ -95,7 +99,8 @@ export default function App() {
   }
 
   // Opening adds a history entry, so the phone's back gesture returns to Today.
-  const openPage = (_kind: Kind, ranges: Range[]) => {
+  const openPage = (kind: Kind, ranges: Range[]) => {
+    setStepping(kind === 'hifz')
     setPortion(ranges)
     setArrivedFrom(null)
     openedFromToday.current = true
@@ -126,6 +131,7 @@ export default function App() {
           page={mushafPage}
           arrivedFrom={arrivedFrom}
           portion={portion}
+          stepping={stepping}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
           onBack={leavePage}
