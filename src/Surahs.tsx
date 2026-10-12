@@ -2,7 +2,7 @@ import { useState } from 'react'
 import BackButton from './BackButton'
 import type { Saved } from './day'
 import { surahArabic, surahName } from './quran'
-import { RATINGS, ratingGroups, type Rating } from './ratings'
+import { RATINGS, RATING_CHOICES, ratingGroups, type Rating } from './ratings'
 import Stars from './Stars'
 
 type Props = { saved: Saved; onRate: (surah: number, rating: Rating) => void; onBack: () => void }
@@ -61,7 +61,7 @@ export default function Surahs({ saved, onRate, onBack }: Props) {
                   </button>
                   {open === surah && (
                     <div className="segmented rating-choices" role="group" aria-label={`Rate ${surahName(surah)}`}>
-                      {RATINGS.map(({ rating: choice, stars, label }) => (
+                      {RATING_CHOICES.map(({ rating: choice, stars, label }) => (
                         <button key={choice} aria-pressed={current === choice} onClick={() => rate(surah, choice)}>
                           <Stars count={stars} />
                           <span>{label}</span>

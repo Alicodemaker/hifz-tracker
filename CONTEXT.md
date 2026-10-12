@@ -33,7 +33,7 @@ Red pen marks a person makes over a Mushaf page to note weak spots. Each page ke
 _Avoid_: Annotation, highlight, note
 
 **Surah rating**:
-How well the person says they hold a memorised Surah: strong (★★★), holes (★★, gaps in places), last page missing (★½, the last page or two) or weak (★, at least a page missing). Set and changed only by the person, on the Surahs screen or from a Mushaf page opened from Muraja'a; planning never reads it.
+How well the person says they hold a memorised Surah: strong (★★★), holes (★★, gaps in places), last page missing (★½, the last page or two) or weak (★, at least a page missing). Set and changed only by the person, on the Surahs screen or from a Mushaf page opened from Rabt or Muraja'a; planning never reads it.
 _Avoid_: Score, grade, strength level
 
 **Juz**:

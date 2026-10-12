@@ -11,6 +11,9 @@ export const RATINGS: { rating: Rating; stars: number; label: string }[] = [
   { rating: 'weak', stars: 1, label: 'Weak' },
 ]
 
+// The choices as offered, weakest on the left to strongest on the right, like a scale.
+export const RATING_CHOICES = [...RATINGS].reverse()
+
 // Choosing the rating a Surah already has clears it.
 export const setRating = (saved: Saved, surah: number, rating: Rating): Saved => {
   const ratings = { ...saved.ratings }
