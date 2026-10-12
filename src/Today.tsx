@@ -1,8 +1,9 @@
 import { toggleDone, type Day, type Kind } from './day'
-import { arabicNames, describeRanges, describeSize } from './format'
+import { arabicNames, describeSize } from './format'
 import { describeDuration, type FinishEstimates } from './pace'
 import type { Range } from './plan'
 import { surahName } from './quran'
+import RangeText from './RangeText'
 import Tick from './Tick'
 
 type Props = {
@@ -41,7 +42,9 @@ function RevisionRow({ name, ranges, done, empty, onOpen }: RowProps) {
           <p lang="ar" className="arabic">
             {arabicNames(ranges)}
           </p>
-          <p className="range">{describeRanges(ranges)}</p>
+          <p className="range">
+            <RangeText ranges={ranges} />
+          </p>
           <p className="faded small">{describeSize(ranges)}</p>
         </>
       ) : (
@@ -99,7 +102,9 @@ export default function Today({
                 {arabicNames(plan.hifz)}
               </p>
             </div>
-            <p className="range">{describeRanges(plan.hifz)}</p>
+            <p className="range">
+              <RangeText ranges={plan.hifz} />
+            </p>
             <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (
               <div className="stepper">

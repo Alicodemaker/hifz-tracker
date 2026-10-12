@@ -269,16 +269,16 @@ export default function MushafPage({
           ? []
           : line
               .filter(([, s, a]) => focusKeys.has(`${s}:${a}`))
-              .flatMap(([code, s, a, kind], k) => [
+              // The space after each glyph is inside its span, so neighbouring hidden words make one strip.
+              .map(([code, s, a, kind], k) => (
                 <span
                   key={`${code}-${k}`}
                   className={`qcf-glyph ${kind === 0 ? 'word' : 'sign'} ${kind === 0 && hidden(`${s}:${a}`) ? 'hidden' : ''}`}
                   data-ayah={`${s}:${a}`}
                 >
-                  {String.fromCodePoint(code)}
-                </span>,
-                ' ',
-              ]),
+                  {String.fromCodePoint(code)}{' '}
+                </span>
+              )),
       )
     // The bundled font: each ayah's pieces from its lines joined, then its marker.
     const ayahs = new Map<string, { words: string[]; ayah: number; ends: boolean }>()
