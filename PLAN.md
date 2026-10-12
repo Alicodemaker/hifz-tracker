@@ -18,6 +18,7 @@ Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page 
 8. ✅ **Rating on the page and a smaller title** (added at the builder's request): opened from Muraja'a, a star button at the top right, opposite the back button, opens a panel to rate the memorised Surahs on that page. The Hifz surah name on Today is smaller, so its vowel marks clear the double rule above.
 9. ✅ **Fixes from the builder's phone**: on Today, the Rabt and Muraja'a surah names in Arabic sit flush right, with no gap before them. Ayah by ayah in the exact font reads right to left (it showed each line's words reversed). Opened from Hifz, the page turns only through the pages of the Hifz Surah. Hide mode goes back to tap-to-reveal: tapping an ayah shows it and tapping again hides it (this replaces step 6's scratch card); with the pen on, a drag still draws and the ‹ › buttons turn the page.
 10. ✅ **Two small touches** (builder's request): in hide mode, a run of hidden words is one continuous strip instead of a strip per word. On Today and in History, a long range wraps between surahs ("Al-Jathiyah 1–13," then "Al-Ahqaf 6–35" on the next line), never inside one.
+11. ✅ **Pins and the hide button** (builder's request): today's portion is marked by small olive triangle pins instead of thin margin bars, never by tinting the text: one on the ayah sign just before the portion (above its first word when that sign isn't on the page, as at a surah's start) and one on its last ayah sign. Hide and the pen swap places, so hide sits nearer the thumb.
 
 ## What we're NOT doing
 
