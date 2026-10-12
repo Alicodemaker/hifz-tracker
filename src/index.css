@@ -171,6 +171,8 @@ button:disabled { opacity: 0.35; cursor: default; }
 .revision li:last-child { border-bottom: 1px solid var(--rule); }
 .revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: right; }
 .revision .range { font-weight: 600; }
+/* Each surah's part stays on one line (unless it alone is too wide), so a long list breaks between surahs. */
+.range-part { display: inline-block; }
 
 /* The check that answers a Done tap */
 .tick { width: 1.1em; height: 1.1em; flex: none; }
@@ -737,14 +739,23 @@ select, input[type='number'] {
 .m-lines.measuring .qcf-row { display: inline-flex; width: auto; justify-content: flex-start; }
 .m-line.center .qcf-row,
 .m-lines.short .qcf-row { justify-content: center; }
+/* On a full-width line, the glyphs share out the spare width themselves rather than leaving it between them,
+   so the hide strips of neighbouring words meet in one continuous line. Half shares at the two ends, with the
+   end glyphs pushed to the edges, keep the gaps exactly as even as space-between would. */
+.m-lines:not(.measuring, .short) .m-line:not(.center) > .qcf-row > .qcf-glyph { flex-grow: 1; text-align: center; }
+.m-lines:not(.measuring, .short) .m-line:not(.center) > .qcf-row > .qcf-glyph:first-child { flex-grow: 0.5; text-align: start; }
+.m-lines:not(.measuring, .short) .m-line:not(.center) > .qcf-row > .qcf-glyph:last-child { flex-grow: 0.5; text-align: end; }
+.m-lines:not(.measuring, .short) .m-line:not(.center) > .qcf-row > .qcf-glyph:only-child { text-align: start; }
 .qcf-glyph.sign { color: var(--mushaf-rosette); }
 .hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .qcf-glyph.word.hidden {
   color: transparent;
   text-shadow: none;
   background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
-  border-radius: 999px;
 }
+/* A run of hidden words is one strip, rounded only at its two ends. */
+.qcf-glyph.word.hidden:not(.qcf-glyph.word.hidden + .qcf-glyph.word.hidden) { border-start-start-radius: 999px; border-end-start-radius: 999px; }
+.qcf-glyph.word.hidden:not(:has(+ .qcf-glyph.word.hidden)) { border-start-end-radius: 999px; border-end-end-radius: 999px; }
 .hiding .qcf-glyph.word:not(.hidden) { animation: reveal var(--motion-quick) ease-out; }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */

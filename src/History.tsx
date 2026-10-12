@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import BackButton from './BackButton'
 import { backupFile, shareBackup } from './backup'
 import { localDate, type Day, type Saved } from './day'
-import { describeRanges, hifzUpTo } from './format'
+import { hifzUpTo } from './format'
+import RangeText from './RangeText'
 import JuzRing from './JuzRing'
 import { juzProgress } from './progress'
 import RestoreButton from './RestoreButton'
@@ -18,17 +19,17 @@ function DayRow({ day }: { day: Day }) {
       <p className="date">{dateLabel(day.date)}</p>
       {day.hifzEnd && (
         <p>
-          <strong>Hifz</strong> {describeRanges(hifzUpTo(day.plan.hifz, day.hifzEnd))}
+          <strong>Hifz</strong> <RangeText ranges={hifzUpTo(day.plan.hifz, day.hifzEnd)} />
         </p>
       )}
       {day.rabtDone && (
         <p>
-          <strong>Rabt</strong> {describeRanges(day.plan.rabt)}
+          <strong>Rabt</strong> <RangeText ranges={day.plan.rabt} />
         </p>
       )}
       {day.murajaDone && (
         <p>
-          <strong>Muraja'a</strong> {describeRanges(day.plan.muraja)}
+          <strong>Muraja'a</strong> <RangeText ranges={day.plan.muraja} />
         </p>
       )}
     </li>

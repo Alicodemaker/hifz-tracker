@@ -3,13 +3,14 @@ import { type AyahRef, ayahCount, pageOf, surahArabic, surahName } from './quran
 
 const isWhole = (r: Range) => r.from === 1 && r.to === ayahCount(r.surah)
 
-// "Ghafir 1–5", "Ash-Shuraa", or "An-Naba to Al-Layl, 15 surahs" for long runs of whole surahs.
-export const describeRanges = (ranges: Range[]): string => {
+// The parts of a description, one per surah: ["Ghafir 1–5"], ["Ash-Shuraa", "Fussilat 1–8"],
+// or ["An-Naba to Al-Layl", "15 surahs"] for long runs of whole surahs.
+export const rangeParts = (ranges: Range[]): string[] => {
   if (ranges.length > 3 && ranges.every(isWhole)) {
     const [first, last] = [ranges[0], ranges[ranges.length - 1]]
-    return `${surahName(first.surah)} to ${surahName(last.surah)}, ${ranges.length} surahs`
+    return [`${surahName(first.surah)} to ${surahName(last.surah)}`, `${ranges.length} surahs`]
   }
-  return ranges.map((r) => (isWhole(r) ? surahName(r.surah) : `${surahName(r.surah)} ${r.from}–${r.to}`)).join(', ')
+  return ranges.map((r) => (isWhole(r) ? surahName(r.surah) : `${surahName(r.surah)} ${r.from}–${r.to}`))
 }
 
 // The Arabic surah names for a set of ranges: "غَافِر", or "النَّبَإ … اللَّيْل" for long runs.
