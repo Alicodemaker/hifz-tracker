@@ -53,11 +53,11 @@ The sequence new material is memorised in: Surahs from last to first (an-Nas, al
 _Avoid_: Direction, progress order
 
 **Rabt**:
-Revision of the most recently memorised 5 Pages' worth of material (by Memorisation order), revised in full each day. Material older than that belongs to the Muraja'a.
+Revision of the Surahs memorised just before the current Hifz, one a day in rotation: the memorised Surahs after the Hifz's Surah (in Mushaf order) that start in the juz the next Hifz is in, looping back after the last. A Surah longer than 10 Pages is taken in pieces of about 10 Pages, cut at Page boundaries. With no such Surah, the Rabt is the Surah memorised just before. The rotation moves on only when the Rabt is ticked, and starts again when Hifz moves to the next Surah. Earlier Pages of the Surah being memorised are not part of it.
 _Avoid_: Sabqi, recent revision, dhor
 
 **Muraja'a**:
-Revision of every memorised Surah that has no part in the Rabt, worked through one Muraja'a slice a day in rotation so everything is revisited regularly. A Surah joins the Muraja'a only once it has left the Rabt completely.
+Revision of every memorised Surah outside the Rabt rotation, worked through one Muraja'a slice a day in rotation so everything is revisited regularly. A Surah joins the Muraja'a once it has left the Rabt rotation, usually when Hifz moves to another juz.
 _Avoid_: Manzil, old revision, dhor
 
 **Muraja'a slice**:

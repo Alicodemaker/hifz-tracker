@@ -27,7 +27,11 @@ export const startDay = (saved: Saved, date: string): Saved => {
   if (saved.today?.date === date) return saved
   let { progress, history } = saved
   if (saved.today && somethingDone(saved.today)) {
-    progress = recordDay(progress, { hifzEnd: saved.today.hifzEnd ?? undefined, murajaDone: saved.today.murajaDone })
+    progress = recordDay(progress, {
+      hifzEnd: saved.today.hifzEnd ?? undefined,
+      rabtDone: saved.today.rabtDone,
+      murajaDone: saved.today.murajaDone,
+    })
     history = [saved.today, ...history]
   }
   const today: Day = { date, plan: planToday(progress), hifzEnd: null, rabtDone: false, murajaDone: false }

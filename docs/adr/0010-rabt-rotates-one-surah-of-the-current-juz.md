@@ -1,0 +1,5 @@
+# Rabt rotates one surah of the current juz
+
+The Rabt used to be the most recently memorised 5 pages, revised in full each day. It is now one surah a day: the memorised surahs after the one being memorised (in mushaf order) that start in the juz the next Hifz is in, looping back at the end. A surah longer than 10 pages is taken in pieces of about 10 pages, cut at page boundaries. That is how the builder actually revises. The earlier pages of the surah being memorised are left out of the Rabt, because the builder revises them during Hifz itself. The rotation moves on only when the Rabt is ticked, so a skipped day repeats it (ADR-0002), and it starts again from the surah after the new one when Hifz moves on. When no memorised surah starts in that juz after the Hifz (at the start of a new juz), the Rabt is the surah memorised just before, so there is always something recent to revise.
+
+Whole surahs are used, even when one runs into the next juz, so that the end of such a surah is not left out of both the Rabt and the Muraja'a. Every surah in the rotation is kept out of the Muraja'a, not only today's, so a surah is never revised twice in one day.
