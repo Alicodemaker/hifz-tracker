@@ -52,6 +52,13 @@ const planHifz = (next: AyahRef | null, amount: number): Range[] => {
   return hifz
 }
 
+// Where Hifz starts for someone setting up: memorisation runs back from an-Nas (ADR-0003), so it is the first
+// Surah, counting back from an-Nas, not yet memorised. Nothing when every Surah is.
+export const suggestedHifzStart = (memorised: number[]): AyahRef | null => {
+  for (let surah = SURAH_COUNT; surah >= 1; surah--) if (!memorised.includes(surah)) return { surah, ayah: 1 }
+  return null
+}
+
 export const isMemorised = (ref: AyahRef, progress: Progress): boolean =>
   progress.memorised.includes(ref.surah) ||
   (progress.hifzNext?.surah === ref.surah && ref.ayah < progress.hifzNext.ayah)
