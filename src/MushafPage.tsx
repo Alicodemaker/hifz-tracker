@@ -4,8 +4,11 @@ import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran
 import QcfLines, { type QcfLine } from './QcfLines'
 import { QCF_FONT_COUNT, downloadQcfFonts, loadQcfFont, qcfFontsReady } from './qcfFonts'
 import qcfFonts from './data/qcf-fonts.json'
+import AyahFocus from './AyahFocus'
 import Drawing from './Drawing'
 import { drawingKey, type Stroke } from './drawings'
+import PageRating from './PageRating'
+import type { Rating } from './ratings'
 import Rosette from './Rosette'
 import Scratch from './Scratch'
 import SurahBadge from './SurahBadge'
@@ -42,6 +45,7 @@ type Props = {
   drawings: Record<string, Stroke[]> | undefined // pen strokes by drawingKey
   onStroke: (key: string, stroke: Stroke) => void
   onClearDrawing: (key: string) => void
+  rating: { memorised: number[]; ratings: Partial<Record<number, Rating>> | undefined; onRate: (surah: number, rating: Rating) => void } | null // opened from Muraja'a
   onBack: () => void
   onTurn: (page: number) => void
 }
@@ -112,6 +116,7 @@ export default function MushafPage({
   drawings,
   onStroke,
   onClearDrawing,
+  rating,
   onBack,
   onTurn,
 }: Props) {
@@ -222,8 +227,9 @@ export default function MushafPage({
   const inkKey = drawingKey(qcfPage ? 'qcf' : 'bundled', page)
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
-  // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, then one more
-  // for each "+1 ayah", until the page's last ayah; then the whole page shows. Each visit starts again.
+  // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, zoomed in to fill
+  // the page, then one more for each "+1 ayah", until the page's last ayah; then the whole page shows as usual.
+  // Each visit starts again.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -242,12 +248,53 @@ export default function MushafPage({
   const [stepsTaken, setStepsTaken] = useState(0)
   const stepEnd = stepStart + stepsTaken
   const stepActive = stepStart >= 0 && stepEnd < pageAyahs.length - 1
-  const position = useMemo(() => new Map(pageAyahs.map((key, i) => [key, i])), [pageAyahs])
-  const stepHidden = (key: string) => {
-    const i = position.get(key) ?? -1
-    return stepActive && (i < stepStart || i > stepEnd)
+  const focusKeys = stepActive ? new Set(pageAyahs.slice(stepStart, stepEnd + 1)) : null
+  const focusText = () => {
+    if (!focusKeys) return null
+    if (qcfPage)
+      return qcfPage.lines.flatMap((line) =>
+        typeof line === 'string'
+          ? []
+          : line
+              .filter(([, s, a]) => focusKeys.has(`${s}:${a}`))
+              .flatMap(([code, , , kind], k) => [
+                <span key={`${code}-${k}`} className={`qcf-glyph ${kind === 0 ? 'word' : 'sign'}`}>
+                  {String.fromCodePoint(code)}
+                </span>,
+                ' ',
+              ]),
+      )
+    // The bundled font: each ayah's pieces from its lines joined, then its marker.
+    const ayahs = new Map<string, { words: string[]; ayah: number; ends: boolean }>()
+    for (const line of lines) {
+      if (typeof line === 'string') continue
+      for (const piece of line) {
+        const key = `${piece[0]}:${piece[1]}`
+        if (!focusKeys.has(key)) continue
+        const [words] = splitMarker(piece)
+        const entry = ayahs.get(key) ?? { words: [], ayah: piece[1], ends: false }
+        entry.words.push(words)
+        entry.ends ||= piece[3] === 1
+        ayahs.set(key, entry)
+      }
+    }
+    return [...ayahs].map(([key, { words, ayah, ends }]) => (
+      <span key={key} className="m-ayah">
+        <span className="m-words">{words.join(' ')}</span>
+        {ends && (
+          <span className="m-marker">
+            {' '}
+            <Rosette ayah={ayah} />
+          </span>
+        )}{' '}
+      </span>
+    ))
   }
-  const hidden = stepHidden
+
+  // Rating, when opened from Muraja'a: the stars at the top right rate the memorised Surahs on this page.
+  const [ratingOpen, setRatingOpen] = useState(false)
+  const pageSurahs = [...new Set(pageAyahs.map((key) => Number(key.split(':')[0])))]
+  const ratableSurahs = rating ? pageSurahs.filter((s) => rating.memorised.includes(s)) : []
 
   // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
@@ -266,6 +313,10 @@ export default function MushafPage({
     const target = e.target as Element
     if (target.closest('button')) return wake() // using a button keeps them all showing
     if (draggedRef.current) return // the end of a scratch or a pen stroke, not a tap
+    if (ratingOpen) {
+      if (!target.closest('.page-rating')) setRatingOpen(false) // a tap elsewhere closes the rating
+      return
+    }
     if (!buttonVisible) return wake()
     window.clearTimeout(fadeTimer.current)
     setButtonVisible(false)
@@ -293,12 +344,36 @@ export default function MushafPage({
           </svg>
         </button>
         <span className="m-page m-label">{page}</span>
-        {top && (
-          <span className="m-where m-label">
-            {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
-          </span>
-        )}
+        <span className="m-right">
+          {top && (
+            <span className="m-where m-label">
+              {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
+            </span>
+          )}
+          {rating && (
+            <button
+              className={`rate ${ratingOpen ? 'on' : ''}`}
+              onClick={() => setRatingOpen((open) => !open)}
+              aria-expanded={ratingOpen}
+              aria-label="Rate surahs on this page"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" />
+              </svg>
+            </button>
+          )}
+        </span>
       </header>
+      {rating && ratingOpen && (
+        <PageRating
+          surahs={ratableSurahs}
+          ratings={rating.ratings}
+          onRate={(surah, choice) => {
+            rating.onRate(surah, choice)
+            if (ratableSurahs.length === 1) setRatingOpen(false)
+          }}
+        />
+      )}
 
       {qcfPage ? (
         <QcfLines
@@ -307,13 +382,12 @@ export default function MushafPage({
           bismillahFont={qcfFonts.fonts[BISMILLAH_FONT]}
           portion={portion}
           hiding={hiding}
-          hidden={hidden}
-          className={arrivedFrom ? `enter-${arrivedFrom}` : ''}
+          className={`${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${focusKeys ? 'behind-focus' : ''}`}
         />
       ) : (
         <div
           ref={linesRef}
-          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
+          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${focusKeys ? 'behind-focus' : ''}`}
           style={
             fontSize
               ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties)
@@ -347,7 +421,7 @@ export default function MushafPage({
                     return (
                       <span
                         key={key}
-                        className={`m-ayah ${hidden(key) ? 'hidden' : ''}`}
+                        className="m-ayah"
                         data-ayah={key}
                       >
                         <span className="m-words">{words}</span>
@@ -367,8 +441,18 @@ export default function MushafPage({
         </div>
       )}
 
-      {hiding && <Scratch key={qcfPage ? 'qcf' : 'bundled'} rootRef={mainRef} draggedRef={draggedRef} paused={penOn} />}
-      {(penOn || strokes.length > 0) && (
+      {focusKeys && (
+        <AyahFocus
+          fitKey={`${qcfPage ? 'qcf' : 'bundled'}:${stepEnd}`}
+          className={`${qcfPage ? 'qcf' : ''} ${hiding ? 'hiding' : ''}`}
+          style={qcfPage ? ({ '--qcf-font': `'${qcfFonts.fonts[qcfPage.f]}'` } as React.CSSProperties) : undefined}
+        >
+          {focusText()}
+        </AyahFocus>
+      )}
+
+      {hiding && <Scratch key={`${qcfPage ? 'qcf' : 'bundled'}:${focusKeys ? 'focus' : 'page'}`} rootRef={mainRef} draggedRef={draggedRef} paused={penOn} />}
+      {!focusKeys && (penOn || strokes.length > 0) && (
         <Drawing
           key={inkKey}
           rootRef={mainRef}
@@ -421,7 +505,7 @@ export default function MushafPage({
         </button>
       )}
 
-      {penOn && strokes.length > 0 && (
+      {!focusKeys && penOn && strokes.length > 0 && (
         <button
           className={`clear-tool ${buttonVisible ? '' : 'faded-out'}`}
           onClick={() => onClearDrawing(inkKey)}
@@ -434,18 +518,20 @@ export default function MushafPage({
         </button>
       )}
 
-      <button
-        className={`pen-toggle ${buttonVisible ? '' : 'faded-out'} ${penOn ? 'on' : ''}`}
-        onClick={onTogglePen}
-        aria-pressed={penOn}
-        aria-label={penOn ? 'Stop drawing' : 'Draw on the page'}
-        tabIndex={buttonVisible ? 0 : -1}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4.5 19.5l1-4.2L16 4.8a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.7 18.5z" />
-          <path d="M14.2 6.6l3.2 3.2" />
-        </svg>
-      </button>
+      {!focusKeys && (
+        <button
+          className={`pen-toggle ${buttonVisible ? '' : 'faded-out'} ${penOn ? 'on' : ''}`}
+          onClick={onTogglePen}
+          aria-pressed={penOn}
+          aria-label={penOn ? 'Stop drawing' : 'Draw on the page'}
+          tabIndex={buttonVisible ? 0 : -1}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4.5 19.5l1-4.2L16 4.8a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.7 18.5z" />
+            <path d="M14.2 6.6l3.2 3.2" />
+          </svg>
+        </button>
+      )}
 
       <button
         className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}

@@ -37,7 +37,7 @@ export default function App() {
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
-  const [stepping, setStepping] = useState(false) // opened from Hifz: pages show today's Hifz ayah by ayah
+  const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function App() {
       setMushafPage(page)
       if (!page) {
         openedFromToday.current = false
-        setStepping(false)
+        setOpenedKind(null)
       }
     }
     window.addEventListener('hashchange', onHash)
@@ -102,7 +102,7 @@ export default function App() {
 
   // Opening adds a history entry, so the phone's back gesture returns to Today.
   const openPage = (kind: Kind, ranges: Range[]) => {
-    setStepping(kind === 'hifz')
+    setOpenedKind(kind)
     setPortion(ranges)
     setArrivedFrom(null)
     openedFromToday.current = true
@@ -133,7 +133,7 @@ export default function App() {
           page={mushafPage}
           arrivedFrom={arrivedFrom}
           portion={portion}
-          stepping={stepping}
+          stepping={openedKind === 'hifz'}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
           penOn={penOn}
@@ -141,6 +141,15 @@ export default function App() {
           drawings={saved.drawings}
           onStroke={(key, stroke) => update(addStroke(saved, key, stroke))}
           onClearDrawing={(key) => update(clearDrawing(saved, key))}
+          rating={
+            openedKind === 'muraja'
+              ? {
+                  memorised: saved.progress.memorised,
+                  ratings: saved.ratings,
+                  onRate: (surah, rating) => update(setRating(saved, surah, rating)),
+                }
+              : null
+          }
           onBack={leavePage}
           onTurn={turnTo}
         />

@@ -1,4 +1,4 @@
-// The Mushaf page's lines box, for the canvases drawn over it (hide mode's scratch cover and the pen).
+// The Mushaf page's lines box (or the zoomed-in ayahs, while they show), for the canvases drawn over it (hide mode's scratch cover and the pen).
 // Calls `paint` now and whenever the box is replaced (the exact font taking over), resized, re-fitted,
 // scrolled (landscape) or slid in after a page turn. Returns a function that stops watching.
 export const watchLinesBox = (root: HTMLElement, paint: (box: HTMLElement | null) => void): (() => void) => {
@@ -13,7 +13,7 @@ export const watchLinesBox = (root: HTMLElement, paint: (box: HTMLElement | null
     changed.disconnect()
   }
   const attach = () => {
-    const next = root.querySelector<HTMLElement>('.m-lines')
+    const next = root.querySelector<HTMLElement>('.m-focus') ?? root.querySelector<HTMLElement>('.m-lines')
     if (next === box) return
     detach()
     box = next
