@@ -219,7 +219,16 @@ button:disabled { opacity: 0.35; cursor: default; }
 .days .date { font-weight: 600; margin-bottom: var(--space-1); }
 .days p:not(.date) { font-size: var(--text-sm); color: var(--ink-faded); }
 .days strong { color: var(--ink); font-weight: 600; }
-.sources { margin-top: var(--space-6); }
+/* Back up and Restore sit in the Backup section, side by side, with when the last Backup was beneath. */
+.backup-buttons { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-2); margin-top: var(--space-3); }
+.backup-hint { margin: var(--space-2) 0 var(--space-6); text-align: center; }
+
+/* Settings: credits at the end, as a quiet list. */
+.credits-title { margin-top: var(--space-6); }
+.credits { padding-inline-start: var(--space-4); display: grid; gap: var(--space-2); }
+
+/* First-run setup */
+.setup-kinds { padding-inline-start: var(--space-4); margin: var(--space-3) 0 var(--space-4); display: grid; gap: var(--space-2); }
 
 /* Settings */
 /* Theme: three choices in one track, the chosen one filled like a ticked Done button. */

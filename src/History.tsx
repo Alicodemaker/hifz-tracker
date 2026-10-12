@@ -59,6 +59,15 @@ export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
         browser's data, or losing or replacing the phone, deletes it. A backup file in Google Drive lets you restore
         everything.
       </p>
+      <div className="row backup-buttons">
+        <button className="button primary" onClick={onBackUp}>
+          Back up
+        </button>
+        <RestoreButton className="button quiet" onRestore={onRestore} onMessage={setMessage} />
+      </div>
+      <p className="faded small backup-hint">
+        {describeLastBackup(saved.lastBackup, localDate())}. In the share menu, pick Save to Drive.
+      </p>
 
       <h2 className="section-title">Juz memorised</h2>
       <p className="faded small juz-summary">
@@ -80,24 +89,6 @@ export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
           ))}
         </ul>
       )}
-
-      <p className="faded small sources">
-        Quran text and page layout: King Fahd Glorious Quran Printing Complex (KFGQPC), via quran.ws (CC BY 4.0).
-        Exact mushaf font: KFGQPC QCF4 (calligraphy by Uthman Taha), downloaded from quran-qcf4 by Mohamad Hajj
-        Rabee, whose page data is used under the MIT licence.
-      </p>
-
-      <div className="action-bar">
-        <div className="row">
-          <button className="button primary" onClick={onBackUp}>
-            Back up
-          </button>
-          <RestoreButton className="button quiet" onRestore={onRestore} onMessage={setMessage} />
-        </div>
-        <p className="faded small hint">
-          {describeLastBackup(saved.lastBackup, localDate())}. In the share menu, pick Save to Drive.
-        </p>
-      </div>
     </main>
   )
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { planToday, recordDay, type Progress, type Range } from './plan'
+import { planToday, recordDay, suggestedHifzStart, type Progress, type Range } from './plan'
 import { ayahCount, pageOf, sizeInPages, surahSize } from './quran'
 
 // Memorised an-Nas back to Fussilat; next Hifz is Ghafir 1 (the builder's real state).
@@ -224,3 +224,18 @@ describe('Recording a day', () => {
   })
 })
 
+
+describe('suggestedHifzStart', () => {
+  it('starts at an-Nas when nothing is memorised', () => {
+    expect(suggestedHifzStart([])).toEqual({ surah: 114, ayah: 1 })
+  })
+
+  it('starts at the first surah, counting back from an-Nas, that is not memorised', () => {
+    expect(suggestedHifzStart(Array.from({ length: 74 }, (_, i) => 41 + i))).toEqual({ surah: 40, ayah: 1 })
+    expect(suggestedHifzStart([114, 113, 111])).toEqual({ surah: 112, ayah: 1 })
+  })
+
+  it('has nothing to suggest when every surah is memorised', () => {
+    expect(suggestedHifzStart(Array.from({ length: 114 }, (_, i) => i + 1))).toBeNull()
+  })
+})

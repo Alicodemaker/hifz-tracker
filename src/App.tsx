@@ -10,6 +10,7 @@ import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
 import { pageOf, surahPages } from './quran'
 import { setRating } from './ratings'
 import Settings from './Settings'
+import Setup from './Setup'
 import { load, save } from './storage'
 import Surahs from './Surahs'
 import Today from './Today'
@@ -185,15 +186,9 @@ export default function App() {
       )
     }
 
-    if (!saved || screen === 'settings')
-      return (
-        <Settings
-          initial={saved?.progress ?? null}
-          onSave={saveSettings}
-          onRestore={restore}
-          onBack={saved ? () => setScreen('today') : null}
-        />
-      )
+    if (!saved) return <Setup onStart={saveSettings} onRestore={restore} />
+
+    if (screen === 'settings') return <Settings initial={saved.progress} onSave={saveSettings} onBack={() => setScreen('today')} />
 
     if (screen === 'history') {
       return <History saved={saved} onBackUp={backUp} onRestore={restore} onBack={() => setScreen('today')} />
