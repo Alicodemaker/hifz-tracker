@@ -169,7 +169,7 @@ button:disabled { opacity: 0.35; cursor: default; }
   border-top: 1px solid var(--rule);
 }
 .revision li:last-child { border-bottom: 1px solid var(--rule); }
-.revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: left; }
+.revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: right; }
 .revision .range { font-weight: 600; }
 
 /* The check that answers a Done tap */
@@ -586,11 +586,22 @@ select, input[type='number'] {
 }
 .m-line.mark-end::after { inset-inline-start: auto; inset-inline-end: calc(-1 * var(--space-2) + 2px); }
 
-/* Hide mode paints a soft bar through the middle of each word on a canvas over the page, like text seen from afar,
-   which a finger rubs away. */
+/* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar.
+   Tapping it reveals it, and tapping again hides it. */
 .m-lines.hiding { -webkit-user-select: none; user-select: none; }
+.m-lines.hiding .m-ayah,
+.m-focus.hiding .m-ayah { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-ayah.hidden .m-words {
+  color: transparent;
+  background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
+  border-radius: 999px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.m-lines.hiding .m-ayah:not(.hidden) .m-words,
+.m-focus.hiding .m-ayah:not(.hidden) .m-words { animation: reveal var(--motion-quick) ease-out; }
+@keyframes reveal { from { opacity: 0; } }
 .mushaf.free-drag { touch-action: none; }
-.scratch-cover,
 .drawing-ink { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
 /* Ayah by ayah: only the ayahs shown so far, zoomed in to fill the page (the page itself stays laid out, unseen). */
@@ -611,6 +622,8 @@ select, input[type='number'] {
 .m-focus.qcf { font-family: var(--qcf-font), var(--font-quran); }
 .m-focus.hiding { -webkit-user-select: none; user-select: none; }
 .m-focus-text { max-width: 100%; text-align: center; line-height: 2.1; }
+/* QCF4 glyphs are private-use characters, which the browser lays out left to right: force the reading order. */
+.m-focus.qcf .m-focus-text { unicode-bidi: bidi-override; direction: rtl; }
 
 .hide-toggle,
 .pen-toggle {
@@ -627,7 +640,7 @@ select, input[type='number'] {
   box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
   transition: opacity var(--motion-calm) ease, background-color var(--motion-quick) ease;
 }
-/* In hide mode, where a drag scratches, the page turns with ‹ › at the bottom centre; the next page is to the left. */
+/* With the pen on, where a drag draws, the page turns with ‹ › at the bottom centre; the next page is to the left. */
 .page-turns {
   position: fixed;
   left: 50%;
@@ -725,6 +738,14 @@ select, input[type='number'] {
 .m-line.center .qcf-row,
 .m-lines.short .qcf-row { justify-content: center; }
 .qcf-glyph.sign { color: var(--mushaf-rosette); }
+.hiding .qcf-glyph.word { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.qcf-glyph.word.hidden {
+  color: transparent;
+  text-shadow: none;
+  background: linear-gradient(transparent 32%, var(--mushaf-blank) 32% 72%, transparent 72%);
+  border-radius: 999px;
+}
+.hiding .qcf-glyph.word:not(.hidden) { animation: reveal var(--motion-quick) ease-out; }
 
 /* A short slide answers a page turn: the next page comes in from the left, as in a mushaf. */
 .m-lines.enter-next { animation: turn-next var(--motion-quick) ease-out; }

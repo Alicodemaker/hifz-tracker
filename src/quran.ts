@@ -23,6 +23,12 @@ export const ayahIndex = ({ surah, ayah }: AyahRef): number => firstIndex[surah 
 
 export const pageOf = (ref: AyahRef): number => data.ayahPage[ayahIndex(ref)]
 
+// The Pages a Surah runs over, from its first Ayah's Page to its last's.
+export const surahPages = (surah: number): { first: number; last: number } => ({
+  first: pageOf({ surah, ayah: 1 }),
+  last: pageOf({ surah, ayah: ayahCount(surah) }),
+})
+
 export const juzStartPage = (juz: number): number => {
   const [surah, ayah] = data.juzStarts[juz - 1]
   return pageOf({ surah, ayah })

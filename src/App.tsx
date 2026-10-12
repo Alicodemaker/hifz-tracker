@@ -6,7 +6,7 @@ import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
-import { pageOf } from './quran'
+import { pageOf, surahPages } from './quran'
 import { setRating } from './ratings'
 import Settings from './Settings'
 import { load, save } from './storage'
@@ -108,9 +108,14 @@ export default function App() {
     openedFromToday.current = true
     window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
   }
+  // Opened from Hifz, pages turn only within the Hifz Surah; otherwise through the whole Mushaf.
+  const pageBounds =
+    openedKind === 'hifz' && portion?.length
+      ? { first: surahPages(portion[0].surah).first, last: surahPages(portion[portion.length - 1].surah).last }
+      : { first: 1, last: 604 }
   // Turning pages replaces that entry, so one back always leaves the Mushaf page.
   const turnTo = (page: number) => {
-    if (page < 1 || page > 604) return
+    if (page < pageBounds.first || page > pageBounds.last) return
     history.replaceState(null, '', `#/page/${page}`)
     setArrivedFrom(mushafPage && page > mushafPage ? 'next' : 'prev')
     setMushafPage(page)
@@ -132,6 +137,7 @@ export default function App() {
           key={mushafPage} // a fresh page on every visit, so hide mode starts fully hidden each time
           page={mushafPage}
           arrivedFrom={arrivedFrom}
+          pageBounds={pageBounds}
           portion={portion}
           stepping={openedKind === 'hifz'}
           hiding={hiding}

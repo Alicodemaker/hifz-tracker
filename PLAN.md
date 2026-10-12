@@ -16,6 +16,7 @@ Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page 
 6. ✅ **Scratch to reveal**: hide mode no longer reveals on tap. With hide mode on, dragging a finger over a blank ayah rubs it away where the finger passes, like a scratch card. A tap only shows or hides the floating buttons, as now. While hide mode or the pen is on, a drag never turns the page, and small ‹ › buttons with the other floating buttons do it instead. Update hide mode in `CONTEXT.md`.
 7. ✅ **Drawing pen**: a pen button the same size as hide sits beside it. When it's on, a finger draws over the page in red, and a "Clear page" button appears. Drawings are kept for each page and each font look (they don't line up across looks), stay until cleared, and go into the Backup.
 8. ✅ **Rating on the page and a smaller title** (added at the builder's request): opened from Muraja'a, a star button at the top right, opposite the back button, opens a panel to rate the memorised Surahs on that page. The Hifz surah name on Today is smaller, so its vowel marks clear the double rule above.
+9. ✅ **Fixes from the builder's phone**: on Today, the Rabt and Muraja'a surah names in Arabic sit flush right, with no gap before them. Ayah by ayah in the exact font reads right to left (it showed each line's words reversed). Opened from Hifz, the page turns only through the pages of the Hifz Surah. Hide mode goes back to tap-to-reveal: tapping an ayah shows it and tapping again hides it (this replaces step 6's scratch card); with the pen on, a drag still draws and the ‹ › buttons turn the page.
 
 ## What we're NOT doing
 
@@ -25,7 +26,7 @@ Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page 
 - No revision of earlier pages of the current Hifz Surah in the app (done by hand during Hifz)
 - No colours, pen sizes or eraser for drawing; only Clear page
 - No tomorrow preview before all three are done
-- No tap-to-reveal in hide mode, and no separate ayah-by-ayah button
+- No separate ayah-by-ayah button
 - No Arabic-script labels or new settings
 
 ## How we'll know it works
