@@ -53,6 +53,12 @@ export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
       </header>
       {message && <p className="notice">{message}</p>}
 
+      <h2 className="section-title">Backup</h2>
+      <p className="faded small backup-why">
+        Your progress is saved only on this phone, inside Chrome. Clearing Chrome's data, or losing or replacing the
+        phone, deletes it. A backup file in Google Drive lets you restore everything.
+      </p>
+
       <h2 className="section-title">Juz memorised</h2>
       <p className="faded small juz-summary">
         {complete} of 30 complete. Each ring fills as you memorise; Juz 1 is on the right, as the mushaf opens.

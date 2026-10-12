@@ -8,11 +8,12 @@ const logged: Saved = { ...fresh, history: [{ ...fresh.today!, rabtDone: true }]
 
 describe('backupDue', () => {
   it('waits until something has been logged', () => {
-    expect(backupDue(fresh, '2026-10-12')).toBe(false)
+    expect(backupDue(fresh, '2026-10-30')).toBe(false)
   })
 
-  it('is due once something is logged and there has never been a backup', () => {
-    expect(backupDue(logged, '2026-10-12')).toBe(true)
+  it('without a backup, is due once the app has been used for two weeks', () => {
+    expect(backupDue(logged, '2026-10-14')).toBe(false) // first logged day 13 days ago
+    expect(backupDue(logged, '2026-10-15')).toBe(true) // 14 days
   })
 
   it('is due two weeks after the last backup', () => {

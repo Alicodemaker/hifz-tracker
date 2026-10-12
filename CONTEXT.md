@@ -87,7 +87,7 @@ One or more days with nothing logged. A Gap never creates overdue work: the next
 _Avoid_: Missed day, streak break, backlog
 
 **Backup**:
-A single file holding all of a person's Logs and settings, which they save wherever they choose (e.g. Google Drive) and can restore from. Once something is logged, Today reminds them when there has been no Backup for two weeks (or ever).
+A single file holding all of a person's Logs and settings, which they save wherever they choose (e.g. Google Drive) and can restore from. Today reminds them two weeks after the last Backup, or, with none yet, once the app has been in use for two weeks.
 _Avoid_: Sync, export, cloud save
 
 **Day**:

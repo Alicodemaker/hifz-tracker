@@ -3,9 +3,12 @@ import { daysBetween, type Saved } from './day'
 
 const BACKUP_DUE_DAYS = 14
 
-// Everything lives on this one phone, so once something is logged, a Backup older than two weeks (or none) is due.
-export const backupDue = (saved: Saved, date: string): boolean =>
-  saved.history.length > 0 && (!saved.lastBackup || daysBetween(saved.lastBackup, date) >= BACKUP_DUE_DAYS)
+// Everything lives on this one phone, so a Backup is due two weeks after the last one, or, with none yet,
+// once the app has been in use for two weeks (counted from the first logged day).
+export const backupDue = (saved: Saved, date: string): boolean => {
+  const since = saved.lastBackup ?? saved.history[saved.history.length - 1]?.date
+  return since !== undefined && daysBetween(since, date) >= BACKUP_DUE_DAYS
+}
 
 // "Not backed up yet", "Last backup today", "Last backup yesterday" or "Last backup 14 days ago".
 export const describeLastBackup = (lastBackup: string | undefined, date: string): string => {
