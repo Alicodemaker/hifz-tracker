@@ -8,7 +8,6 @@ export type Day = {
   hifzEnd: AyahRef | null // last Ayah actually memorised; null if Hifz not done
   rabtDone: boolean
   murajaDone: boolean
-  hifzReps?: number // times today's Hifz was read through, counted on the Mushaf page
 }
 
 export type Kind = 'hifz' | 'rabt' | 'muraja'
@@ -40,9 +39,6 @@ export const toggleDone = (day: Day, kind: Kind): Day => {
   const last = day.plan.hifz.at(-1)
   return { ...day, hifzEnd: day.hifzEnd || !last ? null : { surah: last.surah, ayah: last.to } }
 }
-
-// One more (or one fewer) read-through of today's Hifz, never below none.
-export const countRep = (day: Day, change: 1 | -1): Day => ({ ...day, hifzReps: Math.max(0, (day.hifzReps ?? 0) + change) })
 
 const doneKinds = (day: Day): number => Number(day.hifzEnd !== null) + Number(day.rabtDone) + Number(day.murajaDone)
 // Everything planned today is ticked; a kind with nothing planned counts as done.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { celebrationFor, countRep, startDay, toggleDone, type Saved } from './day'
+import { celebrationFor, startDay, toggleDone, type Saved } from './day'
 import { planToday, type Progress } from './plan'
 
 const progress: Progress = {
@@ -68,23 +68,6 @@ describe('toggleDone', () => {
   })
 })
 
-describe('countRep', () => {
-  const day = startDay(fresh, '2026-09-29').today!
-
-  it('counts Hifz repetitions up and down from none, never below none', () => {
-    expect(day.hifzReps ?? 0).toBe(0)
-    const twice = countRep(countRep(day, 1), 1)
-    expect(twice.hifzReps).toBe(2)
-    expect(countRep(twice, -1).hifzReps).toBe(1)
-    expect(countRep(day, -1).hifzReps).toBe(0)
-  })
-
-  it('starts each new day at none', () => {
-    const counted = { ...fresh, today: countRep(day, 1) }
-    expect(startDay(counted, '2026-09-30').today!.hifzReps ?? 0).toBe(0)
-  })
-})
-
 describe('celebrationFor', () => {
   const day = startDay(fresh, '2026-09-29').today!
 
@@ -106,6 +89,6 @@ describe('celebrationFor', () => {
   it('is nothing for an undo, or for a change that ticks nothing', () => {
     const rabt = toggleDone(day, 'rabt')
     expect(celebrationFor(rabt, toggleDone(rabt, 'rabt'))).toBeNull()
-    expect(celebrationFor(day, countRep(day, 1))).toBeNull()
+    expect(celebrationFor(day, { ...day })).toBeNull()
   })
 })

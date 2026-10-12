@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { Kind } from './day'
 import type { Range } from './plan'
 import { ayahCount, ayahIndex, juzOfAyah, surahArabic, surahName } from './quran'
 import QcfLines, { type QcfLine } from './QcfLines'
@@ -36,11 +35,7 @@ type Props = {
   onToggleHiding: () => void
   onBack: () => void
   onTurn: (page: number) => void
-  task: { kind: Kind; done: boolean; onToggle: () => void } | null // the area of Today that opened the page
-  reps: { count: number; onCount: (change: 1 | -1) => void } | null // Hifz read-throughs, when opened from Hifz
 }
-
-const KIND_NAMES: Record<Kind, string> = { hifz: 'Hifz', rabt: 'Rabt', muraja: "Muraja'a" }
 
 const firstAyah = (lines: Line[]): { surah: number; ayah: number } => {
   for (const line of lines) {
@@ -95,7 +90,7 @@ const BISMILLAH_FONT = 0 // QCF4_Hafs_01, the first font in qcf-fonts.json
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
 
-export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn, task, reps }: Props) {
+export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggleHiding, onBack, onTurn }: Props) {
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -205,7 +200,7 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
     setReveals({ scope, keys })
   }
 
-  // The floating buttons (hide, Done, counter) show and hide together: a tap on the page (not a swipe)
+  // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
   // They show when the page is opened, but not after a page turn.
   const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null)
@@ -341,29 +336,6 @@ export default function MushafPage({ page, arrivedFrom, portion, hiding, onToggl
             <button className="font-download" onClick={download}>
               Download stopped. Check your connection and tap to resume
             </button>
-          )}
-        </div>
-      )}
-
-      {task && (
-        <div className={`page-tools ${buttonVisible ? '' : 'faded-out'}`}>
-          <button className={`tool done-tool ${task.done ? 'on' : ''}`} onClick={task.onToggle} aria-pressed={task.done} tabIndex={buttonVisible ? 0 : -1}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12.5l4.5 4.5L19 7.5" />
-            </svg>
-            {KIND_NAMES[task.kind]} done
-          </button>
-          {reps && (
-            <div className="tool rep-tool">
-              <button className="rep-less" onClick={() => reps.onCount(-1)} disabled={reps.count === 0} aria-label="One read-through fewer" tabIndex={buttonVisible ? 0 : -1}>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 12h12" />
-                </svg>
-              </button>
-              <button className="rep-count" onClick={() => reps.onCount(1)} aria-label={`Read ${reps.count} times. Tap to count one more`} tabIndex={buttonVisible ? 0 : -1}>
-                {reps.count}×
-              </button>
-            </div>
           )}
         </div>
       )}

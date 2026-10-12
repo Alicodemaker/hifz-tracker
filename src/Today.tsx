@@ -61,7 +61,6 @@ export default function Today({
 }: Props) {
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
-  const reps = day.hifzReps ?? 0
 
   // Tapping an area opens its Mushaf page; its own buttons keep their jobs.
   const openFrom = (kind: Kind, portion: Range[]) => (event: React.MouseEvent) => {
@@ -94,10 +93,7 @@ export default function Today({
               </p>
             </div>
             <p className="range">{describeRanges(plan.hifz)}</p>
-            <p className="faded small">
-              {describeSize(plan.hifz)}
-              {reps > 0 && `, read ${reps}×`}
-            </p>
+            <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (
               <div className="stepper">
                 <button disabled={hifzAmount <= 0.25} onClick={() => onChangeAmount(-1)} aria-label="Quarter of a page less each day">

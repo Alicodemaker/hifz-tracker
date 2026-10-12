@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Celebration from './Celebration'
-import { celebrationFor, countRep, localDate, startDay, toggleDone, type Day, type Kind, type Saved } from './day'
+import { celebrationFor, localDate, startDay, type Day, type Kind, type Saved } from './day'
 import History from './History'
 import MushafPage from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
@@ -30,7 +30,6 @@ export default function App() {
   const [screen, setScreen] = useState<'today' | 'settings' | 'history'>('today')
   const [mushafPage, setMushafPage] = useState(pageFromHash)
   const [portion, setPortion] = useState<Range[] | null>(null)
-  const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
   const openedFromToday = useRef(false)
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
@@ -40,10 +39,7 @@ export default function App() {
     const onHash = () => {
       const page = pageFromHash()
       setMushafPage(page)
-      if (!page) {
-        openedFromToday.current = false
-        setOpenedKind(null)
-      }
+      if (!page) openedFromToday.current = false
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
@@ -95,8 +91,7 @@ export default function App() {
   }
 
   // Opening adds a history entry, so the phone's back gesture returns to Today.
-  const openPage = (kind: Kind, ranges: Range[]) => {
-    setOpenedKind(kind)
+  const openPage = (_kind: Kind, ranges: Range[]) => {
     setPortion(ranges)
     setArrivedFrom(null)
     openedFromToday.current = true
@@ -121,21 +116,6 @@ export default function App() {
 
   const screenContent = () => {
     if (saved && mushafPage) {
-      const today = saved.today
-      // Done on the page ticks the area it was opened from and goes back to Today; tapped again, it only undoes.
-      const done =
-        today && (openedKind === 'hifz' ? today.hifzEnd !== null : openedKind === 'rabt' ? today.rabtDone : today.murajaDone)
-      const task =
-        today && openedKind
-          ? {
-              kind: openedKind,
-              done: Boolean(done),
-              onToggle: () => {
-                changeToday(toggleDone(today, openedKind))
-                if (!done) leavePage()
-              },
-            }
-          : null
       return (
         <MushafPage
           key={mushafPage} // a fresh page on every visit, so hide mode starts fully hidden each time
@@ -146,12 +126,6 @@ export default function App() {
           onToggleHiding={() => setHiding((on) => !on)}
           onBack={leavePage}
           onTurn={turnTo}
-          task={task}
-          reps={
-            today && openedKind === 'hifz'
-              ? { count: today.hifzReps ?? 0, onCount: (change) => changeToday(countRep(today, change)) }
-              : null
-          }
         />
       )
     }
