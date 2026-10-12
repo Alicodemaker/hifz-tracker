@@ -21,11 +21,11 @@ One verse within a Surah. The finest position a Hifz can start or end at.
 _Avoid_: Verse, line
 
 **Mushaf page**:
-One Page shown in the app as it appears in the printed 15-line Madani mushaf: the same words on each of its 15 lines, with Surah headers, the bismillah and Ayah markers, always on light paper.
+One Page shown in the app as it appears in the printed 15-line Madani mushaf: the same words on each of its 15 lines, with Surah headers, the bismillah and Ayah markers, always on light paper. Opened from today's Hifz, it turns only through the Pages of the Hifz's Surah.
 _Avoid_: Reader, viewer, page view
 
 **Hide mode**:
-A way of testing memorisation on the Mushaf page, like a scratch card: the Ayah text is covered by blank shapes of the same size and place, while Surah headers, the bismillah and Ayah markers stay visible. Dragging a finger over the cover rubs it away where the finger passes; a tap reveals nothing. While it is on, a drag never turns the page (buttons do). Once switched on it stays on across pages until switched off, and every page starts fully covered each time it is shown.
+A way of testing memorisation on the Mushaf page: the Ayah text is replaced by blank shapes of the same size and place, while Surah headers, the bismillah and Ayah markers stay visible. Tapping an Ayah reveals it and tapping again hides it. Once switched on it stays on across pages until switched off, and every page starts fully hidden each time it is shown.
 _Avoid_: Test mode, quiz, blur mode
 
 **Drawing**:

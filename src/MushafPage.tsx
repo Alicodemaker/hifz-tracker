@@ -10,7 +10,6 @@ import { drawingKey, type Stroke } from './drawings'
 import PageRating from './PageRating'
 import type { Rating } from './ratings'
 import Rosette from './Rosette'
-import Scratch from './Scratch'
 import SurahBadge from './SurahBadge'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
@@ -36,6 +35,7 @@ let knownFontState: FontState = 'checking'
 type Props = {
   page: number
   arrivedFrom: 'next' | 'prev' | null // which way the last page turn went, for the slide
+  pageBounds: { first: number; last: number } // the pages it may turn to (opened from Hifz: the Hifz Surah's)
   portion: Range[] | null
   stepping: boolean // opened from Hifz: today's Hifz shows ayah by ayah
   hiding: boolean
@@ -107,6 +107,7 @@ const BUTTON_FADE_MS = 5_000
 export default function MushafPage({
   page,
   arrivedFrom,
+  pageBounds,
   portion,
   stepping,
   hiding,
@@ -199,7 +200,7 @@ export default function MushafPage({
   }, [lines])
 
   // As in a printed mushaf, the next page lies to the left: swipe right (or press ←) to reach it.
-  // In hide mode or with the pen, a drag scratches or draws instead, and the ‹ › buttons turn the page.
+  // With the pen on, a drag draws instead, and the ‹ › buttons turn the page.
   const touchStart = useRef<{ x: number; y: number } | null>(null)
   const onTouchStart = (e: React.TouchEvent) => (touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })
   const onTouchEnd = (e: React.TouchEvent) => {
@@ -219,11 +220,22 @@ export default function MushafPage({
     return () => window.removeEventListener('keydown', onKey)
   }, [page, onTurn])
 
-  // Hide mode is a scratch card over the page (Scratch): every page starts fully covered each time it is shown.
+  // Hide mode: every page starts fully hidden each time it is shown; tapping an ayah reveals or hides it.
+  // The page remounts on every visit; revealed ayahs also reset when hide mode is switched.
+  const scope = String(hiding)
+  const [reveals, setReveals] = useState<{ scope: string; keys: Set<string> }>({ scope, keys: new Set() })
+  const revealed = reveals.scope === scope ? reveals.keys : new Set<string>()
+  const toggleAyah = (key: string) => {
+    const keys = new Set(revealed)
+    if (!keys.delete(key)) keys.add(key)
+    setReveals({ scope, keys })
+  }
+  const hidden = (key: string) => hiding && !revealed.has(key)
+
   // The pen draws over the page (Drawing); each page keeps its drawing for each font look.
   const mainRef = useRef<HTMLElement>(null)
   const draggedRef = useRef(false)
-  const freeDrag = hiding || penOn
+  const freeDrag = penOn
   const inkKey = drawingKey(qcfPage ? 'qcf' : 'bundled', page)
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
@@ -257,8 +269,12 @@ export default function MushafPage({
           ? []
           : line
               .filter(([, s, a]) => focusKeys.has(`${s}:${a}`))
-              .flatMap(([code, , , kind], k) => [
-                <span key={`${code}-${k}`} className={`qcf-glyph ${kind === 0 ? 'word' : 'sign'}`}>
+              .flatMap(([code, s, a, kind], k) => [
+                <span
+                  key={`${code}-${k}`}
+                  className={`qcf-glyph ${kind === 0 ? 'word' : 'sign'} ${kind === 0 && hidden(`${s}:${a}`) ? 'hidden' : ''}`}
+                  data-ayah={`${s}:${a}`}
+                >
                   {String.fromCodePoint(code)}
                 </span>,
                 ' ',
@@ -279,7 +295,7 @@ export default function MushafPage({
       }
     }
     return [...ayahs].map(([key, { words, ayah, ends }]) => (
-      <span key={key} className="m-ayah">
+      <span key={key} className={`m-ayah ${hidden(key) ? 'hidden' : ''}`} data-ayah={key}>
         <span className="m-words">{words.join(' ')}</span>
         {ends && (
           <span className="m-marker">
@@ -298,7 +314,7 @@ export default function MushafPage({
 
   // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
-  // They show when the page is opened, but not after a page turn (unless in hide mode, for the ‹ › buttons).
+  // They show when the page is opened, but not after a page turn (unless the pen is on, for the ‹ › buttons).
   const [buttonVisible, setButtonVisible] = useState(arrivedFrom === null || freeDrag)
   const fadeTimer = useRef<number | undefined>(undefined)
   const startFadeTimer = () => {
@@ -312,7 +328,9 @@ export default function MushafPage({
   const onPageTap = (e: React.MouseEvent) => {
     const target = e.target as Element
     if (target.closest('button')) return wake() // using a button keeps them all showing
-    if (draggedRef.current) return // the end of a scratch or a pen stroke, not a tap
+    if (draggedRef.current) return // the end of a pen stroke, not a tap
+    const ayah = hiding ? target.closest<HTMLElement>('.m-ayah, .qcf-glyph.word') : null
+    if (ayah?.dataset.ayah) return toggleAyah(ayah.dataset.ayah) // that tap reveals or hides an ayah
     if (ratingOpen) {
       if (!target.closest('.page-rating')) setRatingOpen(false) // a tap elsewhere closes the rating
       return
@@ -333,6 +351,7 @@ export default function MushafPage({
     <main
       ref={mainRef}
       className={`mushaf ${freeDrag ? 'free-drag' : ''}`}
+      onPointerDown={() => (draggedRef.current = false)} // each touch starts as a tap, until the pen draws
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onClick={onPageTap}
@@ -382,6 +401,7 @@ export default function MushafPage({
           bismillahFont={qcfFonts.fonts[BISMILLAH_FONT]}
           portion={portion}
           hiding={hiding}
+          hidden={hidden}
           className={`${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${focusKeys ? 'behind-focus' : ''}`}
         />
       ) : (
@@ -421,7 +441,7 @@ export default function MushafPage({
                     return (
                       <span
                         key={key}
-                        className="m-ayah"
+                        className={`m-ayah ${hidden(key) ? 'hidden' : ''}`}
                         data-ayah={key}
                       >
                         <span className="m-words">{words}</span>
@@ -451,7 +471,6 @@ export default function MushafPage({
         </AyahFocus>
       )}
 
-      {hiding && <Scratch key={`${qcfPage ? 'qcf' : 'bundled'}:${focusKeys ? 'focus' : 'page'}`} rootRef={mainRef} draggedRef={draggedRef} paused={penOn} />}
       {!focusKeys && (penOn || strokes.length > 0) && (
         <Drawing
           key={inkKey}
@@ -486,12 +505,12 @@ export default function MushafPage({
 
       {freeDrag && (
         <div className={`page-turns ${buttonVisible ? '' : 'faded-out'}`}>
-          <button onClick={() => onTurn(page + 1)} disabled={page >= 604} aria-label="Next page" tabIndex={buttonVisible ? 0 : -1}>
+          <button onClick={() => onTurn(page + 1)} disabled={page >= pageBounds.last} aria-label="Next page" tabIndex={buttonVisible ? 0 : -1}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15.5 5l-7 7 7 7" />
             </svg>
           </button>
-          <button onClick={() => onTurn(page - 1)} disabled={page <= 1} aria-label="Previous page" tabIndex={buttonVisible ? 0 : -1}>
+          <button onClick={() => onTurn(page - 1)} disabled={page <= pageBounds.first} aria-label="Previous page" tabIndex={buttonVisible ? 0 : -1}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M8.5 5l7 7-7 7" />
             </svg>

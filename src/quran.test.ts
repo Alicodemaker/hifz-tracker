@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import data from './data/quran.json'
-import { AYAH_COUNT, PAGE_COUNT, ayahCount, juzOfSurah, juzStartPage, pageOf, sizeInPages, surahName, surahSize } from './quran'
+import { AYAH_COUNT, PAGE_COUNT, ayahCount, juzOfSurah, juzStartPage, pageOf, sizeInPages, surahName, surahPages, surahSize } from './quran'
 
 describe('Quran data (15-line Madani mushaf)', () => {
   it('has 114 surahs, 6236 ayahs and 604 pages', () => {
@@ -17,6 +17,11 @@ describe('Quran data (15-line Madani mushaf)', () => {
     expect(pageOf({ surah: 92, ayah: 21 })).toBe(596) // end of al-Layl shares a page with ad-Duha
     expect(pageOf({ surah: 93, ayah: 1 })).toBe(596) // ad-Duha
     expect(pageOf({ surah: 2, ayah: 255 })).toBe(42)
+  })
+
+  it('gives the pages a surah runs over', () => {
+    expect(surahPages(45)).toEqual({ first: 499, last: 502 }) // al-Jathiyah
+    expect(surahPages(108)).toEqual({ first: 602, last: 602 }) // al-Kawthar
   })
 
   it('names surahs and counts their ayahs', () => {
