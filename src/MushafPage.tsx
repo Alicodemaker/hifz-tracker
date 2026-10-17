@@ -249,7 +249,6 @@ export default function MushafPage({
   const half = split === null ? 0 : (pageSteps?.half ?? 0)
   const halfFrom = half === 1 ? split! : 0
   const shownTo = Math.min(halfFrom + (pageSteps?.taken[half] ?? 0) + 1, stepKeys.length)
-  const shownCount = shownTo - halfFrom
   const stepActive = shownTo < stepKeys.length
   const wholePage = halfFrom === 0 && shownTo === stepKeys.length && pageAyahs.every(inStepSurahs)
   const shownKeys = stepping && !wholePage ? new Set(stepKeys.slice(halfFrom, shownTo)) : null
@@ -565,8 +564,9 @@ export default function MushafPage({
           with the count above. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
-          <span className="step-count" aria-label={`${shownCount} of ${stepKeys.length - halfFrom} ayahs`}>
-            {shownCount} / {stepKeys.length - halfFrom}
+          {/* Counted across the whole page, also when starting from the second half. */}
+          <span className="step-count" aria-label={`Up to ayah ${shownTo} of ${stepKeys.length} on this page`}>
+            {shownTo} / {stepKeys.length}
           </span>
           <div className="step-row">
             <button className="step-tool" onClick={step} disabled={!stepActive} tabIndex={buttonVisible ? 0 : -1}>
