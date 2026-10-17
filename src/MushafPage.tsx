@@ -253,6 +253,10 @@ export default function MushafPage({
   const wholePage = halfFrom === 0 && shownTo === stepKeys.length && pageAyahs.every(inStepSurahs)
   const shownKeys = stepping && !wholePage ? new Set(stepKeys.slice(halfFrom, shownTo)) : null
   const away = (key: string) => Boolean(shownKeys && !shownKeys.has(key)) // not reached yet: blank, in its place
+  // As printed, the ayah shown first starts after the end sign of the one before it (of the same Surah), so that
+  // sign still shows; above all from "2. half".
+  const before = pageAyahs[pageAyahs.indexOf(stepKeys[halfFrom]) - 1]
+  const leadSign = shownKeys && before && surahOf(before) === surahOf(stepKeys[halfFrom]) ? before : null
   const fitKey = `${qcfPage ? 'qcf' : 'bundled'}:${halfFrom}-${shownTo}`
   const [zoomFit, setZoomFit] = useState<{ key: string; size: number } | null>(null)
   const [qcfSize, setQcfSize] = useState<number | null>(null)
@@ -438,6 +442,7 @@ export default function MushafPage({
           hiding={hiding}
           hidden={hidden}
           away={away}
+          leadSign={leadSign}
           onFontSize={setQcfSize}
           className={`${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${zoomed ? 'behind-focus' : ''}`}
         />
@@ -486,7 +491,7 @@ export default function MushafPage({
                         {marker && (
                           <span className="m-marker">
                             {' '}
-                            <span className={`m-sign ${pins.signs.has(key) ? 'pin' : ''}`}>
+                            <span className={`m-sign ${pins.signs.has(key) ? 'pin' : ''} ${key === leadSign ? 'lead' : ''}`}>
                               <Rosette ayah={piece[1]} />
                             </span>
                           </span>

@@ -642,6 +642,8 @@ select, input[type='number'] {
 /* Ayah by ayah: only the ayahs shown so far, zoomed in to fill the page (the page itself stays laid out, unseen).
    Near the end of the page they show in the page itself instead, with the ayahs not reached yet blank in place. */
 .m-lines .away { visibility: hidden; }
+.m-lines .away.lead,
+.m-lines .away .lead { visibility: visible; } /* the end sign just before the first ayah shown */
 .m-lines.behind-focus,
 .m-lines.fitted.behind-focus { visibility: hidden; }
 .m-focus {
