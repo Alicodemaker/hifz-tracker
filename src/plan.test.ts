@@ -80,6 +80,12 @@ describe('Rabt', () => {
     expect(days).toEqual([[68], [69], [70], [71], [72], [73], [74], [75], [76], [77], [68], [69]])
   })
 
+  it('also takes the juz finished last when the current juz has only one surah left', () => {
+    // Ghafir is in Juz 24, where only Fussilat is left, so ash-Shura to al-Jathiyah (Juz 25) join the rotation.
+    const days = rabtDays(real, 6).map((rabt) => rabt.map((r) => r.surah))
+    expect(days).toEqual([[41], [42], [43], [44], [45], [41]])
+  })
+
   it('stays on the same surah when it is not ticked', () => {
     expect(planToday(recordDay(mulk, {})).rabt).toEqual(planToday(mulk).rabt)
   })
@@ -87,7 +93,7 @@ describe('Rabt', () => {
   it('starts again after the new surah when Hifz moves to the next surah', () => {
     const later = recordDay(recordDay(mulk, { rabtDone: true }), { rabtDone: true }) // Rabt now at al-Ma'arij
     // Finishing al-Mulk: Hifz moves to at-Tahrim (Juz 28). No memorised surah starts in Juz 28 after it,
-    // so the Rabt is the surah just finished.
+    // so Juz 29 joins, and the Rabt starts at the surah just finished.
     const next = recordDay(later, { hifzEnd: { surah: 67, ayah: 30 }, rabtDone: true })
     expect(next.hifzNext).toEqual({ surah: 66, ayah: 1 })
     expect(planToday(next).rabt).toEqual([{ surah: 67, from: 1, to: 30 }])
@@ -124,8 +130,8 @@ describe("Muraja'a", () => {
 
   it('starts with the first surah fully out of the Rabt, in whole surahs up to ten pages', () => {
     const { muraja } = planToday(real)
-    // Fussilat is in the Rabt rotation, so the Muraja'a starts at ash-Shura.
-    expect(muraja[0]).toEqual({ surah: 42, from: 1, to: 53 })
+    // Fussilat to al-Jathiyah are in the Rabt rotation, so the Muraja'a starts at al-Ahqaf.
+    expect(muraja[0]).toEqual({ surah: 46, from: 1, to: 35 })
     expect(muraja.every(isWhole)).toBe(true)
     expect(size(muraja)).toBeLessThanOrEqual(10)
     const nextSurah = muraja[muraja.length - 1].surah + 1
@@ -215,7 +221,7 @@ describe('Recording a day', () => {
   it("wraps the Muraja'a round to the start after the last slice", () => {
     const lastSlice: Progress = { ...real, murajaNext: { surah: 93, ayah: 1 } } // ad-Duha to an-Nas
     const next = recordDay(lastSlice, { murajaDone: true })
-    expect(planToday(next).muraja[0]).toEqual({ surah: 42, from: 1, to: 53 }) // back to ash-Shura
+    expect(planToday(next).muraja[0]).toEqual({ surah: 46, from: 1, to: 35 }) // back to al-Ahqaf
   })
 
   it('picks up exactly where it stopped after days with nothing logged (a Gap)', () => {

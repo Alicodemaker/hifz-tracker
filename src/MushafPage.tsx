@@ -39,6 +39,8 @@ type Props = {
   pageBounds: { first: number; last: number } // the pages it may turn to (opened from Hifz: the Hifz Surah's)
   portion: Range[] | null
   stepping: boolean // opened from Hifz: today's Hifz shows ayah by ayah
+  stepsTaken: number // "+1 ayah" taps on this page since opening from Today
+  onStep: () => void
   hiding: boolean
   onToggleHiding: () => void
   penOn: boolean
@@ -95,6 +97,8 @@ export default function MushafPage({
   pageBounds,
   portion,
   stepping,
+  stepsTaken,
+  onStep,
   hiding,
   onToggleHiding,
   penOn,
@@ -225,8 +229,9 @@ export default function MushafPage({
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
   // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, zoomed in to fill
-  // the page, then one more for each "+1 ayah", until the page's last ayah; then the whole page shows as usual.
-  // Each visit starts again.
+  // the page, then one more for each "+1 ayah", up to the last ayah of the Hifz's Surah on the page. Other Surahs
+  // on the page never show. When the page holds nothing else, the whole page then shows as usual.
+  // The count is kept for each page across page turns, and starts again when the page is opened from Today.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -237,15 +242,18 @@ export default function MushafPage({
     else lines.forEach((line) => typeof line !== 'string' && line.forEach(([s, a]) => add(s, a)))
     return keys
   }, [qcfPage, lines])
+  const surahOf = (key: string) => Number(key.split(':')[0])
   const inHifz = (key: string) => {
     const [surah, ayah] = key.split(':').map(Number)
     return Boolean(portion?.some((r) => r.surah === surah && ayah >= r.from && ayah <= r.to))
   }
+  const hifzSurahs = new Set(portion?.map((r) => r.surah))
   const stepStart = stepping ? pageAyahs.findIndex(inHifz) : -1
-  const [stepsTaken, setStepsTaken] = useState(0)
-  const stepEnd = stepStart + stepsTaken
-  const stepActive = stepStart >= 0 && stepEnd < pageAyahs.length - 1
-  const focusKeys = stepActive ? new Set(pageAyahs.slice(stepStart, stepEnd + 1)) : null
+  const stepKeys = stepStart < 0 ? [] : pageAyahs.slice(stepStart).filter((key) => hifzSurahs.has(surahOf(key)))
+  const shown = Math.min(stepsTaken + 1, stepKeys.length)
+  const stepActive = shown < stepKeys.length
+  const onlyHifzSurahs = pageAyahs.every((key) => hifzSurahs.has(surahOf(key)))
+  const focusKeys = stepKeys.length && (stepActive || !onlyHifzSurahs) ? new Set(stepKeys.slice(0, shown)) : null
   const focusText = () => {
     if (!focusKeys) return null
     if (qcfPage)
@@ -458,7 +466,7 @@ export default function MushafPage({
 
       {focusKeys && (
         <AyahFocus
-          fitKey={`${qcfPage ? 'qcf' : 'bundled'}:${stepEnd}`}
+          fitKey={`${qcfPage ? 'qcf' : 'bundled'}:${shown}`}
           className={`${qcfPage ? 'qcf' : ''} ${hiding ? 'hiding' : ''}`}
           style={qcfPage ? ({ '--qcf-font': `'${qcfFonts.fonts[qcfPage.f]}'` } as React.CSSProperties) : undefined}
         >
@@ -513,10 +521,17 @@ export default function MushafPage({
         </div>
       )}
 
-      {stepActive && (
-        <button className={`step-tool ${buttonVisible ? '' : 'faded-out'}`} onClick={() => setStepsTaken((n) => n + 1)} tabIndex={buttonVisible ? 0 : -1}>
-          +1 ayah
-        </button>
+      {focusKeys && (
+        <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
+          <span className="step-count" aria-label={`${shown} of ${stepKeys.length} ayahs on this page`}>
+            {shown} / {stepKeys.length}
+          </span>
+          {stepActive && (
+            <button className="step-tool" onClick={onStep} tabIndex={buttonVisible ? 0 : -1}>
+              +1 ayah
+            </button>
+          )}
+        </div>
       )}
 
       {!focusKeys && penOn && strokes.length > 0 && (

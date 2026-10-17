@@ -33,8 +33,19 @@ describe('startDay', () => {
     const saved = startDay({ ...opened, today: yesterday }, '2026-09-30')
     expect(saved.progress.hifzNext).toEqual({ surah: 40, ayah: 6 })
     expect(saved.today!.plan.hifz[0]).toMatchObject({ surah: 40, from: 6 })
-    expect(saved.today!.plan.muraja[0].surah).toBe(43) // ash-Shura was revised, az-Zukhruf is next
+    expect(saved.today!.plan.muraja[0].surah).toBe(48) // al-Ahqaf and Muhammad were revised, al-Fath is next
     expect(saved.history).toEqual([yesterday])
+  })
+
+  it("moves on from the plan the day showed, even when today's rules would plan it differently", () => {
+    // A Day saved by an older version: the Rabt was Fussilat and the Muraja'a ash-Shura.
+    const opened = startDay(fresh, '2026-09-29')
+    const old = { ...opened.today!.plan, rabt: [{ surah: 41, from: 1, to: 54 }], muraja: [{ surah: 42, from: 1, to: 53 }] }
+    const yesterday = { ...opened.today!, plan: old, rabtDone: true, murajaDone: true }
+    const saved = startDay({ ...opened, today: yesterday }, '2026-09-30')
+    expect(saved.progress.rabtNext).toEqual({ surah: 42, ayah: 1 })
+    expect(saved.progress.murajaNext).toEqual({ surah: 43, ayah: 1 })
+    expect(saved.today!.plan.rabt).toEqual([{ surah: 42, from: 1, to: 53 }]) // ash-Shura, not skipped
   })
 
   it('repeats the same plan after days with nothing done, without adding them to the history', () => {

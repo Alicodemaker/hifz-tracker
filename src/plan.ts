@@ -102,13 +102,18 @@ const splitLongSurah = (surah: number, limit: number): Range[] => {
 }
 
 // The Surahs the Rabt rotates through: memorised Surahs after the one being memorised (in Mushaf order)
-// that start in the juz the next Hifz is in. With none, it is the Surah memorised just before.
+// that start in the juz the next Hifz is in. With one or none there, those of the juz after it (the one
+// finished last) join, so the rotation still moves on. With none at all, it is the Surah memorised just before.
 const rabtSurahs = (progress: Progress): number[] => {
   const hifzSurah = progress.hifzNext?.surah ?? 0
   const juz = progress.hifzNext ? juzOfAyah(ayahIndex(progress.hifzNext)) : 1
   const memorised = new Set(progress.memorised)
-  const inJuz = [...memorised].filter((s) => s > hifzSurah && juzOfSurah(s) === juz).sort((a, b) => a - b)
-  if (inJuz.length) return inJuz
+  const startingIn = (juzes: number[]) =>
+    [...memorised].filter((s) => s > hifzSurah && juzes.includes(juzOfSurah(s))).sort((a, b) => a - b)
+  const inJuz = startingIn([juz])
+  if (inJuz.length > 1) return inJuz
+  const withLastJuz = startingIn([juz, juz + 1])
+  if (withLastJuz.length) return withLastJuz
   return memorised.has(hifzSurah + 1) ? [hifzSurah + 1] : []
 }
 
@@ -197,8 +202,8 @@ const afterSlice = (slice: Range[]): AyahRef | null => {
 
 // A Gap or a partly revised slice leaves progress untouched, so tomorrow's plan repeats (ADR-0002).
 // When Hifz moves on to another Surah, the Rabt starts again from the Surah after it.
-export const recordDay = (progress: Progress, log: DayLog): Progress => {
-  const plan = planToday(progress)
+// Progress moves on from the plan the Day showed, which differs from today's rules only after an app update.
+export const recordDay = (progress: Progress, log: DayLog, plan: TodaysPlan = planToday(progress)): Progress => {
   let next = progress
   if (log.rabtDone && plan.rabt.length > 0) next = { ...next, rabtNext: afterSlice(plan.rabt) }
   if (log.murajaDone && plan.muraja.length > 0) next = { ...next, murajaNext: afterSlice(plan.muraja) }
