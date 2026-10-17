@@ -33,7 +33,7 @@ export const startDay = (saved: Saved, date: string): Saved => {
   let { progress, history } = saved
   const { beforeNextDay: _, ...rest } = saved // a new date ends the chance to undo
   if (saved.today && somethingDone(saved.today)) {
-    progress = recordDay(progress, logOf(saved.today))
+    progress = recordDay(progress, logOf(saved.today), saved.today.plan)
     history = [saved.today, ...history]
   }
   const today: Day = { date, plan: planToday(progress), hifzEnd: null, rabtDone: false, murajaDone: false }
@@ -87,7 +87,7 @@ const allDone = (day: Day): boolean =>
 export const updateToday = (saved: Saved, day: Day): Saved => {
   const { beforeNextDay: _, ...rest } = saved // any other tick ends the chance to undo
   if (!allDone(day) || !somethingDone(day)) return { ...rest, today: day }
-  const progress = recordDay(saved.progress, logOf(day))
+  const progress = recordDay(saved.progress, logOf(day), day.plan)
   const next: Day = { date: day.date, plan: planToday(progress), hifzEnd: null, rabtDone: false, murajaDone: false }
   const before = saved.today && { progress: saved.progress, today: saved.today }
   return { ...rest, progress, history: [day, ...saved.history], today: next, ...(before && { beforeNextDay: before }) }
