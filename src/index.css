@@ -639,8 +639,28 @@ select, input[type='number'] {
 .mushaf.free-drag { touch-action: none; }
 .drawing-ink { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-/* Ayah by ayah: the page keeps its printed layout and size; ayahs not reached yet are blank in their places. */
+/* Ayah by ayah: only the ayahs shown so far, zoomed in to fill the page (the page itself stays laid out, unseen).
+   Near the end of the page they show in the page itself instead, with the ayahs not reached yet blank in place. */
 .m-lines .away { visibility: hidden; }
+.m-lines.behind-focus,
+.m-lines.fitted.behind-focus { visibility: hidden; }
+.m-focus {
+  position: absolute;
+  inset: calc(env(safe-area-inset-top) + var(--tap)) var(--space-3) calc(2 * var(--float-button) + var(--space-2) + 2 * var(--space-3) + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-quran);
+  visibility: hidden; /* until the size is fitted */
+}
+.mushaf:has(.m-foot) .m-focus { bottom: calc(3 * var(--float-button) + var(--space-2) + 3 * var(--space-3) + env(safe-area-inset-bottom)); }
+.m-focus.fitted { visibility: visible; }
+.m-focus.fitted.measure-only { visibility: hidden; pointer-events: none; }
+.m-focus.qcf { font-family: var(--qcf-font), var(--font-quran); }
+.m-focus-text { max-width: 100%; text-align: center; line-height: 2.1; }
+/* QCF4 glyphs are private-use characters, which the browser lays out left to right: force the reading order. */
+.m-focus.qcf .m-focus-text { unicode-bidi: bidi-override; direction: rtl; }
 
 .hide-toggle,
 .pen-toggle {

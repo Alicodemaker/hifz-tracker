@@ -20,6 +20,7 @@ type Props = {
   hiding: boolean
   hidden: (key: string) => boolean // whether an ayah shows as a blank shape (hide mode)
   away: (key: string) => boolean // whether an ayah is left blank in its place (ayah by ayah, not reached yet)
+  onFontSize?: (size: number) => void // the text size the page fitted, in px; keep it stable
   className: string
 }
 
@@ -33,7 +34,7 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, away, className }: Props) {
+export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, away, onFontSize, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -57,12 +58,13 @@ export default function QcfLines({ page, lines, fontFamily, bismillahFont, porti
       if (widest <= 0) return
       const size = Math.floor(((BASE_SIZE * available) / widest) * 10) / 10
       setFontSize(size)
+      onFontSize?.(size)
       setCentered(new Set(widths.flatMap((w, i) => (w > 0 && w < widest * 0.75 && endsSurah(lines[i]) ? [i] : []))))
     }
     document.fonts.ready.then(fit)
     window.addEventListener('resize', fit)
     return () => window.removeEventListener('resize', fit)
-  }, [lines, fontFamily])
+  }, [lines, fontFamily, onFontSize])
 
   // Today's portion: pins on the ayah sign before it (or above its first word) and on its last ayah sign.
   const pins = portionPins(
