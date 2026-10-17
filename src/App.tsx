@@ -3,7 +3,7 @@ import { backupDue, backupFile, describeLastBackup, shareBackup } from './backup
 import Celebration from './Celebration'
 import { applySettings, celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
 import History from './History'
-import MushafPage, { type StepRange } from './MushafPage'
+import MushafPage, { type PageSteps } from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
@@ -23,8 +23,6 @@ const openToday = (saved: Saved | null) => {
   return next
 }
 
-const FIRST_AYAH: StepRange = { first: 0, last: 0 }
-
 type Cheer = { size: 'small' | 'big'; origin: { x: number; y: number }; id: number }
 
 const pageFromHash = (): number | null => {
@@ -43,8 +41,7 @@ export default function App() {
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
   const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
-  const [stepping, setStepping] = useState(false) // ayah by ayah, like hide mode, stays on across pages
-  const [steps, setSteps] = useState<Record<number, StepRange>>({}) // ayah by ayah: the ayahs shown by page, kept across page turns
+  const [steps, setSteps] = useState<Record<number, PageSteps | null>>({}) // ayah by ayah, switched for each page, kept across page turns
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
@@ -132,8 +129,7 @@ export default function App() {
   const openPage = (kind: Kind, ranges: Range[]) => {
     setOpenedKind(kind)
     setPortion(ranges)
-    setStepping(kind === 'hifz') // from Hifz the page opens ayah by ayah
-    setSteps({})
+    setSteps({}) // every page starts again from Today
     setArrivedFrom(null)
     openedFromToday.current = true
     window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
@@ -169,13 +165,9 @@ export default function App() {
           arrivedFrom={arrivedFrom}
           pageBounds={pageBounds}
           portion={portion}
-          stepping={stepping}
-          onToggleStepping={() => {
-            setStepping((on) => !on)
-            setSteps({}) // switching it on again starts at one ayah
-          }}
-          stepRange={steps[mushafPage] ?? FIRST_AYAH}
-          onStepRange={(range) => setSteps((ranges) => ({ ...ranges, [mushafPage]: range }))}
+          steps={steps[mushafPage]}
+          stepsByDefault={openedKind === 'hifz'}
+          onSteps={(pageSteps) => setSteps((all) => ({ ...all, [mushafPage]: pageSteps }))}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
           penOn={penOn}
