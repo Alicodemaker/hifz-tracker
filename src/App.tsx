@@ -41,6 +41,7 @@ export default function App() {
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
   const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
+  const [stepping, setStepping] = useState(false) // ayah by ayah, like hide mode, stays on across pages
   const [steps, setSteps] = useState<Record<number, number>>({}) // ayah by ayah: "+1 ayah" taps by page, kept across page turns
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
@@ -129,7 +130,8 @@ export default function App() {
   const openPage = (kind: Kind, ranges: Range[]) => {
     setOpenedKind(kind)
     setPortion(ranges)
-    setSteps({}) // ayah by ayah starts again at one ayah only when opened from Today
+    setStepping(kind === 'hifz') // from Hifz the page opens ayah by ayah
+    setSteps({})
     setArrivedFrom(null)
     openedFromToday.current = true
     window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
@@ -165,7 +167,11 @@ export default function App() {
           arrivedFrom={arrivedFrom}
           pageBounds={pageBounds}
           portion={portion}
-          stepping={openedKind === 'hifz'}
+          stepping={stepping}
+          onToggleStepping={() => {
+            setStepping((on) => !on)
+            setSteps({}) // switching it on again starts at one ayah
+          }}
           stepsTaken={steps[mushafPage] ?? 0}
           onStep={() => setSteps((taken) => ({ ...taken, [mushafPage]: (taken[mushafPage] ?? 0) + 1 }))}
           hiding={hiding}

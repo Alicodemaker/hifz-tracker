@@ -38,8 +38,9 @@ type Props = {
   arrivedFrom: 'next' | 'prev' | null // which way the last page turn went, for the slide
   pageBounds: { first: number; last: number } // the pages it may turn to (opened from Hifz: the Hifz Surah's)
   portion: Range[] | null
-  stepping: boolean // opened from Hifz: today's Hifz shows ayah by ayah
-  stepsTaken: number // "+1 ayah" taps on this page since opening from Today
+  stepping: boolean // ayah by ayah is on (from Hifz it starts on)
+  onToggleStepping: () => void
+  stepsTaken: number // "+1 ayah" taps on this page since ayah by ayah was switched on
   onStep: () => void
   hiding: boolean
   onToggleHiding: () => void
@@ -97,6 +98,7 @@ export default function MushafPage({
   pageBounds,
   portion,
   stepping,
+  onToggleStepping,
   stepsTaken,
   onStep,
   hiding,
@@ -228,10 +230,10 @@ export default function MushafPage({
   const inkKey = drawingKey(qcfPage ? 'qcf' : 'bundled', page)
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
-  // Ayah by ayah, on a page that holds part of today's Hifz: only its first Hifz ayah shows, zoomed in to fill
-  // the page, then one more for each "+1 ayah", up to the last ayah of the Hifz's Surah on the page. Other Surahs
-  // on the page never show. When the page holds nothing else, the whole page then shows as usual.
-  // The count is kept for each page across page turns, and starts again when the page is opened from Today.
+  // Ayah by ayah: only one ayah shows, zoomed in to fill the page, then one more for each "+1 ayah". It starts at
+  // the first ayah of today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so
+  // another Surah on the page never shows. When the page holds nothing else, the whole page shows once all are in.
+  // The count is kept for each page across page turns, and starts again when ayah by ayah is switched on.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -243,17 +245,17 @@ export default function MushafPage({
     return keys
   }, [qcfPage, lines])
   const surahOf = (key: string) => Number(key.split(':')[0])
-  const inHifz = (key: string) => {
+  const inPortion = (key: string) => {
     const [surah, ayah] = key.split(':').map(Number)
     return Boolean(portion?.some((r) => r.surah === surah && ayah >= r.from && ayah <= r.to))
   }
-  const hifzSurahs = new Set(portion?.map((r) => r.surah))
-  const stepStart = stepping ? pageAyahs.findIndex(inHifz) : -1
-  const stepKeys = stepStart < 0 ? [] : pageAyahs.slice(stepStart).filter((key) => hifzSurahs.has(surahOf(key)))
+  const portionStart = pageAyahs.findIndex(inPortion)
+  const portionSurahs = new Set(portion?.map((r) => r.surah))
+  const inStepSurahs = (key: string) => portionStart < 0 || portionSurahs.has(surahOf(key))
+  const stepKeys = stepping ? pageAyahs.slice(Math.max(portionStart, 0)).filter(inStepSurahs) : []
   const shown = Math.min(stepsTaken + 1, stepKeys.length)
   const stepActive = shown < stepKeys.length
-  const onlyHifzSurahs = pageAyahs.every((key) => hifzSurahs.has(surahOf(key)))
-  const focusKeys = stepKeys.length && (stepActive || !onlyHifzSurahs) ? new Set(stepKeys.slice(0, shown)) : null
+  const focusKeys = stepKeys.length && (stepActive || !pageAyahs.every(inStepSurahs)) ? new Set(stepKeys.slice(0, shown)) : null
   const focusText = () => {
     if (!focusKeys) return null
     if (qcfPage)
@@ -521,17 +523,33 @@ export default function MushafPage({
         </div>
       )}
 
-      {focusKeys && (
+      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, the count, "+1 ayah" and a button to leave it. */}
+      {stepping ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
           <span className="step-count" aria-label={`${shown} of ${stepKeys.length} ayahs on this page`}>
             {shown} / {stepKeys.length}
           </span>
-          {stepActive && (
-            <button className="step-tool" onClick={onStep} tabIndex={buttonVisible ? 0 : -1}>
-              +1 ayah
-            </button>
-          )}
+          <button className="step-tool" onClick={onStep} disabled={!stepActive} tabIndex={buttonVisible ? 0 : -1}>
+            +1 ayah
+          </button>
+          <button className="step-exit" onClick={onToggleStepping} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
         </div>
+      ) : (
+        <button
+          className={`step-toggle ${buttonVisible ? '' : 'faded-out'}`}
+          onClick={onToggleStepping}
+          aria-label="Ayah by ayah"
+          tabIndex={buttonVisible ? 0 : -1}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h14" />
+            <path className="faint" d="M5 12h14M5 17h9" />
+          </svg>
+        </button>
       )}
 
       {!focusKeys && penOn && strokes.length > 0 && (
