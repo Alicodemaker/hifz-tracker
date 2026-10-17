@@ -5,6 +5,7 @@ import { bandSurah } from './bandSurah'
 import QcfLines, { type QcfLine } from './QcfLines'
 import { QCF_FONT_COUNT, downloadQcfFonts, loadQcfFont, qcfFontsReady } from './qcfFonts'
 import qcfFonts from './data/qcf-fonts.json'
+import AyahFocus from './AyahFocus'
 import Drawing from './Drawing'
 import { drawingKey, type Stroke } from './drawings'
 import { pageHalves } from './halves'
@@ -95,6 +96,8 @@ const NO_STROKES: Stroke[] = []
 const BISMILLAH_FONT = 0 // QCF4_Hafs_01, the first font in qcf-fonts.json
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
+// Ayah by ayah zooms in on the ayahs shown, until zooming would make them at most this much bigger than the page.
+const NEAR_PAGE = 1.5
 
 export default function MushafPage({
   page,
@@ -214,12 +217,13 @@ export default function MushafPage({
     return () => window.removeEventListener('keydown', onKey)
   }, [page, onTurn])
 
-  // Ayah by ayah: the page keeps its printed layout and size, and only the ayahs reached so far show, in their
-  // places; one more for each "+ ayah". It starts at the first ayah of today's portion on the page (or the page's
-  // first ayah) and keeps to the portion's Surahs, so another Surah on the page never shows. More than five ayahs
-  // split into a first and second half, starting in the first; each half shows on its own. When the page holds
-  // nothing else, the whole page shows once all of it is in. It is switched for each page, and each page stays
-  // as it was left until going back to Today.
+  // Ayah by ayah: only the ayahs reached so far show, zoomed in to fill the page; one more for each "+ ayah". With
+  // the last ayah in (of the page, or of the half showing), or once zooming would barely enlarge them, they show in
+  // the page's own layout and size instead, with the rest blank in its place, so it finishes looking like the page. It starts at the first ayah
+  // of today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so another Surah on
+  // the page never shows. More than five ayahs split into a first and second half, starting in the first; each half
+  // shows on its own. When the page holds nothing else, the whole page shows once all of it is in. It is switched
+  // for each page, and each page stays as it was left until going back to Today.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -251,10 +255,62 @@ export default function MushafPage({
   const wholePage = halfFrom === 0 && shownTo === stepKeys.length && pageAyahs.every(inStepSurahs)
   const shownKeys = stepping && !wholePage ? new Set(stepKeys.slice(halfFrom, shownTo)) : null
   const away = (key: string) => Boolean(shownKeys && !shownKeys.has(key)) // not reached yet: blank, in its place
+  const fitKey = `${qcfPage ? 'qcf' : 'bundled'}:${halfFrom}-${shownTo}`
+  const [zoomFit, setZoomFit] = useState<{ key: string; size: number } | null>(null)
+  const [qcfSize, setQcfSize] = useState<number | null>(null)
+  const pageSize = qcfPage ? qcfSize : fontSize
+  const nearPage = !stepActive || (zoomFit?.key === fitKey && pageSize !== null && zoomFit.size <= pageSize * NEAR_PAGE)
+  const zoomed = shownKeys !== null && !nearPage
   const step = () => {
     const taken: [number, number] = [...pageSteps!.taken]
     taken[half]++
     onSteps({ ...pageSteps!, taken })
+  }
+
+  const focusText = () => {
+    if (!shownKeys) return null
+    if (qcfPage)
+      return qcfPage.lines.flatMap((line) =>
+        typeof line === 'string'
+          ? []
+          : line
+              .filter(([, s, a]) => shownKeys.has(`${s}:${a}`))
+              // The space after each glyph is inside its span, so neighbouring hidden words make one strip.
+              .map(([code, s, a, kind], k) => (
+                <span
+                  key={`${code}-${k}`}
+                  className={`qcf-glyph ${kind === 0 ? 'word' : 'sign'} ${kind === 0 && hidden(`${s}:${a}`) ? 'hidden' : ''}`}
+                  data-ayah={`${s}:${a}`}
+                >
+                  {String.fromCodePoint(code)}{' '}
+                </span>
+              )),
+      )
+    // The bundled font: each ayah's pieces from its lines joined, then its marker.
+    const ayahs = new Map<string, { words: string[]; ayah: number; ends: boolean }>()
+    for (const line of lines) {
+      if (typeof line === 'string') continue
+      for (const piece of line) {
+        const key = `${piece[0]}:${piece[1]}`
+        if (!shownKeys.has(key)) continue
+        const [words] = splitMarker(piece)
+        const entry = ayahs.get(key) ?? { words: [], ayah: piece[1], ends: false }
+        entry.words.push(words)
+        entry.ends ||= piece[3] === 1
+        ayahs.set(key, entry)
+      }
+    }
+    return [...ayahs].map(([key, { words, ayah, ends }]) => (
+      <span key={key} className={`m-ayah ${hidden(key) ? 'hidden' : ''}`} data-ayah={key}>
+        <span className="m-words">{words.join(' ')}</span>
+        {ends && (
+          <span className="m-marker">
+            {' '}
+            <Rosette ayah={ayah} />
+          </span>
+        )}{' '}
+      </span>
+    ))
   }
 
   // Hide mode and the pen step aside for ayah by ayah, whose buttons take their place; they come back after it.
@@ -384,12 +440,13 @@ export default function MushafPage({
           hiding={hiding}
           hidden={hidden}
           away={away}
-          className={arrivedFrom ? `enter-${arrivedFrom}` : ''}
+          onFontSize={setQcfSize}
+          className={`${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${zoomed ? 'behind-focus' : ''}`}
         />
       ) : (
         <div
           ref={linesRef}
-          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''}`}
+          className={`m-lines ${fontSize ? 'fitted' : ''} ${lines.length < 15 ? 'short' : ''} ${hiding ? 'hiding' : ''} ${arrivedFrom ? `enter-${arrivedFrom}` : ''} ${zoomed ? 'behind-focus' : ''}`}
           style={
             fontSize
               ? ({ '--quran-size': `${fontSize}px` } as React.CSSProperties)
@@ -444,6 +501,18 @@ export default function MushafPage({
             )
           })}
         </div>
+      )}
+
+      {/* Also laid out while the page shows instead, to measure whether zooming still enlarges the ayahs. */}
+      {shownKeys && (
+        <AyahFocus
+          fitKey={fitKey}
+          onFitted={setZoomFit}
+          className={`${qcfPage ? 'qcf' : ''} ${zoomed ? '' : 'measure-only'}`}
+          style={qcfPage ? ({ '--qcf-font': `'${qcfFonts.fonts[qcfPage.f]}'` } as React.CSSProperties) : undefined}
+        >
+          {focusText()}
+        </AyahFocus>
       )}
 
       {!shownKeys && (freeDrag || strokes.length > 0) && (
