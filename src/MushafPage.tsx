@@ -11,6 +11,7 @@ import PageRating from './PageRating'
 import { portionPins } from './pins'
 import type { Rating } from './ratings'
 import Rosette from './Rosette'
+import StepSlider from './StepSlider'
 import SurahBadge from './SurahBadge'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
@@ -33,6 +34,8 @@ type FontState = 'checking' | 'absent' | 'downloading' | 'failed' | 'ready'
 // Remembered across page turns, so the check happens once per app start.
 let knownFontState: FontState = 'checking'
 
+export type StepRange = { first: number; last: number }
+
 type Props = {
   page: number
   arrivedFrom: 'next' | 'prev' | null // which way the last page turn went, for the slide
@@ -40,8 +43,8 @@ type Props = {
   portion: Range[] | null
   stepping: boolean // ayah by ayah is on (from Hifz it starts on)
   onToggleStepping: () => void
-  stepsTaken: number // "+1 ayah" taps on this page since ayah by ayah was switched on
-  onStep: () => void
+  stepRange: StepRange // the ayahs shown on this page, as indexes into its steps; from 0 to 0 at first
+  onStepRange: (range: StepRange) => void
   hiding: boolean
   onToggleHiding: () => void
   penOn: boolean
@@ -99,8 +102,8 @@ export default function MushafPage({
   portion,
   stepping,
   onToggleStepping,
-  stepsTaken,
-  onStep,
+  stepRange,
+  onStepRange,
   hiding,
   onToggleHiding,
   penOn,
@@ -226,14 +229,15 @@ export default function MushafPage({
   // The pen draws over the page (Drawing); each page keeps its drawing for each font look.
   const mainRef = useRef<HTMLElement>(null)
   const draggedRef = useRef(false)
-  const freeDrag = penOn
+  const freeDrag = penOn && !stepping // the pen steps aside for ayah by ayah, whose slider takes its place
   const inkKey = drawingKey(qcfPage ? 'qcf' : 'bundled', page)
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
-  // Ayah by ayah: only one ayah shows, zoomed in to fill the page, then one more for each "+1 ayah". It starts at
+  // Ayah by ayah: only one ayah shows, zoomed in to fill the page, then one more for each "+ ayah". It starts at
   // the first ayah of today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so
-  // another Surah on the page never shows. When the page holds nothing else, the whole page shows once all are in.
-  // The count is kept for each page across page turns, and starts again when ayah by ayah is switched on.
+  // another Surah on the page never shows. The slider also moves the first ayah on, to leave out what is already
+  // memorised. When the page holds nothing else, the whole page shows once all of it is in.
+  // Each page keeps its range across page turns; it starts again when ayah by ayah is switched on.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -253,9 +257,12 @@ export default function MushafPage({
   const portionSurahs = new Set(portion?.map((r) => r.surah))
   const inStepSurahs = (key: string) => portionStart < 0 || portionSurahs.has(surahOf(key))
   const stepKeys = stepping ? pageAyahs.slice(Math.max(portionStart, 0)).filter(inStepSurahs) : []
-  const shown = Math.min(stepsTaken + 1, stepKeys.length)
-  const stepActive = shown < stepKeys.length
-  const focusKeys = stepKeys.length && (stepActive || !pageAyahs.every(inStepSurahs)) ? new Set(stepKeys.slice(0, shown)) : null
+  const stepLast = Math.min(stepRange.last, stepKeys.length - 1)
+  const stepFirst = Math.min(stepRange.first, stepLast)
+  const shown = stepLast - stepFirst + 1
+  const stepActive = stepLast < stepKeys.length - 1
+  const wholePage = stepFirst === 0 && !stepActive && pageAyahs.every(inStepSurahs)
+  const focusKeys = stepKeys.length && !wholePage ? new Set(stepKeys.slice(stepFirst, stepLast + 1)) : null
   const focusText = () => {
     if (!focusKeys) return null
     if (qcfPage)
@@ -322,7 +329,7 @@ export default function MushafPage({
   }
   const onPageTap = (e: React.MouseEvent) => {
     const target = e.target as Element
-    if (target.closest('button')) return wake() // using a button keeps them all showing
+    if (target.closest('button, .step-slider')) return wake() // using a button keeps them all showing
     if (draggedRef.current) return // the end of a pen stroke, not a tap
     const ayah = hiding ? target.closest<HTMLElement>('.m-ayah, .qcf-glyph.word') : null
     if (ayah?.dataset.ayah) return toggleAyah(ayah.dataset.ayah) // that tap reveals or hides an ayah
@@ -468,7 +475,7 @@ export default function MushafPage({
 
       {focusKeys && (
         <AyahFocus
-          fitKey={`${qcfPage ? 'qcf' : 'bundled'}:${shown}`}
+          fitKey={`${qcfPage ? 'qcf' : 'bundled'}:${stepFirst}-${stepLast}`}
           className={`${qcfPage ? 'qcf' : ''} ${hiding ? 'hiding' : ''}`}
           style={qcfPage ? ({ '--qcf-font': `'${qcfFonts.fonts[qcfPage.f]}'` } as React.CSSProperties) : undefined}
         >
@@ -476,12 +483,12 @@ export default function MushafPage({
         </AyahFocus>
       )}
 
-      {!focusKeys && (penOn || strokes.length > 0) && (
+      {!focusKeys && (freeDrag || strokes.length > 0) && (
         <Drawing
           key={inkKey}
           rootRef={mainRef}
           strokes={strokes}
-          penOn={penOn}
+          penOn={freeDrag}
           draggedRef={draggedRef}
           onStroke={(stroke) => onStroke(inkKey, stroke)}
         />
@@ -523,20 +530,37 @@ export default function MushafPage({
         </div>
       )}
 
-      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, the count, "+1 ayah" and a button to leave it. */}
+      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, "+ ayah", the slider and a button to leave it,
+          with the count above. */}
       {stepping ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
           <span className="step-count" aria-label={`${shown} of ${stepKeys.length} ayahs on this page`}>
             {shown} / {stepKeys.length}
           </span>
-          <button className="step-tool" onClick={onStep} disabled={!stepActive} tabIndex={buttonVisible ? 0 : -1}>
-            +1 ayah
-          </button>
-          <button className="step-exit" onClick={onToggleStepping} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
+          <div className="step-row">
+            <button
+              className="step-tool"
+              onClick={() => onStepRange({ first: stepFirst, last: stepLast + 1 })}
+              disabled={!stepActive}
+              tabIndex={buttonVisible ? 0 : -1}
+            >
+              + ayah
+            </button>
+            <StepSlider
+              labels={stepKeys.map((key) => `${surahName(surahOf(key))} ${key.split(':')[1]}`)}
+              first={stepFirst}
+              last={stepLast}
+              onChange={(first, last) => {
+                onStepRange({ first, last })
+                wake()
+              }}
+            />
+            <button className="step-exit" onClick={onToggleStepping} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
         </div>
       ) : (
         <button
@@ -552,7 +576,7 @@ export default function MushafPage({
         </button>
       )}
 
-      {!focusKeys && penOn && strokes.length > 0 && (
+      {freeDrag && strokes.length > 0 && (
         <button
           className={`clear-tool ${buttonVisible ? '' : 'faded-out'}`}
           onClick={() => onClearDrawing(inkKey)}
@@ -565,7 +589,7 @@ export default function MushafPage({
         </button>
       )}
 
-      {!focusKeys && (
+      {!stepping && (
         <button
           className={`pen-toggle ${buttonVisible ? '' : 'faded-out'} ${penOn ? 'on' : ''}`}
           onClick={onTogglePen}

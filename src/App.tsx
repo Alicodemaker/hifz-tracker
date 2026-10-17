@@ -3,7 +3,7 @@ import { backupDue, backupFile, describeLastBackup, shareBackup } from './backup
 import Celebration from './Celebration'
 import { applySettings, celebrationFor, localDate, startDay, undoNextDay, updateToday, type Day, type Kind, type Saved } from './day'
 import History from './History'
-import MushafPage from './MushafPage'
+import MushafPage, { type StepRange } from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
@@ -22,6 +22,8 @@ const openToday = (saved: Saved | null) => {
   if (next && next !== saved) save(next)
   return next
 }
+
+const FIRST_AYAH: StepRange = { first: 0, last: 0 }
 
 type Cheer = { size: 'small' | 'big'; origin: { x: number; y: number }; id: number }
 
@@ -42,7 +44,7 @@ export default function App() {
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
   const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
   const [stepping, setStepping] = useState(false) // ayah by ayah, like hide mode, stays on across pages
-  const [steps, setSteps] = useState<Record<number, number>>({}) // ayah by ayah: "+1 ayah" taps by page, kept across page turns
+  const [steps, setSteps] = useState<Record<number, StepRange>>({}) // ayah by ayah: the ayahs shown by page, kept across page turns
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
   useEffect(() => {
@@ -172,8 +174,8 @@ export default function App() {
             setStepping((on) => !on)
             setSteps({}) // switching it on again starts at one ayah
           }}
-          stepsTaken={steps[mushafPage] ?? 0}
-          onStep={() => setSteps((taken) => ({ ...taken, [mushafPage]: (taken[mushafPage] ?? 0) + 1 }))}
+          stepRange={steps[mushafPage] ?? FIRST_AYAH}
+          onStepRange={(range) => setSteps((ranges) => ({ ...ranges, [mushafPage]: range }))}
           hiding={hiding}
           onToggleHiding={() => setHiding((on) => !on)}
           penOn={penOn}
