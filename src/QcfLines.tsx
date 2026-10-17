@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Range } from './plan'
 import { ayahCount, surahArabic } from './quran'
+import { bandSurah } from './bandSurah'
 import { portionPins } from './pins'
 import { loadQcfNameFont, qcfNameGlyph } from './qcfFonts'
 import SurahBadge from './SurahBadge'
@@ -18,6 +19,7 @@ type Props = {
   portion: Range[] | null
   hiding: boolean
   hidden: (key: string) => boolean // whether an ayah shows as a blank shape (hide mode)
+  away: (key: string) => boolean // whether an ayah is left blank in its place (ayah by ayah, not reached yet)
   className: string
 }
 
@@ -31,7 +33,7 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, className }: Props) {
+export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, away, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -86,9 +88,11 @@ export default function QcfLines({ page, lines, fontFamily, bismillahFont, porti
       dir="rtl"
     >
       {lines.map((line, i) => {
+        const band = typeof line === 'string' ? bandSurah(lines, i) : null
+        const bandAway = band !== null && away(`${band}:1`) ? 'away' : ''
         if (typeof line === 'string' && line.startsWith('b'))
           return (
-            <div key={i} className="m-line bismillah">
+            <div key={i} className={`m-line bismillah ${bandAway}`}>
               <span className="basmala qcf-basmala" style={{ fontFamily: `'${bismillahFont}'` }}>
                 {String.fromCodePoint(Number(line.slice(1)))}
               </span>
@@ -96,7 +100,7 @@ export default function QcfLines({ page, lines, fontFamily, bismillahFont, porti
           )
         if (typeof line === 'string')
           return (
-            <div key={i} className="m-line surah-band">
+            <div key={i} className={`m-line surah-band ${bandAway}`}>
               <SurahBadge
                 surah={Number(line.slice(1))}
                 name={surahArabic(Number(line.slice(1)))}
@@ -114,7 +118,7 @@ export default function QcfLines({ page, lines, fontFamily, bismillahFont, porti
                 return (
                   <span
                     key={k}
-                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''} ${pinned ? 'pin' : ''}`}
+                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''} ${pinned ? 'pin' : ''} ${away(key) ? 'away' : ''}`}
                     data-ayah={key}
                   >
                     {String.fromCodePoint(code)}
