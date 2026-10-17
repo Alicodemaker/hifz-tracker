@@ -104,7 +104,7 @@ export default function MushafPage({
   onToggleStepping,
   stepRange,
   onStepRange,
-  hiding,
+  hiding: hideMode,
   onToggleHiding,
   penOn,
   onTogglePen,
@@ -115,6 +115,8 @@ export default function MushafPage({
   onBack,
   onTurn,
 }: Props) {
+  // Hide mode and the pen step aside for ayah by ayah, whose buttons take their place; they come back after it.
+  const hiding = hideMode && !stepping
   const [data, setData] = useState<MushafData | null>(cached)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -229,7 +231,7 @@ export default function MushafPage({
   // The pen draws over the page (Drawing); each page keeps its drawing for each font look.
   const mainRef = useRef<HTMLElement>(null)
   const draggedRef = useRef(false)
-  const freeDrag = penOn && !stepping // the pen steps aside for ayah by ayah, whose slider takes its place
+  const freeDrag = penOn && !stepping
   const inkKey = drawingKey(qcfPage ? 'qcf' : 'bundled', page)
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
@@ -604,19 +606,21 @@ export default function MushafPage({
         </button>
       )}
 
-      <button
-        className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}
-        onClick={onToggleHiding}
-        aria-pressed={hiding}
-        aria-label={hiding ? 'Show the text' : 'Hide the text'}
-        tabIndex={buttonVisible ? 0 : -1}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
-          <circle cx="12" cy="12" r="3" />
-          {!hiding && <path d="M4 4l16 16" />}
-        </svg>
-      </button>
+      {!stepping && (
+        <button
+          className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}
+          onClick={onToggleHiding}
+          aria-pressed={hiding}
+          aria-label={hiding ? 'Show the text' : 'Hide the text'}
+          tabIndex={buttonVisible ? 0 : -1}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+            <circle cx="12" cy="12" r="3" />
+            {!hiding && <path d="M4 4l16 16" />}
+          </svg>
+        </button>
+      )}
     </main>
   )
 }
