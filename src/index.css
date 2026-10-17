@@ -702,7 +702,7 @@ select, input[type='number'] {
 .page-turns svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Ayah by ayah: off, a round toggle in the bottom left corner. On, a row of "+ ayah", the slider and a round
-   exit button across the bottom, with the count above it on the left and the hide button above it on the right.
+   exit button across the bottom, with the count above it on the left. Hide and the pen are put away meanwhile.
    They fade with the hide button. */
 .step-toggle,
 .step-exit {
@@ -818,10 +818,6 @@ select, input[type='number'] {
 
 /* While the font download strip shows, sit just above it. */
 .mushaf:has(.m-foot) .step-tools { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
-/* The slider row takes the full width, so hide moves up beside the count (with the font strip, it stays in it). */
-.mushaf:has(.step-tools):not(:has(.m-foot)) .hide-toggle {
-  bottom: calc(var(--space-3) + var(--float-button) + var(--space-2) + env(safe-area-inset-bottom));
-}
 .mushaf:has(.step-tools) .m-focus { bottom: calc(2 * var(--float-button) + var(--space-2) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
 .mushaf:has(.step-tools):has(.m-foot) .m-focus {
   bottom: calc(3 * var(--float-button) + var(--space-2) + 3 * var(--space-3) + env(safe-area-inset-bottom));
