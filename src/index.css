@@ -701,17 +701,54 @@ select, input[type='number'] {
 }
 .page-turns svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Ayah by ayah: the count and "+1 ayah" float at the bottom left, opposite the hide button, and fade with it. */
-.step-tools {
+/* Ayah by ayah: off, a round toggle in the bottom left corner. On, a row of "+ ayah", the slider and a round
+   exit button across the bottom, with the count above it on the left and the hide button above it on the right.
+   They fade with the hide button. */
+.step-toggle,
+.step-exit {
+  position: relative;
+  width: var(--float-button);
+  height: var(--float-button);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-olive);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
+}
+.step-toggle {
   position: fixed;
   left: var(--space-3);
   bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
   transition: opacity var(--motion-calm) ease;
 }
-.step-tools.faded-out { opacity: 0; pointer-events: none; }
+.step-toggle.faded-out { opacity: 0; pointer-events: none; }
+.mushaf:has(.m-foot) .step-toggle { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
+.step-toggle svg,
+.step-exit svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.step-toggle .faint { opacity: 0.5; stroke-dasharray: 0.1 3.6; }
+.step-toggle::after,
+.step-exit::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, (100% - 44px) / 2);
+}
+.step-tools {
+  position: fixed;
+  inset-inline: var(--space-3);
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  pointer-events: none; /* only its buttons and slider take taps */
+  transition: opacity var(--motion-calm) ease;
+}
+.step-tools > *,
+.step-row > * { pointer-events: auto; }
+.step-tools.faded-out { opacity: 0; }
+.step-tools.faded-out * { pointer-events: none; }
+.step-row { display: flex; align-items: center; gap: var(--space-2); align-self: stretch; pointer-events: none; }
 .step-count {
   height: var(--float-button);
   padding-inline: var(--space-3);
@@ -735,8 +772,60 @@ select, input[type='number'] {
   box-shadow: var(--float-shadow);
   font-size: var(--mushaf-head-size);
 }
+.step-tool { flex: none; }
+.step-tool:disabled { opacity: 0.45; }
+.step-exit { flex: none; }
+
+/* The slider: one tick per ayah, right to left; the olive span between the two thumbs is what shows. The whole
+   pill takes the drag, so the thumbs can stay small. */
+.step-slider {
+  flex: 1;
+  min-width: 0;
+  height: var(--float-button);
+  padding-inline: var(--space-3);
+  border-radius: 999px;
+  background: var(--mushaf-paper);
+  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
+  touch-action: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.step-slider .track { position: relative; height: 100%; }
+.step-slider .tick,
+.step-slider .thumb {
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+}
+.step-slider .tick { width: 4px; height: 4px; background: var(--mushaf-olive); opacity: 0.35; }
+.step-slider .tick.in { opacity: 0; }
+.step-slider .fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mushaf-olive);
+  transform: translateY(-50%);
+}
+.step-slider .thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--mushaf-olive);
+  box-shadow: 0 0 0 2px var(--mushaf-paper);
+}
+.step-slider .thumb:focus-visible { outline: 2px solid var(--mushaf-olive); outline-offset: 2px; }
+
 /* While the font download strip shows, sit just above it. */
 .mushaf:has(.m-foot) .step-tools { bottom: calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
+/* The slider row takes the full width, so hide moves up beside the count (with the font strip, it stays in it). */
+.mushaf:has(.step-tools):not(:has(.m-foot)) .hide-toggle {
+  bottom: calc(var(--space-3) + var(--float-button) + var(--space-2) + env(safe-area-inset-bottom));
+}
+.mushaf:has(.step-tools) .m-focus { bottom: calc(2 * var(--float-button) + var(--space-2) + 2 * var(--space-3) + env(safe-area-inset-bottom)); }
+.mushaf:has(.step-tools):has(.m-foot) .m-focus {
+  bottom: calc(3 * var(--float-button) + var(--space-2) + 3 * var(--space-3) + env(safe-area-inset-bottom));
+}
 /* Hide, used far more, sits just left of the pen, nearer the thumb; the pen takes the corner. */
 .hide-toggle { right: calc(var(--space-3) + var(--float-button) + var(--space-2)); }
 /* With no pen (ayah by ayah), hide takes the corner. */
