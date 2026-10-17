@@ -35,7 +35,7 @@ type FontState = 'checking' | 'absent' | 'downloading' | 'failed' | 'ready'
 // Remembered across page turns, so the check happens once per app start.
 let knownFontState: FontState = 'checking'
 
-// Ayah by ayah on one page: which half shows, and the "+ ayah" taps in each half.
+// Ayah by ayah on one page: whether it starts from the second half, and the "+ ayah" taps from each start.
 export type PageSteps = { half: 0 | 1; taken: [number, number] }
 const FRESH_STEPS: PageSteps = { half: 0, taken: [0, 0] }
 
@@ -97,7 +97,7 @@ const BISMILLAH_FONT = 0 // QCF4_Hafs_01, the first font in qcf-fonts.json
 const SWIPE_MIN = 50 // px of mostly horizontal travel
 const BUTTON_FADE_MS = 5_000
 // Ayah by ayah zooms in on the ayahs shown, until zooming would make them at most this much bigger than the page.
-const NEAR_PAGE = 1.5
+const NEAR_PAGE = 1.2
 
 export default function MushafPage({
   page,
@@ -218,12 +218,12 @@ export default function MushafPage({
   }, [page, onTurn])
 
   // Ayah by ayah: only the ayahs reached so far show, zoomed in to fill the page; one more for each "+ ayah". With
-  // the last ayah in (of the page, or of the half showing), or once zooming would barely enlarge them, they show in
-  // the page's own layout and size instead, with the rest blank in its place, so it finishes looking like the page. It starts at the first ayah
-  // of today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so another Surah on
-  // the page never shows. More than five ayahs split into a first and second half, starting in the first; each half
-  // shows on its own. When the page holds nothing else, the whole page shows once all of it is in. It is switched
-  // for each page, and each page stays as it was left until going back to Today.
+  // the page's last ayah in, or once zooming would barely enlarge them, they show in the page's own layout and size
+  // instead, with the rest blank in its place, so it finishes looking like the page. It starts at the first ayah of
+  // today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so another Surah on the
+  // page never shows. With more than five ayahs, "2. half" starts it from the second half instead, leaving out the
+  // first; each start keeps its own count. When the page holds nothing else, the whole page shows once all of it is
+  // in. It is switched for each page, and each page stays as it was left until going back to Today.
   const pageAyahs = useMemo(() => {
     const keys: string[] = []
     const add = (surah: number, ayah: number) => {
@@ -248,10 +248,9 @@ export default function MushafPage({
   const split = pageHalves(stepKeys)
   const half = split === null ? 0 : (pageSteps?.half ?? 0)
   const halfFrom = half === 1 ? split! : 0
-  const halfTo = split !== null && half === 0 ? split : stepKeys.length
-  const shownTo = Math.min(halfFrom + (pageSteps?.taken[half] ?? 0) + 1, halfTo)
+  const shownTo = Math.min(halfFrom + (pageSteps?.taken[half] ?? 0) + 1, stepKeys.length)
   const shownCount = shownTo - halfFrom
-  const stepActive = shownTo < halfTo
+  const stepActive = shownTo < stepKeys.length
   const wholePage = halfFrom === 0 && shownTo === stepKeys.length && pageAyahs.every(inStepSurahs)
   const shownKeys = stepping && !wholePage ? new Set(stepKeys.slice(halfFrom, shownTo)) : null
   const away = (key: string) => Boolean(shownKeys && !shownKeys.has(key)) // not reached yet: blank, in its place
@@ -566,27 +565,23 @@ export default function MushafPage({
           with the count above. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
-          <span className="step-count" aria-label={`${shownCount} of ${stepKeys.length} ayahs on this page`}>
-            {shownCount} / {stepKeys.length}
+          <span className="step-count" aria-label={`${shownCount} of ${stepKeys.length - halfFrom} ayahs`}>
+            {shownCount} / {stepKeys.length - halfFrom}
           </span>
           <div className="step-row">
             <button className="step-tool" onClick={step} disabled={!stepActive} tabIndex={buttonVisible ? 0 : -1}>
               + ayah
             </button>
             {split !== null && (
-              <div className="step-halves" role="group" aria-label="Half of the page">
-                {(['1st half', '2nd half'] as const).map((label, h) => (
-                  <button
-                    key={label}
-                    className={half === h ? 'on' : ''}
-                    onClick={() => onSteps({ ...pageSteps, half: h as 0 | 1 })}
-                    aria-pressed={half === h}
-                    tabIndex={buttonVisible ? 0 : -1}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <button
+                className={`step-half ${half === 1 ? 'on' : ''}`}
+                onClick={() => onSteps({ ...pageSteps, half: half === 1 ? 0 : 1 })}
+                aria-pressed={half === 1}
+                aria-label="Start from the second half"
+                tabIndex={buttonVisible ? 0 : -1}
+              >
+                2. half
+              </button>
             )}
             <button className="step-exit" onClick={() => onSteps(null)} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
