@@ -20,6 +20,7 @@ type Props = {
   hiding: boolean
   hidden: (key: string) => boolean // whether an ayah shows as a blank shape (hide mode)
   away: (key: string) => boolean // whether an ayah is left blank in its place (ayah by ayah, not reached yet)
+  leadSign: string | null // the ayah whose end sign still shows, just before the first ayah shown
   onFontSize?: (size: number) => void // the text size the page fitted, in px; keep it stable
   className: string
 }
@@ -34,7 +35,7 @@ const endsSurah = (line: QcfLine) => {
 }
 
 // A page in the exact QCF4 font: every glyph is one word or sign, and each printed line is spread to full width.
-export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, away, onFontSize, className }: Props) {
+export default function QcfLines({ page, lines, fontFamily, bismillahFont, portion, hiding, hidden, away, leadSign, onFontSize, className }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [fontSize, setFontSize] = useState<number | null>(null)
   const [centered, setCentered] = useState<Set<number>>(new Set())
@@ -120,7 +121,7 @@ export default function QcfLines({ page, lines, fontFamily, bismillahFont, porti
                 return (
                   <span
                     key={k}
-                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''} ${pinned ? 'pin' : ''} ${away(key) ? 'away' : ''}`}
+                    className={`qcf-glyph ${isWord ? 'word' : 'sign'} ${isWord && hidden(key) ? 'hidden' : ''} ${pinned ? 'pin' : ''} ${away(key) ? 'away' : ''} ${kind === 1 && key === leadSign ? 'lead' : ''}`}
                     data-ayah={key}
                   >
                     {String.fromCodePoint(code)}
