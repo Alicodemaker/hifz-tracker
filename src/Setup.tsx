@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import type { Saved } from './day'
 import { DEFAULT_MURAJA_PAGES, suggestedHifzStart, type Progress } from './plan'
+import Intro from './Intro'
 import { MemorisedSurahs, MurajaPagesChoice, NextHifzFields } from './ProgressFields'
 import { surahName, type AyahRef } from './quran'
 import RestoreButton from './RestoreButton'
 
 type Props = { onStart: (progress: Progress) => void; onRestore: (saved: Saved) => void }
 
-type Step = 'welcome' | 'memorised' | 'start'
+type Step = 'intro' | 'memorised' | 'start'
 
-// The first run: what the app does, then what is memorised and where Hifz starts. Nothing is ticked to begin with.
+// The first run: four intro cards on what the app does, then what is memorised and where Hifz starts. Nothing is ticked to begin with.
 export default function Setup({ onStart, onRestore }: Props) {
-  const [step, setStep] = useState<Step>('welcome')
+  const [step, setStep] = useState<Step>('intro')
+  const [card, setCard] = useState(0) // which of the intro's four cards shows
   const [message, setMessage] = useState('')
   const [memorised, setMemorised] = useState<Set<number>>(() => new Set())
   const [next, setNext] = useState<AyahRef>({ surah: 114, ayah: 1 })
@@ -40,39 +42,18 @@ export default function Setup({ onStart, onRestore }: Props) {
   const start = () =>
     onStart({ memorised: [...memorised].sort((a, b) => a - b), hifzNext: next, murajaNext: null, murajaPages })
 
-  if (step === 'welcome')
+  if (step === 'intro')
     return (
-      <main className="screen setup">
-        <header className="screen-head">
-          <h1>Hifz Tracker</h1>
-        </header>
-        {message && <p className="notice">{message}</p>}
-        <p>Each day, the app plans three kinds of work:</p>
-        <ul className="setup-kinds">
-          <li>
-            <strong>Hifz</strong>: the new portion to memorise today.
-          </li>
-          <li>
-            <strong>Rabt</strong>: revision of what you memorised recently.
-          </li>
-          <li>
-            <strong>Muraja'a</strong>: revision of everything older, in rotation.
-          </li>
-        </ul>
-        <p className="faded small">
-          Memorisation runs from an-Nas back towards al-Fatiha, in the 15-line Madani mushaf. Everything stays on this
-          phone.
-        </p>
-
-        <div className="action-bar">
-          <button className="button primary" onClick={() => go('memorised')}>
-            Set up
-          </button>
-          <p className="faded small hint">
-            Moving from another phone? <RestoreButton className="link" onRestore={onRestore} onMessage={setMessage} />
-          </p>
-        </div>
-      </main>
+      <Intro
+        card={card}
+        onCard={(to) => {
+          setCard(to)
+          window.scrollTo(0, 0)
+        }}
+        onSetUp={() => go('memorised')}
+        notice={message && <p className="notice">{message}</p>}
+        restore={<RestoreButton className="link" onRestore={onRestore} onMessage={setMessage} />}
+      />
     )
 
   if (step === 'memorised')
@@ -86,7 +67,7 @@ export default function Setup({ onStart, onRestore }: Props) {
 
         <div className="action-bar">
           <div className="row">
-            <button className="button quiet" onClick={() => go('welcome')}>
+            <button className="button quiet" onClick={() => go('intro')}>
               Back
             </button>
             <button className="button primary" onClick={() => go('start')}>
