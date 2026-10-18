@@ -426,8 +426,9 @@ export default function MushafPage({
         <span className="m-page m-label">{page}</span>
         <span className="m-right">
           {top && (
-            <span className="m-where m-label">
-              {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
+            <span className="m-where">
+              <span className="m-label">{surahName(top.surah)}</span>{' '}
+              <span className="m-label">(Juz {juzOfAyah(ayahIndex(top))})</span>
             </span>
           )}
           {rating && !zoomed && (
