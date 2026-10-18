@@ -10,10 +10,10 @@ type Props = { onStart: (progress: Progress) => void; onRestore: (saved: Saved) 
 
 type Step = 'intro' | 'memorised' | 'start'
 
-// The first run: four intro cards on what the app does, then what is memorised and where Hifz starts. Nothing is ticked to begin with.
+// The first run: five intro cards on what the app does, then what is memorised and where Hifz starts. Nothing is ticked to begin with.
 export default function Setup({ onStart, onRestore }: Props) {
   const [step, setStep] = useState<Step>('intro')
-  const [card, setCard] = useState(0) // which of the intro's four cards shows
+  const [card, setCard] = useState(0) // which of the intro's cards shows
   const [message, setMessage] = useState('')
   const [memorised, setMemorised] = useState<Set<number>>(() => new Set())
   const [next, setNext] = useState<AyahRef>({ surah: 114, ayah: 1 })

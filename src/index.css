@@ -295,13 +295,14 @@ button:disabled { opacity: 0.35; cursor: default; }
   white-space: nowrap;
 }
 .intro-done span.on { background: var(--lapis); color: var(--on-lapis); box-shadow: none; }
-/* Card 3: a corner of a Mushaf page, its ayahs hidden behind blank strips. */
-.intro-page { display: grid; gap: var(--space-3); width: min(100%, 260px); padding: var(--space-4); background: var(--mushaf-paper); border-radius: var(--radius-sm); font-size: 22px; }
-.intro-page .line { display: flex; align-items: center; gap: var(--space-2); direction: rtl; }
-.intro-page .blank { flex: 1; height: 0.9em; border-radius: 4px; background: var(--mushaf-blank); }
-.intro-page .blank.short { flex: 0.6; }
-/* Card 4: ratings, strongest first, as on the Surahs screen. */
-.intro-stars { display: grid; gap: var(--space-2); justify-items: center; font-size: 28px; color: var(--lapis); }
+/* Cards 3 to 5: screenshots of the app. A crop fills the leaf; whole phone screens stand side by side, as tall as
+   the phone leaves room for. */
+.intro-picture:has(.intro-crop) { padding: 0; overflow: hidden; }
+.intro-picture picture,
+.intro-crop { display: block; width: 100%; height: auto; }
+.intro-crop.faded-end { mask-image: linear-gradient(to bottom, black 70%, transparent); }
+.intro-phones { display: flex; justify-content: center; gap: var(--space-3); }
+.intro-phones img { display: block; height: clamp(160px, calc(100dvh - 460px), 340px); width: auto; border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--rule), var(--float-shadow); }
 
 /* Settings */
 /* Theme: three choices in one track, the chosen one filled like a ticked Done button. */

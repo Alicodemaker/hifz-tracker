@@ -1,11 +1,15 @@
 import type { ReactNode } from 'react'
-import Rosette from './Rosette'
-import Stars from './Stars'
+import ayahByAyah from './assets/intro/ayah-by-ayah.webp'
+import hideAndPen from './assets/intro/hide-and-pen.webp'
+import mushaf from './assets/intro/mushaf.webp'
+import surahsDark from './assets/intro/surahs-dark.webp'
+import surahsLight from './assets/intro/surahs-light.webp'
 import Tick from './Tick'
 
 type Card = { title: string; picture: ReactNode; body: ReactNode; note?: string }
 
-// Each card has a small sketch of what it talks about, drawn from the app's own pieces.
+// Each card has a picture of what it talks about: a sketch from the app's own pieces, or a screenshot of the app
+// taken by `npm run intro-shots`.
 const CARDS: Card[] = [
   {
     title: 'Your hifz, planned each day',
@@ -53,31 +57,36 @@ const CARDS: Card[] = [
   },
   {
     title: 'Memorise from the Mushaf',
+    picture: <img className="intro-crop" src={mushaf} alt="Surah al-Ikhlas on a page of the Madani mushaf" />,
+    body: (
+      <p>
+        Tap a portion on Today to open its page in the 15-line Madani mushaf. Download the exact mushaf font once
+        (36 MB) from any page to see it like this.
+      </p>
+    ),
+  },
+  {
+    title: 'Tools on the page',
     picture: (
-      <div className="intro-page" aria-hidden="true">
-        <span className="line">
-          <span className="blank" /> <Rosette ayah={1} />
-        </span>
-        <span className="line">
-          <span className="blank short" /> <Rosette ayah={2} />
-        </span>
+      <div className="intro-phones">
+        <img src={ayahByAyah} alt="A page going ayah by ayah, three ayahs in" />
+        <img src={hideAndPen} alt="A page with its ayahs hidden, one shown and underlined with the pen" />
       </div>
     ),
     body: (
       <p>
-        Tap a portion on Today to open its page in the 15-line Madani mushaf. Hide the ayahs to test yourself, go ayah
-        by ayah, or mark weak spots with the pen.
+        Go ayah by ayah, adding one at a time. Hide the text and tap an ayah to test yourself, and mark weak spots with
+        the pen.
       </p>
     ),
   },
   {
     title: 'Know your strong Surahs',
     picture: (
-      <div className="intro-stars">
-        <Stars count={3} />
-        <Stars count={2} />
-        <Stars count={1} />
-      </div>
+      <picture>
+        <source srcSet={surahsDark} media="(prefers-color-scheme: dark)" />
+        <img className="intro-crop faded-end" src={surahsLight} alt="The Surahs screen, grouped by rating" />
+      </picture>
     ),
     body: (
       <p>
@@ -96,7 +105,7 @@ type Props = {
   restore: ReactNode // the Restore link, for a moved phone
 }
 
-// The first-run intro: four cards on what the app does, then on to setting it up. Skip goes straight there.
+// The first-run intro: five cards on what the app does, then on to setting it up. Skip goes straight there.
 export default function Intro({ card, onCard, onSetUp, notice, restore }: Props) {
   const { title, picture, body, note } = CARDS[card]
   const last = card === CARDS.length - 1
