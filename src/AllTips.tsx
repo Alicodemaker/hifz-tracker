@@ -33,7 +33,7 @@ export default function AllTips({ onBack }: { onBack: () => void }) {
           Tip {index + 1} of {TIPS.length}
         </p>
         <h2>{tip.title}</h2>
-        <TipText text={tip.text} />
+        <TipText tip={tip} />
       </section>
 
       <CardNav

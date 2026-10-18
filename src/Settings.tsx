@@ -110,12 +110,12 @@ export default function Settings({ initial, onSave, onBack }: Props) {
       </div>
 
       <h2 className="section-title">Next Hifz</h2>
-      <p className="faded small">The first ayah you have not memorised yet.</p>
+      <p className="faded small">The first ayah you don't know yet.</p>
       <NextHifzFields next={next} onChange={setNext} />
       {nextIsMemorised && <p className="notice alert">{surahName(next.surah)} is also ticked as memorised below. Untick it to save.</p>}
 
       <h2 className="section-title">Muraja'a per day</h2>
-      <p className="faded small">Whole surahs, up to this many pages. A longer surah is split across days.</p>
+      <p className="faded small">How many pages of old surahs to go over each day.</p>
       <MurajaPagesChoice value={murajaPages} onChange={setMurajaPages} />
 
       <h2 className="section-title">Help</h2>

@@ -1,86 +1,115 @@
 import type { ReactNode } from 'react'
-import ayahByAyah from './assets/intro/ayah-by-ayah.webp'
-import hideAndPen from './assets/intro/hide-and-pen.webp'
 import mushaf from './assets/intro/mushaf.webp'
 import surahsDark from './assets/intro/surahs-dark.webp'
 import surahsLight from './assets/intro/surahs-light.webp'
 import CardNav from './CardNav'
+import { AyahByAyahIcon, EyeIcon, PenIcon } from './icons'
 import { useSwipe } from './swipe'
 import Tick from './Tick'
 
-type Card = { title: string; picture: ReactNode; body: ReactNode; note?: string }
+type Card = { title: string; picture: ReactNode; body: ReactNode }
 
-// Each card has a picture of what it talks about: a sketch from the app's own pieces, or a screenshot of the app
-// taken by `npm run screenshots`.
+// Little pictures for the three kinds: something new growing, going back over what is recent, and a stack of old.
+const KINDS = [
+  {
+    name: 'Hifz',
+    what: 'Learn new ayahs',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21v-8" />
+        <path d="M12 13c0-4-3-6.5-7.5-6.5 0 4 3 6.5 7.5 6.5z" />
+        <path d="M12 11c0-3.5 2.5-6.5 7.5-6.5 0 4-3 6.5-7.5 6.5z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Rabt',
+    what: 'Go over the recent ones',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
+        <path d="M4.5 3.8v4.5H9" />
+      </svg>
+    ),
+  },
+  {
+    name: "Muraja'a",
+    what: 'Keep the old ones strong',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="15" width="17" height="4.5" rx="1" />
+        <rect x="5" y="9.75" width="14" height="4.5" rx="1" />
+        <rect x="6.5" y="4.5" width="11" height="4.5" rx="1" />
+      </svg>
+    ),
+  },
+]
+
+// The intro, in words a child could follow: one idea a card, a few words, and a big picture (a sketch from the app's
+// own pieces, or a screenshot taken by `npm run screenshots`). The sketches come in with a short animation, once.
 const CARDS: Card[] = [
   {
-    title: 'Your hifz, planned each day',
+    title: 'Three things each day',
     picture: (
       <div className="intro-kinds">
-        <span>Hifz</span>
-        <span>Rabt</span>
-        <span>Muraja'a</span>
+        {KINDS.map((kind) => (
+          <div key={kind.name}>
+            <span className="intro-kind-icon">{kind.icon}</span>
+            <strong>{kind.name}</strong>
+            <span className="small">{kind.what}</span>
+          </div>
+        ))}
       </div>
     ),
-    body: (
-      <ul className="setup-kinds">
+    body: <p>Learn a little every day, and keep it strong.</p>,
+  },
+  {
+    title: 'Tick them off',
+    picture: (
+      <div className="intro-ticking">
+        <div className="intro-done">
+          {['Hifz', 'Rabt', "Muraja'a"].map((kind) => (
+            <span key={kind} className="on">
+              <Tick /> {kind}
+            </span>
+          ))}
+        </div>
+        <p className="intro-tomorrow">Tomorrow's plan is ready</p>
+      </div>
+    ),
+    body: <p>Done with one? Tap it.</p>,
+  },
+  {
+    title: 'Open the Mushaf',
+    picture: <img className="intro-crop" src={mushaf} alt="Surah al-Ikhlas on a page of the Madani mushaf" />,
+    body: <p>Tap Hifz, Rabt or Muraja'a to open its page.</p>,
+  },
+  {
+    title: 'Buttons on the page',
+    picture: (
+      <ul className="intro-tools">
         <li>
-          <strong>Hifz</strong>: the new portion to memorise today.
+          <span className="intro-tool pill">
+            <AyahByAyahIcon />
+            Ayah by ayah
+          </span>
+          One ayah at a time
         </li>
         <li>
-          <strong>Rabt</strong>: revision of what you memorised recently.
+          <span className="intro-tool">
+            <EyeIcon struck />
+          </span>
+          Hide the ayahs, to test yourself
         </li>
         <li>
-          <strong>Muraja'a</strong>: revision of everything older, in rotation.
+          <span className="intro-tool">
+            <PenIcon />
+          </span>
+          Mark weak spots in red
         </li>
       </ul>
     ),
-    note: 'Memorisation runs from an-Nas back towards al-Fatiha, in the 15-line Madani mushaf.',
-  },
-  {
-    title: 'Tick each one done',
-    picture: (
-      <div className="intro-done">
-        <span className="on">
-          <Tick /> Hifz
-        </span>
-        <span className="on">
-          <Tick /> Rabt
-        </span>
-        <span>Muraja'a</span>
-      </div>
-    ),
-    body: (
-      <p>
-        When all three are done, the day goes into History and tomorrow's plan shows straight away. Change how much Hifz
-        you take each day, and the app tells you when you will finish.
-      </p>
-    ),
-  },
-  {
-    title: 'Memorise from the Mushaf',
-    picture: <img className="intro-crop" src={mushaf} alt="Surah al-Ikhlas on a page of the Madani mushaf" />,
-    body: (
-      <p>
-        Tap a portion on Today to open its page in the 15-line Madani mushaf. Download the exact mushaf font once
-        (36 MB) from any page to see it like this.
-      </p>
-    ),
-  },
-  {
-    title: 'Tools on the page',
-    picture: (
-      <div className="intro-phones">
-        <img src={ayahByAyah} alt="A page going ayah by ayah, three ayahs in" />
-        <img src={hideAndPen} alt="A page with its ayahs hidden, one shown and underlined with the pen" />
-      </div>
-    ),
-    body: (
-      <p>
-        Go ayah by ayah, adding one at a time. Hide the text and tap an ayah to test yourself, and mark weak spots with
-        the pen.
-      </p>
-    ),
+    body: <p>They sit at the bottom of the page. Gone? Tap the screen.</p>,
   },
   {
     title: 'Know your strong Surahs',
@@ -90,12 +119,7 @@ const CARDS: Card[] = [
         <img className="intro-crop faded-end" src={surahsLight} alt="The Surahs screen, grouped by rating" />
       </picture>
     ),
-    body: (
-      <p>
-        Rate each memorised Surah from weak to strong, and see at a glance which are ready for salah. Everything stays
-        on this phone, so make a Backup from History now and then.
-      </p>
-    ),
+    body: <p>Give each Surah one to three stars, and see which are ready for salah.</p>,
   },
 ]
 
@@ -111,7 +135,7 @@ type Props = {
 // The intro: five cards on what the app does, by Next and Back or by swiping. On the first run it leads into setup;
 // Settings can replay it.
 export default function Intro({ card, onCard, onDone, doneLabel, notice, restore }: Props) {
-  const { title, picture, body, note } = CARDS[card]
+  const { title, picture, body } = CARDS[card]
   const last = card === CARDS.length - 1
   const swipe = useSwipe(
     () => !last && onCard(card + 1),
@@ -132,7 +156,6 @@ export default function Intro({ card, onCard, onDone, doneLabel, notice, restore
         <div className="intro-picture">{picture}</div>
         <h1 className="intro-title">{title}</h1>
         <div className="intro-body">{body}</div>
-        {note && <p className="faded small">{note}</p>}
       </div>
 
       <CardNav
