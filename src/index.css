@@ -191,7 +191,7 @@ button:disabled { opacity: 0.35; cursor: default; }
   color: var(--lapis);
 }
 .play-link::before { content: ''; position: absolute; inset: -10px; }
-.play-link svg { width: 62%; height: 62%; fill: currentColor; margin-inline-start: 8%; }
+.play-link svg { width: 62%; height: 62%; fill: currentColor; }
 
 /* The check that answers a Done tap */
 .tick { width: 1.1em; height: 1.1em; flex: none; }

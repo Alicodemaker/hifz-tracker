@@ -13,8 +13,9 @@ export default function PlayLink({ surah }: { surah: number }) {
       rel="noopener noreferrer"
       aria-label={`Search YouTube for ${surahName(surah)}`}
     >
+      {/* The triangle is centred by its box, then nudged right by a twelfth of its width so it reads as centred. */}
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M9 6.5v11l9-5.5z" />
+        <path d="M8.25 6.5v11l9-5.5z" />
       </svg>
     </a>
   )
