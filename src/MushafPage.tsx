@@ -11,8 +11,9 @@ import { drawingKey, type Stroke } from './drawings'
 import { pageHalves } from './halves'
 import PageRating from './PageRating'
 import { portionPins } from './pins'
-import type { Rating } from './ratings'
+import { RATINGS, type Rating } from './ratings'
 import Rosette from './Rosette'
+import Stars from './Stars'
 import SurahBadge from './SurahBadge'
 
 // [surah, ayah, text, 1 if the ayah ends on this line]
@@ -350,6 +351,10 @@ export default function MushafPage({
   const ratableSurahs = rating ? pageSurahs.filter((s) => rating.memorised.includes(s)) : []
   // A memorised Surah on the page with no rating yet opens the rating by itself, as a reminder: once for each Surah
   // after opening from Today, not again on its every page.
+  // The stars button shows the rating of the page's main memorised Surah (most ayahs here) once it is rated.
+  const ayahsHere = (surah: number) => pageAyahs.filter((key) => surahOf(key) === surah).length
+  const mainSurah = ratableSurahs.reduce<number | null>((best, s) => (best === null || ayahsHere(s) > ayahsHere(best) ? s : best), null)
+  const mainRating = RATINGS.find((r) => mainSurah !== null && r.rating === rating?.ratings?.[mainSurah])
   const [remindedBefore] = useState(rating?.reminded ?? []) // as this page opened; the page remounts on every visit
   const toRemind = rating ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
   const ratingOpen = ratingChoice ?? toRemind.length > 0
@@ -426,14 +431,20 @@ export default function MushafPage({
           )}
           {rating && (
             <button
-              className={`rate ${ratingOpen ? 'on' : ''}`}
+              className={`rate ${ratingOpen ? 'on' : ''} ${mainRating ? 'rated' : ''}`}
               onClick={() => setRatingOpen(!ratingOpen)}
               aria-expanded={ratingOpen}
-              aria-label="Rate surahs on this page"
+              aria-label={
+                mainRating ? `Rate surahs on this page (${surahName(mainSurah!)}: ${mainRating.label})` : 'Rate surahs on this page'
+              }
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" />
-              </svg>
+              {mainRating ? (
+                <Stars count={mainRating.stars} />
+              ) : (
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" />
+                </svg>
+              )}
             </button>
           )}
         </span>
