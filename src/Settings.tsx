@@ -4,12 +4,23 @@ import { DEFAULT_MURAJA_PAGES, type Progress } from './plan'
 import { MemorisedSurahs, MurajaPagesChoice, NextHifzFields } from './ProgressFields'
 import { surahName } from './quran'
 import { loadTheme, saveTheme, type Theme } from './theme'
+import { appVersion, builtAt, checkForUpdate, installUpdate } from './update'
 
 const THEMES: { value: Theme; label: string }[] = [
   { value: 'system', label: 'Phone' },
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
 ]
+
+// The update button names what it's doing, or what it found.
+const UPDATE_LABELS = {
+  idle: 'Check for updates',
+  checking: 'Checking…',
+  updating: 'Updating…',
+  latest: 'Up to date',
+  offline: "Can't check offline",
+}
+type UpdateStatus = keyof typeof UPDATE_LABELS
 
 type Props = {
   initial: Progress
@@ -22,11 +33,20 @@ export default function Settings({ initial, onSave, onBack }: Props) {
   const [next, setNext] = useState(initial.hifzNext ?? { surah: 1, ayah: 1 })
   const [theme, setTheme] = useState(loadTheme)
   const [murajaPages, setMurajaPages] = useState(initial.murajaPages ?? DEFAULT_MURAJA_PAGES)
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle')
 
   // The theme applies straight away; progress changes wait for Save.
   const chooseTheme = (choice: Theme) => {
     saveTheme(choice)
     setTheme(choice)
+  }
+
+  const update = async () => {
+    setUpdateStatus('checking')
+    const found = await checkForUpdate()
+    if (found !== 'available') return setUpdateStatus(found)
+    setUpdateStatus('updating')
+    await installUpdate()
   }
 
   const toggle = (surahs: number[], on: boolean) =>
@@ -48,10 +68,20 @@ export default function Settings({ initial, onSave, onBack }: Props) {
 
   return (
     <main className="screen">
-      <header className="screen-head">
+      <header className="screen-head with-version">
         <div className="title-row">
           <BackButton onClick={onBack} label="Back to Today without saving" />
           <h1>Settings</h1>
+        </div>
+        <div className="app-version">
+          <p className="faded small">
+            Version {appVersion}
+            <br />
+            {builtAt}
+          </p>
+          <button className="link" onClick={update} disabled={updateStatus === 'checking' || updateStatus === 'updating'}>
+            {UPDATE_LABELS[updateStatus]}
+          </button>
         </div>
       </header>
 
