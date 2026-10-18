@@ -7,7 +7,7 @@ import MushafPage, { type PageSteps } from './MushafPage'
 import { changeHifzAmount, finishEstimates } from './pace'
 import { addStroke, clearDrawing } from './drawings'
 import { DEFAULT_HIFZ_AMOUNT, type Progress, type Range } from './plan'
-import { pageOf, surahPages } from './quran'
+import { ayahCount, pageOf, surahPages } from './quran'
 import { setRating } from './ratings'
 import Settings from './Settings'
 import Setup from './Setup'
@@ -40,7 +40,7 @@ export default function App() {
   const [arrivedFrom, setArrivedFrom] = useState<'next' | 'prev' | null>(null)
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
-  const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
+  const [openedKind, setOpenedKind] = useState<Kind | 'surah' | null>(null) // which of today's areas (or a Surah on Surahs) opened the page
   const [reminded, setReminded] = useState<number[]>([]) // Surahs whose rating opened by itself since opening from Today
   const remind = useCallback((surahs: number[]) => setReminded((all) => [...new Set([...all, ...surahs])]), [])
   const [steps, setSteps] = useState<Record<number, PageSteps | null>>({}) // ayah by ayah, switched for each page, kept across page turns
@@ -127,8 +127,8 @@ export default function App() {
     setScreen('history')
   }
 
-  // Opening adds a history entry, so the phone's back gesture returns to Today.
-  const openPage = (kind: Kind, ranges: Range[]) => {
+  // Opening adds a history entry, so the phone's back gesture returns to Today (or Surahs).
+  const openPage = (kind: Kind | 'surah', ranges: Range[]) => {
     setOpenedKind(kind)
     setPortion(ranges)
     setSteps({}) // every page starts again from Today
@@ -179,7 +179,7 @@ export default function App() {
           onStroke={(key, stroke) => update(addStroke(saved, key, stroke))}
           onClearDrawing={(key) => update(clearDrawing(saved, key))}
           rating={
-            openedKind === 'muraja' || openedKind === 'rabt'
+            openedKind !== 'hifz' // Hifz is the one different Mushaf page; every other one can rate
               ? {
                   memorised: saved.progress.memorised,
                   ratings: saved.ratings,
@@ -205,7 +205,12 @@ export default function App() {
 
     if (screen === 'surahs') {
       return (
-        <Surahs saved={saved} onRate={(surah, rating) => update(setRating(saved, surah, rating))} onBack={() => setScreen('today')} />
+        <Surahs
+          saved={saved}
+          onRate={(surah, rating) => update(setRating(saved, surah, rating))}
+          onOpen={(surah) => openPage('surah', [{ surah, from: 1, to: ayahCount(surah) }])}
+          onBack={() => setScreen('today')}
+        />
       )
     }
 
