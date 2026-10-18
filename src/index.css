@@ -636,9 +636,9 @@ select, input[type='number'] {
 /* Over a sign, centred on it. A QCF4 glyph's box is the whole line, with the sign's ink in its middle. */
 .qcf-glyph.sign.pin::before { left: 50%; transform: translateX(-50%); bottom: calc(50% + 0.62em); }
 .m-sign.pin::before { left: 50%; transform: translateX(-50%); bottom: 1.72em; } /* the rosette's top, measured */
-/* Over a first word, at the edge where it starts. */
-.qcf-glyph.word.pin::before { inset-inline-start: 0; bottom: calc(50% + 0.62em); }
-.m-words.pin::before { inset-inline-start: 0; bottom: calc(100% - 0.1em); }
+/* Over a first word, at the edge where it starts, high enough to clear tall letters and their vowel marks. */
+.qcf-glyph.word.pin::before { inset-inline-start: 0; bottom: calc(50% + 0.95em); }
+.m-words.pin::before { inset-inline-start: 0; bottom: calc(100% + 0.2em); }
 
 /* Hide mode: each hidden ayah becomes a soft bar through the middle of its line, like text seen from afar.
    Tapping it reveals it, and tapping again hides it. */
