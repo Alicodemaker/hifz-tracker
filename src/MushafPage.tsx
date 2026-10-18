@@ -592,35 +592,38 @@ export default function MushafPage({
         </div>
       )}
 
-      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, "+ ayah", the halves and a button to leave it,
-          with the count above. */}
+      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, one row of "+ ayah" (holding the count), the halves
+          and a button to leave it. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
-          {/* Counted across the whole page, also when starting from the second half. */}
-          <span className="step-count" aria-label={`Up to ayah ${shownTo} of ${stepKeys.length} on this page`}>
-            {shownTo} / {stepKeys.length}
-          </span>
-          <div className="step-row">
-            <button className="step-tool" onClick={step} disabled={!stepActive} tabIndex={buttonVisible ? 0 : -1}>
-              + ayah
+          <button
+            className="step-tool"
+            onClick={step}
+            disabled={!stepActive}
+            tabIndex={buttonVisible ? 0 : -1}
+          >
+            + ayah
+            {/* Counted across the whole page, also when starting from the second half. */}
+            <span className="step-count">
+              {shownTo} / {stepKeys.length}
+            </span>
+          </button>
+          {split !== null && (
+            <button
+              className={`step-half ${half === 1 ? 'on' : ''}`}
+              onClick={() => onSteps({ ...pageSteps, half: half === 1 ? 0 : 1 })}
+              aria-pressed={half === 1}
+              aria-label="Start from the second half"
+              tabIndex={buttonVisible ? 0 : -1}
+            >
+              2. half
             </button>
-            {split !== null && (
-              <button
-                className={`step-half ${half === 1 ? 'on' : ''}`}
-                onClick={() => onSteps({ ...pageSteps, half: half === 1 ? 0 : 1 })}
-                aria-pressed={half === 1}
-                aria-label="Start from the second half"
-                tabIndex={buttonVisible ? 0 : -1}
-              >
-                2. half
-              </button>
-            )}
-            <button className="step-exit" onClick={() => onSteps(null)} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 6l12 12M18 6L6 18" />
-              </svg>
-            </button>
-          </div>
+          )}
+          <button className="step-exit" onClick={() => onSteps(null)} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
         </div>
       ) : (
         <button

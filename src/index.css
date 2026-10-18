@@ -729,13 +729,14 @@ select, input[type='number'] {
 /* Ayah by ayah: only the ayahs shown so far, zoomed in to fill the page (the page itself stays laid out, unseen).
    Near the end of the page they show in the page itself instead, with the ayahs not reached yet blank in place. */
 .m-lines .away { visibility: hidden; }
-.m-lines .away.lead,
-.m-lines .away .lead { visibility: visible; } /* the end sign just before the first ayah shown */
+/* The end sign just before the first ayah shown; not while the page hides behind the zoom, where it would show through. */
+.m-lines:not(.behind-focus) .away.lead,
+.m-lines:not(.behind-focus) .away .lead { visibility: visible; }
 .m-lines.behind-focus,
 .m-lines.fitted.behind-focus { visibility: hidden; }
 .m-focus {
   position: absolute;
-  inset: calc(env(safe-area-inset-top) + var(--tap)) var(--space-3) calc(2 * var(--float-button) + var(--space-2) + 2 * var(--space-3) + env(safe-area-inset-bottom));
+  inset: calc(env(safe-area-inset-top) + var(--tap)) var(--space-3) calc(var(--float-button) + 2 * var(--space-3) + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -743,7 +744,7 @@ select, input[type='number'] {
   font-family: var(--font-quran);
   visibility: hidden; /* until the size is fitted */
 }
-.mushaf:has(.m-foot) .m-focus { bottom: calc(3 * var(--float-button) + var(--space-2) + 3 * var(--space-3) + env(safe-area-inset-bottom)); }
+.mushaf:has(.m-foot) .m-focus { bottom: calc(2 * var(--float-button) + 3 * var(--space-3) + env(safe-area-inset-bottom)); }
 .m-focus.fitted { visibility: visible; }
 .m-focus.fitted.measure-only { visibility: hidden; pointer-events: none; }
 .m-focus.qcf { font-family: var(--qcf-font), var(--font-quran); }
@@ -791,7 +792,7 @@ select, input[type='number'] {
 .page-turns svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Ayah by ayah: off, a round toggle in the bottom left corner. On, a row of "+ ayah", the slider and a round
-   exit button across the bottom, with the count above it on the left. Hide and the pen are put away meanwhile.
+   exit button in one row across the bottom; "+ ayah" also holds the count. Hide and the pen are put away meanwhile.
    They fade with the hide button. */
 .step-toggle,
 .step-exit {
@@ -827,29 +828,21 @@ select, input[type='number'] {
   inset-inline: var(--space-3);
   bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-2);
-  pointer-events: none; /* only its buttons and slider take taps */
+  pointer-events: none; /* only its buttons take taps */
   transition: opacity var(--motion-calm) ease;
 }
-.step-tools > *,
-.step-row > * { pointer-events: auto; }
+.step-tools > * { pointer-events: auto; }
 .step-tools.faded-out { opacity: 0; }
 .step-tools.faded-out * { pointer-events: none; }
-.step-row { display: flex; align-items: center; gap: var(--space-2); align-self: stretch; pointer-events: none; }
+/* The count inside "+ ayah", set apart by a thin rule and quieter than the action. */
 .step-count {
-  height: var(--float-button);
-  padding-inline: var(--space-3);
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: var(--mushaf-paper);
-  color: var(--mushaf-olive);
-  box-shadow: var(--float-shadow), inset 0 0 0 1.5px var(--mushaf-olive);
-  font-size: var(--mushaf-head-size);
+  margin-inline-start: var(--space-3);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 1.5px solid color-mix(in srgb, currentColor 35%, transparent);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  opacity: 0.85;
 }
 .step-tool {
   position: relative;
@@ -860,6 +853,9 @@ select, input[type='number'] {
   color: var(--mushaf-paper);
   box-shadow: var(--float-shadow);
   font-size: var(--mushaf-head-size);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 .step-tool { flex: none; }
 .step-tool:disabled { opacity: 0.45; }
