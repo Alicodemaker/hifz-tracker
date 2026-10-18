@@ -15,62 +15,63 @@ export type TipId =
   | 'surahs'
   | 'history'
 
-// In the order Settings lists them: Today, then the Mushaf page, then the other screens.
+// In the order Settings lists them: Today, then the Mushaf page, then the other screens. Each one's words name only
+// what its picture shows (src/tipPictures.ts), so nothing in a tip has to be looked for elsewhere.
 export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'hifz-amount',
     title: 'How much Hifz',
-    text: '− and + change how much new Hifz you take each day, a quarter of a page at a time. The line between them shows when you would finish at that pace.',
+    text: 'Tap − or + for a quarter of a page less or more new Hifz each day. The lines between them show when you would finish at that pace.',
   },
   {
     id: 'next-day',
     title: 'Day done',
-    text: "All done, so the day is in History and tomorrow's plan is showing. Ticked one by mistake? \"Undo\" brings the day back.",
+    text: 'All three are done, so your next plan is showing. Ticked one by mistake? Tap Undo.',
   },
   {
     id: 'hifz-page',
     title: "Today's Hifz",
-    text: "The page opens ayah by ayah: tap \"+\u00a0ayah\" to add the next one. Small green triangles mark where today's Hifz starts and ends. Tap the page to show or hide the buttons.",
+    text: 'One ayah at a time: tap "+\u00a0ayah" for the next. "2.\u00a0half" starts from the middle of the page, and × shows the whole page. If the buttons fade, tap the page.',
   },
   {
     id: 'rabt-page',
     title: 'Rabt on the page',
-    text: "Green triangles mark where today's Rabt starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
+    text: "Green triangles like this one mark where today's Rabt starts and ends. If the buttons fade, tap the page.",
   },
   {
     id: 'muraja-page',
     title: "Muraja'a on the page",
-    text: "Green triangles mark where today's Muraja'a starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
+    text: "Green triangles like this one mark where today's Muraja'a starts and ends. If the buttons fade, tap the page.",
   },
   {
     id: 'ayah-by-ayah',
     title: 'Ayah by ayah',
-    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, and on a long page "2.\u00a0half" starts from its middle. × shows the whole page again.',
+    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, "2.\u00a0half" starts from the middle of the page, and × shows the whole page again.',
   },
   {
     id: 'hide',
     title: 'Hide the text',
-    text: 'Every ayah is hidden, to test yourself. Tap an ayah to show it, and tap it again to hide it. The eye button shows the whole text again.',
+    text: 'Every ayah is hidden, to test yourself. Tap an ayah to show it, and tap it again to hide it. The eye shows the whole text again.',
   },
   {
     id: 'pen',
     title: 'The pen',
-    text: 'Draw with your finger to mark weak spots in red. Drawings stay on the page until you tap the bin to clear it. While the pen is on, the ‹ › buttons turn the page.',
+    text: 'Draw with your finger to mark weak spots in red. The bin clears the page. While the pen is on, ‹ and › turn the page.',
   },
   {
     id: 'rate',
     title: 'Rate a Surah',
-    text: 'From Weak to Strong. Ratings group your Surahs on the Surahs screen, so a strong one for salah is quick to find. They never change your plan.',
+    text: 'How well do you hold this Surah? Pick from Weak to Strong. A rating never changes your plan.',
   },
   {
     id: 'surahs',
     title: 'Surahs',
-    text: 'Your memorised Surahs, grouped by how well you hold them. Tap a Surah to rate it, or its book to open it in the Mushaf.',
+    text: 'Your Surahs, grouped by how well you hold them. Tap a Surah to rate it, or the book to open it in the Mushaf.',
   },
   {
     id: 'history',
-    title: 'History',
-    text: 'Every finished day is logged here. Everything stays on this phone, so Back up now and then (to Drive or email, say), and Restore on a new phone.',
+    title: 'Back up your progress',
+    text: 'Your progress is kept only on this phone. Tap Back up now and then to save a copy, and Restore it on a new phone.',
   },
 ]
 

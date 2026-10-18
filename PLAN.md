@@ -50,6 +50,7 @@ Changes from my note cards. I rate each Surah myself (★ weak, ★½ last page 
 - No separate ayah-by-ayah button (until step 17, at the builder's request)
 - No Arabic-script labels or new settings
 
+31. ✅ **Tips say only what their picture shows** (builder's request): each tip's words name only what is in its picture, and every gold ring is something the words name. Rabt and Muraja'a show the start triangle with the page's buttons below it ("Green triangles like this one mark where today's Rabt starts and ends. If the buttons fade, tap the page."), on a short screen so both fit. Today's Hifz rings "+ ayah", "2. half" and ×; ayah by ayah rings × too; the pen rings ‹ and ›; hide rings the ayah tapped to show it; rating rings the choices. Day done no longer mentions History, Rate no longer mentions the Surahs screen, and the History tip is about backing up (its picture). Crops no longer cut a line or button in half, and the ring round Undo hugs the word.
 ## How we'll know it works
 
 1. Rate al-Mulk ★★★ and al-Qalam ★: the Surahs screen shows al-Mulk under strong and al-Qalam under weak, and both are still there after a Backup and restore.
