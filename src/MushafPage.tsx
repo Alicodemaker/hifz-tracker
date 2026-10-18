@@ -54,7 +54,14 @@ type Props = {
   drawings: Record<string, Stroke[]> | undefined // pen strokes by drawingKey
   onStroke: (key: string, stroke: Stroke) => void
   onClearDrawing: (key: string) => void
-  rating: { memorised: number[]; ratings: Partial<Record<number, Rating>> | undefined; onRate: (surah: number, rating: Rating) => void } | null // opened from Rabt or Muraja'a
+  // Opened from Rabt or Muraja'a. `reminded`: Surahs whose rating already opened by itself since opening from Today.
+  rating: {
+    memorised: number[]
+    ratings: Partial<Record<number, Rating>> | undefined
+    onRate: (surah: number, rating: Rating) => void
+    reminded: number[]
+    onReminded: (surahs: number[]) => void
+  } | null
   onBack: () => void
   onTurn: (page: number) => void
 }
@@ -338,9 +345,19 @@ export default function MushafPage({
   const strokes = drawings?.[inkKey] ?? NO_STROKES
 
   // Rating, when opened from Rabt or Muraja'a: the stars at the top right rate the memorised Surahs on this page.
-  const [ratingOpen, setRatingOpen] = useState(false)
+  const [ratingChoice, setRatingOpen] = useState<boolean | null>(null) // null until opened or closed on this page
   const pageSurahs = [...new Set(pageAyahs.map((key) => Number(key.split(':')[0])))]
   const ratableSurahs = rating ? pageSurahs.filter((s) => rating.memorised.includes(s)) : []
+  // A memorised Surah on the page with no rating yet opens the rating by itself, as a reminder: once for each Surah
+  // after opening from Today, not again on its every page.
+  const [remindedBefore] = useState(rating?.reminded ?? []) // as this page opened; the page remounts on every visit
+  const toRemind = rating ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
+  const ratingOpen = ratingChoice ?? toRemind.length > 0
+  const remindKey = toRemind.join(',')
+  const onReminded = rating?.onReminded
+  useEffect(() => {
+    if (remindKey) onReminded?.(remindKey.split(',').map(Number))
+  }, [remindKey, onReminded])
 
   // The floating buttons show and hide together: a tap on the page (not a swipe)
   // shows them and the next tap hides them; they also fade on their own after five seconds.
@@ -410,7 +427,7 @@ export default function MushafPage({
           {rating && (
             <button
               className={`rate ${ratingOpen ? 'on' : ''}`}
-              onClick={() => setRatingOpen((open) => !open)}
+              onClick={() => setRatingOpen(!ratingOpen)}
               aria-expanded={ratingOpen}
               aria-label="Rate surahs on this page"
             >

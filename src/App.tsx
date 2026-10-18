@@ -41,6 +41,8 @@ export default function App() {
   const [hiding, setHiding] = useState(false) // hide mode stays on across pages until switched off
   const [penOn, setPenOn] = useState(false) // the drawing pen, like hide mode, stays on across pages
   const [openedKind, setOpenedKind] = useState<Kind | null>(null) // which of today's areas opened the page
+  const [reminded, setReminded] = useState<number[]>([]) // Surahs whose rating opened by itself since opening from Today
+  const remind = useCallback((surahs: number[]) => setReminded((all) => [...new Set([...all, ...surahs])]), [])
   const [steps, setSteps] = useState<Record<number, PageSteps | null>>({}) // ayah by ayah, switched for each page, kept across page turns
 
   // The Mushaf page lives at #/page/<n>, so the phone's back gesture leaves it.
@@ -130,6 +132,7 @@ export default function App() {
     setOpenedKind(kind)
     setPortion(ranges)
     setSteps({}) // every page starts again from Today
+    setReminded([])
     setArrivedFrom(null)
     openedFromToday.current = true
     window.location.hash = `#/page/${pageOf({ surah: ranges[0].surah, ayah: ranges[0].from })}`
@@ -181,6 +184,8 @@ export default function App() {
                   memorised: saved.progress.memorised,
                   ratings: saved.ratings,
                   onRate: (surah, rating) => update(setRating(saved, surah, rating)),
+                  reminded,
+                  onReminded: remind,
                 }
               : null
           }
