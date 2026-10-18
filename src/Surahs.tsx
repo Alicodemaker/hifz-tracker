@@ -5,13 +5,18 @@ import { surahArabic, surahName } from './quran'
 import { RATINGS, RATING_CHOICES, ratingGroups, type Rating } from './ratings'
 import Stars from './Stars'
 
-type Props = { saved: Saved; onRate: (surah: number, rating: Rating) => void; onBack: () => void }
+type Props = {
+  saved: Saved
+  onRate: (surah: number, rating: Rating) => void
+  onOpen: (surah: number) => void // opens its first page in the Mushaf, as from Rabt or Muraja'a
+  onBack: () => void
+}
 
 const starsOf = (rating: Rating) => RATINGS.find((r) => r.rating === rating)!.stars
 const labelOf = (rating: Rating) => RATINGS.find((r) => r.rating === rating)!.label
 
 // Memorised Surahs grouped by how well they are held, so a strong one for salah is quick to find.
-export default function Surahs({ saved, onRate, onBack }: Props) {
+export default function Surahs({ saved, onRate, onOpen, onBack }: Props) {
   const [open, setOpen] = useState<number | null>(null) // the Surah whose rating choices show
   const groups = ratingGroups(saved)
 
@@ -32,7 +37,7 @@ export default function Surahs({ saved, onRate, onBack }: Props) {
       {groups.length === 0 ? (
         <p className="faded">Surahs appear here once they are memorised.</p>
       ) : (
-        <p className="faded small surahs-intro">Tap a surah to rate how well you hold it.</p>
+        <p className="faded small surahs-intro">Tap a surah to rate how well you hold it, or its book to open it in the Mushaf.</p>
       )}
 
       {groups.map(({ rating, surahs }) => (
@@ -52,13 +57,21 @@ export default function Surahs({ saved, onRate, onBack }: Props) {
               const current = saved.ratings?.[surah]
               return (
                 <li key={surah} className={open === surah ? 'open' : ''}>
-                  <button className="surah-row" onClick={() => setOpen(open === surah ? null : surah)} aria-expanded={open === surah}>
-                    <span className="surah-number faded">{surah}</span>
-                    <span className="surah-name">{surahName(surah)}</span>
-                    <span lang="ar" className="arabic">
-                      {surahArabic(surah)}
-                    </span>
-                  </button>
+                  <div className="surah-line">
+                    <button className="surah-row" onClick={() => setOpen(open === surah ? null : surah)} aria-expanded={open === surah}>
+                      <span className="surah-number faded">{surah}</span>
+                      <span className="surah-name">{surahName(surah)}</span>
+                      <span lang="ar" className="arabic">
+                        {surahArabic(surah)}
+                      </span>
+                    </button>
+                    <button className="surah-open" onClick={() => onOpen(surah)} aria-label={`Open ${surahName(surah)} in the Mushaf`}>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 6.5C10.2 5.2 7.6 4.6 4 4.8v13c3.6-.2 6.2.4 8 1.7 1.8-1.3 4.4-1.9 8-1.7v-13c-3.6-.2-6.2.4-8 1.7z" />
+                        <path d="M12 6.5v13" />
+                      </svg>
+                    </button>
+                  </div>
                   {open === surah && (
                     <div className="segmented rating-choices" role="group" aria-label={`Rate ${surahName(surah)}`}>
                       {RATING_CHOICES.map(({ rating: choice, stars, label }) => (

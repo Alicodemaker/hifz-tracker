@@ -69,16 +69,6 @@ export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
         {describeLastBackup(saved.lastBackup, localDate())}. In the share menu, pick Save to Drive.
       </p>
 
-      <h2 className="section-title">Juz memorised</h2>
-      <p className="faded small juz-summary">
-        {complete} of 30 complete. Each ring fills as you memorise; Juz 1 is on the right, as the mushaf opens.
-      </p>
-      <div className="juz-grid">
-        {shares.map((share, i) => (
-          <JuzRing key={i} juz={i + 1} share={share} />
-        ))}
-      </div>
-
       <h2 className="section-title">Logged days</h2>
       {days.length === 0 ? (
         <p className="faded">Days appear here once you tap Done on the Today screen.</p>
@@ -89,6 +79,16 @@ export default function History({ saved, onBackUp, onRestore, onBack }: Props) {
           ))}
         </ul>
       )}
+
+      <h2 className="section-title juz-title">Juz memorised</h2>
+      <p className="faded small juz-summary">
+        {complete} of 30 complete. Each ring fills as you memorise; Juz 1 is on the right, as the mushaf opens.
+      </p>
+      <div className="juz-grid">
+        {shares.map((share, i) => (
+          <JuzRing key={i} juz={i + 1} share={share} />
+        ))}
+      </div>
     </main>
   )
 }
