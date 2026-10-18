@@ -20,6 +20,7 @@
   --on-lapis: #fffbf4;
   --lapis-wash: #e3ebec; /* quiet lapis tint behind done items */
   --alert: #9a3b2e;
+  --exit: #c62f2f; /* the × that leaves a mode, as written in a tip: the red of its button */
 
   /* Type */
   --font-ui: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -96,6 +97,7 @@
     --on-lapis: #17130f;
     --lapis-wash: #1f2a2d;
     --alert: #e2a092;
+    --exit: #e5675c; /* lighter, to read on the dark surfaces */
   }
 }
 :root[data-theme='dark'] {
@@ -108,4 +110,5 @@
   --on-lapis: #17130f;
   --lapis-wash: #1f2a2d;
   --alert: #e2a092;
+  --exit: #e5675c; /* lighter, to read on the dark surfaces */
 }

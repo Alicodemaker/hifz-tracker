@@ -86,11 +86,12 @@ const across = (y, height) => ({ x: 0, y: Math.max(0, y), width: PHONE.width, he
 const SHORT = { width: PHONE.width, height: 270 }
 
 // Tip pictures zoom in on what the tip is about, with a gold ring around each thing to tap or look at: a circle round
-// a round button, a pill round the rest. The crop is a small area around the rings (shown larger in the tip), unless
-// the rings need more room.
+// a round button, a pill round the rest. Every ring is something the tip's words name, and the words name nothing the
+// picture doesn't show. The crop is a small area around the rings (shown larger in the tip), unless the rings need
+// more room or `area` gives it outright; `pad` is the gap between a pill and what it rings.
 const RING = '#f0b429'
 const box = async (locator) => locator.first().boundingBox()
-const focus = async (page, name, targets, { width = 260, height = 170, at } = {}) => {
+const focus = async (page, name, targets, { width = 260, height = 170, at, area, pad = 7 } = {}) => {
   const rects = targets.filter(Boolean)
   const left = Math.min(...rects.map((r) => r.x))
   const top = Math.min(...rects.map((r) => r.y))
@@ -105,7 +106,7 @@ const focus = async (page, name, targets, { width = 260, height = 170, at } = {}
   const x = Math.min(Math.max(0, Math.min(Math.max(centre.x - w / 2, right + keep - w), left - keep)), view.width - w)
   const y = Math.min(Math.max(0, Math.min(Math.max(centre.y - h / 2, bottom + keep - h), top - keep)), view.height - h)
   await page.evaluate(
-    ({ rects, colour }) =>
+    ({ rects, colour, pad }) =>
       rects.forEach((r) => {
         const round = Math.abs(r.width - r.height) < 8
         const side = Math.max(r.width, r.height) + 12
@@ -115,19 +116,19 @@ const focus = async (page, name, targets, { width = 260, height = 170, at } = {}
           position: 'fixed',
           zIndex: 99999,
           pointerEvents: 'none',
-          left: `${round ? r.x + r.width / 2 - side / 2 : r.x - 7}px`,
-          top: `${round ? r.y + r.height / 2 - side / 2 : r.y - 7}px`,
-          width: `${round ? side : r.width + 14}px`,
-          height: `${round ? side : r.height + 14}px`,
+          left: `${round ? r.x + r.width / 2 - side / 2 : r.x - pad}px`,
+          top: `${round ? r.y + r.height / 2 - side / 2 : r.y - pad}px`,
+          width: `${round ? side : r.width + pad * 2}px`,
+          height: `${round ? side : r.height + pad * 2}px`,
           borderRadius: '999px',
           border: `3px solid ${colour}`,
           boxShadow: '0 0 0 2px rgb(255 255 255 / 70%), 0 0 14px rgb(240 180 41 / 55%)',
         })
         document.body.append(ring)
       }),
-    { rects, colour: RING },
+    { rects, colour: RING, pad },
   )
-  await shot(page, tips, name, CROP_WIDTH, { x, y, width: w, height: h })
+  await shot(page, tips, name, CROP_WIDTH, area ?? { x, y, width: w, height: h })
   await page.evaluate(() => document.querySelectorAll('.shot-ring').forEach((ring) => ring.remove()))
 }
 
@@ -196,20 +197,27 @@ for (const scheme of ['light', 'dark']) {
   const page = await newPhone(scheme, 3)
   // The Hifz amount: − and +, with the finish estimate between them.
   const stepper = page.locator('.hifz .stepper')
-  await focus(page, `hifz-amount-${scheme}`, [await box(stepper.locator('button').first()), await box(stepper.locator('button').last())], { height: 130 })
-  // A finished day: its Undo.
+  const steps = await box(stepper)
+  await focus(page, `hifz-amount-${scheme}`, [await box(stepper.locator('button').first()), await box(stepper.locator('button').last())], {
+    area: across(steps.y - 16, steps.height + 32),
+  })
+  // A finished day: its Undo, with a ring round the word itself (its button is wider), clear of the words beside it.
   for (const kind of ['Hifz', 'Rabt', "Muraja'a"]) {
     const done = page.locator('.done-buttons').getByRole('button', { name: kind, exact: true })
     if (await done.isEnabled()) await done.click()
   }
   await page.locator('.celebration').waitFor({ state: 'detached', timeout: 10000 })
   const undo = await box(page.getByRole('button', { name: 'Undo' }))
-  await focus(page, `next-day-${scheme}`, [undo], { width: PHONE.width, height: 110, at: { x: PHONE.width / 2, y: undo.y - 10 } })
-  // Surahs: a Surah tapped to rate it, and its book to open it.
+  await focus(page, `next-day-${scheme}`, [undo], { width: PHONE.width, height: 110, at: { x: PHONE.width / 2, y: undo.y - 10 }, pad: -3 })
+  // Surahs: the group's heading, a Surah tapped to rate it, and its book to open it.
   await page.getByRole('button', { name: 'Surahs' }).click()
   const row = page.locator('.surah-list li').first()
   await row.locator('.surah-row').click()
-  await focus(page, `surahs-${scheme}`, [await box(row.locator('.rating-choices')), await box(row.locator('.surah-open'))], { width: PHONE.width })
+  const group = await box(page.locator('.rating-title'))
+  const choices = await box(row.locator('.rating-choices'))
+  await focus(page, `surahs-${scheme}`, [choices, await box(row.locator('.surah-open'))], {
+    area: across(group.y - 12, choices.y + choices.height + 18 - (group.y - 12)),
+  })
   await page.getByRole('button', { name: 'Back to Today' }).click()
   // History: the Backup section, with Back up and Restore.
   await page.getByRole('button', { name: 'History' }).click()
@@ -225,62 +233,97 @@ for (const scheme of ['light', 'dark']) {
   })
 }
 
+// The buttons on a Mushaf page fade away after a few seconds; a tap on the page brings them back.
+const showButtons = async (page) => {
+  if (await page.locator('.mushaf .faded-out').count()) await page.locator('.m-head .m-page').click()
+  await page.waitForTimeout(400)
+}
+const pageButtons = (page) =>
+  Promise.all(['.step-toggle', '.hide-toggle', '.pen-toggle'].map((button) => box(page.locator(`.mushaf ${button}`))))
+// The page below its header, down to the bottom of the screen.
+const belowHead = async (page) => {
+  const head = await box(page.locator('.m-head'))
+  const y = head.y + head.height + 4
+  return across(y, page.viewportSize().height - y)
+}
+// A screen short enough that the top of a page (its Surah's banner and the first ayahs) and the buttons at the bottom
+// fit in one tip picture.
+const PAGE_TOP = { width: PHONE.width, height: 330 }
+
 // Tips on the Mushaf page, which stays light in any theme.
 {
   const page = await newPhone('light', 3)
   const back = () => page.getByRole('button', { name: 'Back to Today' }).click()
-  const plusAyah = () => box(page.locator('.step-tool'))
+  const stepButtons = () => Promise.all(['.step-tool', '.step-half', '.step-exit'].map((button) => box(page.locator(button))))
 
-  // On a short screen: opened from Hifz, ayah by ayah, one ayah in, and its "+ ayah". Then al-Ikhlas three ayahs in
-  // (they are short enough to stay zoomed in at that height), with "+ ayah" and "2. half".
+  // On a short screen: opened from Hifz, ayah by ayah, one ayah in, with "+ ayah", "2. Half" and ×. Then al-Ikhlas
+  // three ayahs in (they are short enough to stay zoomed in at that height).
   await page.locator('section.hifz').click()
   await exactFont(page)
   await page.setViewportSize(SHORT)
   await page.waitForTimeout(800)
-  await focus(page, 'hifz-page', [await plusAyah()], { width: SHORT.width, height: SHORT.height })
+  await focus(page, 'hifz-page', await stepButtons(), { area: await belowHead(page) })
   await back()
   await openPage(page, 604)
   await page.getByRole('button', { name: 'Ayah by ayah' }).click()
   await page.getByRole('button', { name: '+ ayah' }).click()
   await page.getByRole('button', { name: '+ ayah' }).click()
   await page.waitForTimeout(800)
-  await focus(page, 'ayah-by-ayah', [await plusAyah(), await box(page.locator('.step-half'))], { width: SHORT.width, height: SHORT.height })
+  await focus(page, 'ayah-by-ayah', await stepButtons(), { area: await belowHead(page) })
   await page.getByRole('button', { name: 'Show the whole page' }).click()
   await page.setViewportSize(PHONE)
-  await page.getByRole('button', { name: 'Back to Today' }).click()
+  await back()
 
-  // Opened from Rabt: the triangle at the start of today's Rabt, and the star that rates the Surah.
+  // Opened from Rabt, on a short screen: the triangle at the start of today's Rabt, and the buttons at the bottom.
   await page.locator('.revision li').nth(0).click()
   await exactFont(page)
   await closeRating(page)
+  await page.setViewportSize(PAGE_TOP)
   await page.waitForTimeout(600)
-  await focus(page, 'rabt-page', [await triangle(page), await box(page.locator('.mushaf .rate'))], { width: 240 })
+  await showButtons(page)
+  await focus(page, 'rabt-page', [await triangle(page), ...(await pageButtons(page))], { area: await belowHead(page) })
+  await page.setViewportSize(PHONE)
+  await page.waitForTimeout(400)
 
-  // The rating panel, opened from the star.
+  // The rating panel, opened from the star: the star and the choices, down to the panel's edge (the page's triangle
+  // peeks out under it).
   await page.locator('.mushaf .rate').click()
   const panel = await box(page.locator('.page-rating'))
-  await focus(page, 'rate', [await box(page.locator('.mushaf .rate'))], { width: PHONE.width, height: panel.y + panel.height + 12, at: { x: PHONE.width / 2, y: (panel.y + panel.height + 12) / 2 } })
+  await focus(page, 'rate', [await box(page.locator('.mushaf .rate')), await box(page.locator('.page-rating-choices'))], {
+    area: across(0, panel.y + panel.height + 1),
+  })
   await closeRating(page)
 
-  // Hide mode: the eye button, and an ayah near it tapped to show it.
-  const eye = await box(page.getByRole('button', { name: 'Hide the text' }))
+  // Hide mode: an ayah near the bottom tapped to show it, and the eye button that shows them all.
   await page.getByRole('button', { name: 'Hide the text' }).click()
-  const area = { x: eye.x + eye.width + 12 - 280, y: eye.y + eye.height + 12 - 200 }
-  await page.locator('.qcf-glyph.word').evaluateAll(
-    (words, { x, y }) => {
-      const near = words.find((w) => {
-        const r = w.getBoundingClientRect()
-        return r.x > x + 20 && r.y > y + 20 && r.y + r.height < y + 120
+  const bottom = across(PHONE.height - 200, 200)
+  const shown = await page.locator('.qcf-glyph.word').evaluateAll((words, top) => {
+    // The first ayah wholly on one line in the area.
+    const lines = new Map()
+    for (const w of words) {
+      const r = w.getBoundingClientRect()
+      const ayah = lines.get(w.dataset.ayah) ?? { ayah: w.dataset.ayah, tops: new Set(), left: r.x, right: r.x + r.width, top: r.y, bottom: r.y + r.height }
+      ayah.tops.add(Math.round(r.y))
+      Object.assign(ayah, {
+        left: Math.min(ayah.left, r.x),
+        right: Math.max(ayah.right, r.x + r.width),
+        top: Math.min(ayah.top, r.y),
+        bottom: Math.max(ayah.bottom, r.y + r.height),
       })
-      near?.click()
-    },
-    area,
-  )
+      lines.set(w.dataset.ayah, ayah)
+    }
+    const ayah = [...lines.values()].find((a) => a.tops.size === 1 && a.top > top + 20 && a.bottom < top + 160)
+    return ayah && { ayah: ayah.ayah, x: ayah.left, y: ayah.top, width: ayah.right - ayah.left, height: ayah.bottom - ayah.top }
+  }, bottom.y)
+  await page.locator(`.qcf-glyph.word[data-ayah="${shown.ayah}"]`).first().click()
   await page.waitForTimeout(400)
-  await focus(page, 'hide', [await box(page.getByRole('button', { name: 'Show the text' }))], { width: 280, height: 200, at: { x: area.x + 140, y: area.y + 100 } })
+  await showButtons(page)
+  // From the top of the line two above it, so no ayah sign is cut.
+  const from = shown.y - 100
+  await focus(page, 'hide', [shown, await box(page.getByRole('button', { name: 'Show the text' }))], { area: across(from, PHONE.height - from), pad: 4 })
   await page.getByRole('button', { name: 'Show the text' }).click()
 
-  // The pen: a weak spot underlined in red near it, its bin, and the pen itself.
+  // The pen: a weak spot underlined in red near it, the pen, its bin, and ‹ › to turn the page.
   const penButton = await box(page.getByRole('button', { name: 'Draw on the page' }))
   await page.getByRole('button', { name: 'Draw on the page' }).click()
   const zone = { x: penButton.x + penButton.width + 12 - 300, y: penButton.y + penButton.height + 12 - 220 }
@@ -300,21 +343,21 @@ for (const scheme of ['light', 'dark']) {
   for (let i = 1; i <= 16; i++) await page.mouse.move(right - ((right - left) * i) / 16, lineBottom + Math.sin(i / 2) * 2)
   await page.mouse.up()
   await page.waitForTimeout(400)
-  await focus(page, 'pen', [await box(page.getByRole('button', { name: 'Stop drawing' })), await box(page.getByRole('button', { name: 'Clear page' }))], {
-    width: 300,
-    height: 220,
-    at: { x: zone.x + 150, y: zone.y + 110 },
-  })
+  await showButtons(page)
+  const pen = ['Stop drawing', 'Clear page', 'Previous page', 'Next page'].map((name) => box(page.getByRole('button', { name })))
+  await focus(page, 'pen', await Promise.all(pen), { width: 300, height: 220, at: { x: zone.x + 150, y: zone.y + 110 } })
   await page.getByRole('button', { name: 'Clear page' }).click()
   await page.getByRole('button', { name: 'Stop drawing' }).click()
   await back()
 
-  // Opened from Muraja'a: the triangle at the start of today's Muraja'a.
+  // Opened from Muraja'a, on a short screen: the triangle at the start of today's Muraja'a, and the buttons.
   await page.locator('.revision li').nth(1).click()
   await exactFont(page)
   await closeRating(page)
+  await page.setViewportSize(PAGE_TOP)
   await page.waitForTimeout(600)
-  await focus(page, 'muraja-page', [await triangle(page)], { width: 240, height: 160 })
+  await showButtons(page)
+  await focus(page, 'muraja-page', [await triangle(page), ...(await pageButtons(page))], { area: await belowHead(page) })
 }
 
 await browser.close()

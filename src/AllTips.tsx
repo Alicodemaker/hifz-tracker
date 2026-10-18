@@ -2,6 +2,7 @@ import { useState } from 'react'
 import BackButton from './BackButton'
 import CardNav from './CardNav'
 import TipPicture from './TipPicture'
+import TipText from './TipText'
 import { useSwipe } from './swipe'
 import { TIPS, resetTips } from './tips'
 
@@ -32,7 +33,7 @@ export default function AllTips({ onBack }: { onBack: () => void }) {
           Tip {index + 1} of {TIPS.length}
         </p>
         <h2>{tip.title}</h2>
-        <p>{tip.text}</p>
+        <TipText text={tip.text} />
       </section>
 
       <CardNav

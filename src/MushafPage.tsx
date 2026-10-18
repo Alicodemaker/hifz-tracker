@@ -229,7 +229,7 @@ export default function MushafPage({
   // the page's last ayah in, or once zooming would barely enlarge them, they show in the page's own layout and size
   // instead, with the rest blank in its place, so it finishes looking like the page. It starts at the first ayah of
   // today's portion on the page (or the page's first ayah) and keeps to the portion's Surahs, so another Surah on the
-  // page never shows. With more than five ayahs, "2. half" starts it from the second half instead, leaving out the
+  // page never shows. With more than five ayahs, "2. Half" starts it from the second half instead, leaving out the
   // first; each start keeps its own count. When the page holds nothing else, the whole page shows once all of it is
   // in. It is switched for each page, and each page stays as it was left until going back to Today.
   const pageAyahs = useMemo(() => {
@@ -262,7 +262,7 @@ export default function MushafPage({
   const shownKeys = stepping && !wholePage ? new Set(stepKeys.slice(halfFrom, shownTo)) : null
   const away = (key: string) => Boolean(shownKeys && !shownKeys.has(key)) // not reached yet: blank, in its place
   // As printed, the ayah shown first starts after the end sign of the one before it (of the same Surah), so that
-  // sign still shows; above all from "2. half".
+  // sign still shows; above all from "2. Half".
   const before = pageAyahs[pageAyahs.indexOf(stepKeys[halfFrom]) - 1]
   const leadSign = shownKeys && before && surahOf(before) === surahOf(stepKeys[halfFrom]) ? before : null
   const fitKey = `${qcfPage ? 'qcf' : 'bundled'}:${halfFrom}-${shownTo}`
@@ -356,8 +356,9 @@ export default function MushafPage({
   const mainSurah = ratableSurahs.reduce<number | null>((best, s) => (best === null || ayahsHere(s) > ayahsHere(best) ? s : best), null)
   const mainRating = RATINGS.find((r) => mainSurah !== null && r.rating === rating?.ratings?.[mainSurah])
   const [remindedBefore] = useState(rating?.reminded ?? []) // as this page opened; the page remounts on every visit
-  const toRemind = rating ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
-  const ratingOpen = ratingChoice ?? toRemind.length > 0
+  // While ayah by ayah is zoomed in, the rating stays put away (its button too), and the reminder waits for the page.
+  const toRemind = rating && !zoomed ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
+  const ratingOpen = !zoomed && (ratingChoice ?? toRemind.length > 0)
   const remindKey = toRemind.join(',')
   const onReminded = rating?.onReminded
   useEffect(() => {
@@ -429,7 +430,7 @@ export default function MushafPage({
               {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
             </span>
           )}
-          {rating && (
+          {rating && !zoomed && (
             <button
               className={`rate ${ratingOpen ? 'on' : ''} ${mainRating ? 'rated' : ''}`}
               onClick={() => {
@@ -596,8 +597,9 @@ export default function MushafPage({
         </div>
       )}
 
-      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, one row of "+ ayah" (the count on its left), the
-          halves and a button to leave it. */}
+      {/* Ayah by ayah: off, a pill in the bottom left corner with a magnifying glass on an Arabic letter (it zooms in
+          on the ayahs) and its name; on, one row of "+ ayah" (the count on its left), the halves and a red × to leave
+          it. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
           <button
@@ -620,7 +622,7 @@ export default function MushafPage({
               aria-label="Start from the second half"
               tabIndex={buttonVisible ? 0 : -1}
             >
-              2. half
+              2. Half
             </button>
           )}
           <button className="step-exit" onClick={() => onSteps(null)} aria-label="Show the whole page" tabIndex={buttonVisible ? 0 : -1}>
@@ -640,9 +642,13 @@ export default function MushafPage({
           tabIndex={buttonVisible ? 0 : -1}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 7h14" />
-            <path className="faint" d="M5 12h14M5 17h9" />
+            <circle cx="9.6" cy="9.6" r="8.6" />
+            <path className="handle" d="M15.8 15.8L22 22" />
+            <text className="letter" x="9.6" y="12.8" textAnchor="middle">
+              ب
+            </text>
           </svg>
+          <span className="step-toggle-label">Ayah by ayah</span>
         </button>
       )}
 
