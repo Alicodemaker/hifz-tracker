@@ -1017,7 +1017,7 @@ select, input[type='number'] {
 /* A line for each button a tip explains, a little apart. */
 .tip-text { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
 .tip .tip-text p { margin: 0; }
-.tip-symbol { font-size: 1.5em; font-weight: 600; line-height: 0; vertical-align: -0.1em; }
+.tip-symbol { font-size: 1.5em; font-weight: 600; line-height: 0; vertical-align: -0.1em; color: var(--exit); }
 @keyframes tip-fade { from { opacity: 0; } }
 @keyframes tip-rise { from { transform: translateY(100%); } }
 
