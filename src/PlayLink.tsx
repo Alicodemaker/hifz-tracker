@@ -2,7 +2,7 @@ import { surahName } from './quran'
 
 // Experiment: a quick way to hear a Surah recited, by opening a YouTube search for it. Needs a connection.
 const searchUrl = (surah: number) =>
-  `https://www.youtube.com/results?search_query=${encodeURIComponent(surahName(surah))}`
+  `https://www.youtube.com/results?search_query=${encodeURIComponent(`Surah ${surahName(surah)}`)}`
 
 export default function PlayLink({ surah }: { surah: number }) {
   return (
@@ -11,7 +11,7 @@ export default function PlayLink({ surah }: { surah: number }) {
       href={searchUrl(surah)}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Search YouTube for ${surahName(surah)}`}
+      aria-label={`Search YouTube for Surah ${surahName(surah)}`}
     >
       {/* The triangle is centred by its box, then nudged right by a twelfth of its width so it reads as centred. */}
       <svg viewBox="0 0 24 24" aria-hidden="true">

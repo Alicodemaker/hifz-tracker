@@ -1,5 +1,6 @@
+import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // GitHub Pages serves the app under the repo name: https://<user>.github.io/<repo>/.
@@ -7,12 +8,25 @@ import { VitePWA } from 'vite-plugin-pwa'
 // The same base feeds the asset URLs, the manifest's start_url and scope, and the service worker's scope.
 const base = process.env.BASE_PATH ?? '/hifz-tracker/'
 
+// Each build is named by its version (package.json) and the time it was built. The running app knows its own, and
+// version.json tells it the newest one deployed. version.json isn't precached, so it's always fetched from the server.
+const version: string = JSON.parse(readFileSync('package.json', 'utf8')).version
+const build = new Date().toISOString()
+const versionJson: Plugin = {
+  name: 'version-json',
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version, build }) })
+  },
+}
+
 export default defineConfig({
   base,
+  define: { __APP_VERSION__: JSON.stringify(version), __APP_BUILD__: JSON.stringify(build) },
   // The Mushaf page data is one large chunk on purpose (it loads only when a page opens).
   build: { chunkSizeWarningLimit: 1700 },
   plugins: [
     react(),
+    versionJson,
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
