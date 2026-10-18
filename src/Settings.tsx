@@ -111,15 +111,15 @@ export default function Settings({ initial, onSave, onBack }: Props) {
       <p className="faded small">Whole surahs, up to this many pages. A longer surah is split across days.</p>
       <MurajaPagesChoice value={murajaPages} onChange={setMurajaPages} />
 
-      <h2 className="section-title">Memorised surahs</h2>
-      <p className="faded small">Tick whole surahs, or a whole juz at once.</p>
-      <MemorisedSurahs memorised={memorised} next={next} onToggle={toggle} />
-
-      <h2 className="section-title intro-replay-title">Intro</h2>
+      <h2 className="section-title">Intro</h2>
       <p className="faded small">What the app does, in five cards, as on the first run.</p>
       <button className="button quiet intro-replay" onClick={() => showIntro(0)}>
         Replay the intro
       </button>
+
+      <h2 className="section-title">Memorised surahs</h2>
+      <p className="faded small">Tick whole surahs, or a whole juz at once.</p>
+      <MemorisedSurahs memorised={memorised} next={next} onToggle={toggle} />
 
       <h2 className="section-title credits-title">Credits</h2>
       <ul className="faded small credits">
