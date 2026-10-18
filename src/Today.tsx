@@ -24,6 +24,19 @@ type Props = {
 const longDate = (date: string) =>
   new Date(`${date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })
 
+// A small book beside the Arabic name, so it reads as something to tap: the area opens its page in the Mushaf.
+// The same book as the Surahs screen's open button. Placed first, so in the right-to-left name it sits on the right.
+function ReadMark() {
+  return (
+    <span className="read-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 6.5C10.2 5.2 7.6 4.6 4 4.8v13c3.6-.2 6.2.4 8 1.7 1.8-1.3 4.4-1.9 8-1.7v-13c-3.6-.2-6.2.4-8 1.7z" />
+        <path d="M12 6.5v13" />
+      </svg>
+    </span>
+  )
+}
+
 function KindLabel({ name, done }: { name: string; done: boolean }) {
   return (
     <h2 className={`kind-label ${done ? 'done' : ''}`}>
@@ -42,10 +55,11 @@ function RevisionRow({ name, ranges, done, empty, onOpen }: RowProps) {
       {ranges.length ? (
         <>
           <p lang="ar" className="arabic">
+            <ReadMark />
             {arabicNames(ranges)}
           </p>
           <p className="range">
-            <RangeText ranges={ranges} play />
+            <RangeText ranges={ranges} listen />
           </p>
           <p className="faded small">{describeSize(ranges)}</p>
         </>
@@ -112,11 +126,12 @@ export default function Today({
           <>
             <div className="band">
               <p lang="ar" className="arabic">
+                <ReadMark />
                 {arabicNames(plan.hifz)}
               </p>
             </div>
             <p className="range">
-              <RangeText ranges={plan.hifz} play />
+              <RangeText ranges={plan.hifz} listen />
             </p>
             <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (

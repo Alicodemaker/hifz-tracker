@@ -4,6 +4,8 @@ import hideAndPen from './assets/intro/hide-and-pen.webp'
 import mushaf from './assets/intro/mushaf.webp'
 import surahsDark from './assets/intro/surahs-dark.webp'
 import surahsLight from './assets/intro/surahs-light.webp'
+import CardNav from './CardNav'
+import { useSwipe } from './swipe'
 import Tick from './Tick'
 
 type Card = { title: string; picture: ReactNode; body: ReactNode; note?: string }
@@ -106,12 +108,17 @@ type Props = {
   restore?: ReactNode // the Restore link, for a moved phone (first run only)
 }
 
-// The intro: five cards on what the app does. On the first run it leads into setup; Settings can replay it.
+// The intro: five cards on what the app does, by Next and Back or by swiping. On the first run it leads into setup;
+// Settings can replay it.
 export default function Intro({ card, onCard, onDone, doneLabel, notice, restore }: Props) {
   const { title, picture, body, note } = CARDS[card]
   const last = card === CARDS.length - 1
+  const swipe = useSwipe(
+    () => !last && onCard(card + 1),
+    () => card > 0 && onCard(card - 1),
+  )
   return (
-    <main className="screen setup intro">
+    <main className="screen setup intro" {...swipe}>
       <header className="screen-head intro-head">
         <span className="faded small">Hifz Tracker</span>
         {!last && (
@@ -121,29 +128,21 @@ export default function Intro({ card, onCard, onDone, doneLabel, notice, restore
         )}
       </header>
       {notice}
-      <div className="intro-picture">{picture}</div>
-      <h1 className="intro-title">{title}</h1>
-      <div className="intro-body">{body}</div>
-      {note && <p className="faded small">{note}</p>}
-
-      <div className="action-bar">
-        <div className="intro-dots" role="img" aria-label={`${card + 1} of ${CARDS.length}`}>
-          {CARDS.map((_, i) => (
-            <span key={i} className={i === card ? 'on' : ''} />
-          ))}
-        </div>
-        <div className="row">
-          {card > 0 && (
-            <button className="button quiet" onClick={() => onCard(card - 1)}>
-              Back
-            </button>
-          )}
-          <button className="button primary" onClick={last ? onDone : () => onCard(card + 1)}>
-            {last ? doneLabel : 'Next'}
-          </button>
-        </div>
-        {restore && <p className="faded small hint">Moving from another phone? {restore}</p>}
+      <div key={card} className="card-in">
+        <div className="intro-picture">{picture}</div>
+        <h1 className="intro-title">{title}</h1>
+        <div className="intro-body">{body}</div>
+        {note && <p className="faded small">{note}</p>}
       </div>
+
+      <CardNav
+        count={CARDS.length}
+        index={card}
+        onIndex={onCard}
+        doneLabel={doneLabel}
+        onDone={onDone}
+        hint={restore && <>Moving from another phone? {restore}</>}
+      />
     </main>
   )
 }

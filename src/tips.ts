@@ -30,7 +30,7 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'hifz-page',
     title: "Today's Hifz",
-    text: "The page opens ayah by ayah: tap \"+ ayah\" to add the next one. Small olive pins mark where today's Hifz starts and ends. Tap the page to show or hide the buttons.",
+    text: "The page opens ayah by ayah: tap \"+\u00a0ayah\" to add the next one. Small olive pins mark where today's Hifz starts and ends. Tap the page to show or hide the buttons.",
   },
   {
     id: 'rabt-page',
@@ -45,7 +45,7 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'ayah-by-ayah',
     title: 'Ayah by ayah',
-    text: 'Only the ayahs you have added show, zoomed in. "+ ayah" adds the next one, and on a long page "2. half" starts from its middle. × shows the whole page again.',
+    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, and on a long page "2.\u00a0half" starts from its middle. × shows the whole page again.',
   },
   {
     id: 'hide',
