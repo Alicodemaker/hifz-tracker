@@ -740,7 +740,7 @@ select, input[type='number'] {
 }
 .m-lines.hiding .m-ayah:not(.hidden) .m-words { animation: reveal var(--motion-quick) ease-out; }
 @keyframes reveal { from { opacity: 0; } }
-.mushaf.free-drag { touch-action: none; }
+.mushaf.free-drag { touch-action: none; -webkit-user-select: none; user-select: none; } /* a drag draws; it never selects text */
 .drawing-ink { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
 /* Ayah by ayah: only the ayahs shown so far, zoomed in to fill the page (the page itself stays laid out, unseen).
@@ -853,18 +853,18 @@ select, input[type='number'] {
 .step-tools > * { pointer-events: auto; }
 .step-tools.faded-out { opacity: 0; }
 .step-tools.faded-out * { pointer-events: none; }
-/* The count inside "+ ayah", set apart by a thin rule and quieter than the action. */
+/* The count inside "+ ayah", on its left, set apart by a thin rule and quieter than the action. */
 .step-count {
-  margin-inline-start: var(--space-3);
-  padding-inline-start: var(--space-3);
-  border-inline-start: 1.5px solid color-mix(in srgb, currentColor 35%, transparent);
+  margin-inline-end: var(--space-2);
+  padding-inline-end: var(--space-2);
+  border-inline-end: 1.5px solid color-mix(in srgb, currentColor 35%, transparent);
   font-variant-numeric: tabular-nums;
   opacity: 0.85;
 }
 .step-tool {
   position: relative;
   height: var(--float-button);
-  padding-inline: var(--space-4);
+  padding-inline: var(--space-3);
   border-radius: 999px;
   background: var(--mushaf-olive);
   color: var(--mushaf-paper);
@@ -998,9 +998,15 @@ select, input[type='number'] {
 @keyframes tip-fade { from { opacity: 0; } }
 @keyframes tip-rise { from { transform: translateY(100%); } }
 
+/* A tip's picture: a crop across the screen, at full width. Never taller than about a third of the screen, so the
+   words and "Got it" stay in view: a taller one is shown smaller, whole, in the middle. */
+.tip-picture { display: flex; justify-content: center; margin-bottom: var(--space-4); }
+.tip-picture picture { display: contents; }
+.tip-picture img { display: block; width: auto; height: auto; max-width: 100%; max-height: 34dvh; border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--rule); }
+
 /* All tips, from Settings: one card at a time, swiped through like the intro. */
-.tips-intro { margin-bottom: var(--space-4); }
-.tip-card { padding: var(--space-5) var(--space-4); border-radius: var(--radius-lg); background: var(--leaf); }
+.tip-card { padding: var(--space-4); border-radius: var(--radius-lg); background: var(--leaf); }
+.tip-card .tip-picture img { max-height: 28dvh; } /* the card, its words and the buttons fit a small phone's screen */
 .tip-card h2 { font-size: var(--text-lg); margin: var(--space-1) 0 var(--space-2); }
 
 /* Each card of the intro and the tips comes in with a short fade. */
