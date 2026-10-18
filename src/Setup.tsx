@@ -63,7 +63,7 @@ export default function Setup({ onStart, onRestore }: Props) {
         <header className="screen-head">
           <h1>What have you memorised?</h1>
         </header>
-        <p className="faded small">Tick the surahs you know by heart. Nothing yet? Just tap Next.</p>
+        <p className="faded small">Tick whole surahs, or a whole juz at once. Nothing yet? Leave it empty.</p>
         <MemorisedSurahs memorised={memorised} next={next} onToggle={toggle} />
 
         <div className="action-bar">
@@ -84,12 +84,12 @@ export default function Setup({ onStart, onRestore }: Props) {
       <header className="screen-head">
         <h1>Where does your Hifz start?</h1>
       </header>
-      <p className="faded small">The first ayah you don't know yet.</p>
+      <p className="faded small">The first ayah you have not memorised yet.</p>
       <NextHifzFields next={next} onChange={setNext} />
       {nextIsMemorised && <p className="notice alert">{surahName(next.surah)} is ticked as memorised. Choose another surah, or go back.</p>}
 
       <h2 className="section-title">Muraja'a per day</h2>
-      <p className="faded small">How many pages of old surahs to go over each day. You can change it later.</p>
+      <p className="faded small">Pages of older revision per day. You can change it later.</p>
       <MurajaPagesChoice value={murajaPages} onChange={setMurajaPages} />
 
       <div className="action-bar">

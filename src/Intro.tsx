@@ -13,7 +13,7 @@ type Card = { title: string; picture: ReactNode; body: ReactNode }
 const KINDS = [
   {
     name: 'Hifz',
-    what: 'Learn new ayahs',
+    what: 'New memorisation',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 21v-8" />
@@ -24,7 +24,7 @@ const KINDS = [
   },
   {
     name: 'Rabt',
-    what: 'Go over the recent ones',
+    what: 'Recent revision',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
@@ -34,7 +34,7 @@ const KINDS = [
   },
   {
     name: "Muraja'a",
-    what: 'Keep the old ones strong',
+    what: 'Older revision',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="3.5" y="15" width="17" height="4.5" rx="1" />
@@ -45,11 +45,11 @@ const KINDS = [
   },
 ]
 
-// The intro, in words a child could follow: one idea a card, a few words, and a big picture (a sketch from the app's
+// The intro: one idea a card, a few concise words, and a big picture (a sketch from the app's
 // own pieces, or a screenshot taken by `npm run screenshots`). The sketches come in with a short animation, once.
 const CARDS: Card[] = [
   {
-    title: 'Three things each day',
+    title: 'Your daily plan',
     picture: (
       <div className="intro-kinds">
         {KINDS.map((kind) => (
@@ -61,10 +61,10 @@ const CARDS: Card[] = [
         ))}
       </div>
     ),
-    body: <p>Learn a little every day, and keep it strong.</p>,
+    body: <p>The app plans all three for you each day.</p>,
   },
   {
-    title: 'Tick them off',
+    title: 'Tick each one done',
     picture: (
       <div className="intro-ticking">
         <div className="intro-done">
@@ -74,18 +74,18 @@ const CARDS: Card[] = [
             </span>
           ))}
         </div>
-        <p className="intro-tomorrow">Tomorrow's plan is ready</p>
+        <p className="intro-tomorrow">Next day's plan ready</p>
       </div>
     ),
-    body: <p>Done with one? Tap it.</p>,
+    body: <p>When all three are done, the next day's plan appears.</p>,
   },
   {
     title: 'Open the Mushaf',
     picture: <img className="intro-crop" src={mushaf} alt="Surah al-Ikhlas on a page of the Madani mushaf" />,
-    body: <p>Tap Hifz, Rabt or Muraja'a to open its page.</p>,
+    body: <p>Tap Hifz, Rabt or Muraja'a on Today to open its page.</p>,
   },
   {
-    title: 'Buttons on the page',
+    title: 'Tools on the page',
     picture: (
       <ul className="intro-tools">
         <li>
@@ -99,17 +99,17 @@ const CARDS: Card[] = [
           <span className="intro-tool">
             <EyeIcon struck />
           </span>
-          Hide the ayahs, to test yourself
+          Hide the text to test yourself
         </li>
         <li>
           <span className="intro-tool">
             <PenIcon />
           </span>
-          Mark weak spots in red
+          Mark weak spots
         </li>
       </ul>
     ),
-    body: <p>They sit at the bottom of the page. Gone? Tap the screen.</p>,
+    body: <p>They sit at the bottom of the page. If they fade, tap the screen.</p>,
   },
   {
     title: 'Know your strong Surahs',
@@ -119,7 +119,7 @@ const CARDS: Card[] = [
         <img className="intro-crop faded-end" src={surahsLight} alt="The Surahs screen, grouped by rating" />
       </picture>
     ),
-    body: <p>Give each Surah one to three stars, and see which are ready for salah.</p>,
+    body: <p>Rate each Surah from one to three stars and see which are ready for salah.</p>,
   },
 ]
 
