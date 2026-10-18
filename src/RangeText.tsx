@@ -1,17 +1,17 @@
 import { rangePart, rangeParts } from './format'
 import type { Range } from './plan'
-import PlayLink from './PlayLink'
+import ListenLink from './ListenLink'
 
 // A range description that wraps only between surahs, so "Al-Ahqaf 6–35" never splits across lines.
-// With play, every surah is named, even in a long run, and each name ends with its PlayLink instead of a comma.
-export default function RangeText({ ranges, play = false }: { ranges: Range[]; play?: boolean }) {
-  if (play)
+// With listen, every surah is named, even in a long run, and each name ends with its ListenLink instead of a comma.
+export default function RangeText({ ranges, listen = false }: { ranges: Range[]; listen?: boolean }) {
+  if (listen)
     return ranges.map((r, i) => (
       <span key={i}>
         {i > 0 && ' '}
-        <span className="range-part with-play">
+        <span className="range-part with-listen">
           {rangePart(r)}
-          <PlayLink surah={r.surah} />
+          <ListenLink surah={r.surah} />
         </span>
       </span>
     ))

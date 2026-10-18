@@ -3,6 +3,8 @@
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
+/* A sideways swipe turns a card or a Mushaf page; it must never be taken as the browser's back gesture. */
+html, body { overscroll-behavior-x: none; }
 
 body {
   margin: 0;
@@ -158,6 +160,20 @@ button:disabled { opacity: 0.35; cursor: default; }
 .stepper .estimates { text-align: center; line-height: 1.4; }
 
 .opens-page { cursor: pointer; }
+/* The book beside an Arabic name that opens its page: a soft round mark, like the listen link, at a fixed size
+   whatever the name's size, lined up with the middle of the name. */
+.read-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-inline-end: 0.3em;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--lapis-wash);
+  color: var(--lapis);
+}
+.read-mark svg { width: 62%; height: 62%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
 
 /* Today: Rabt and Muraja'a as quiet rows under the band */
 .revision { list-style: none; padding: 0; }
@@ -171,14 +187,14 @@ button:disabled { opacity: 0.35; cursor: default; }
 .revision li:last-child { border-bottom: 1px solid var(--rule); }
 .revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: right; }
 .revision .range { font-weight: 600; }
-/* A long list of surahs, each with its play link, takes the full width in tidy columns, under the Arabic beside the label. */
+/* A long list of surahs, each with its listen link, takes the full width in tidy columns, under the Arabic beside the label. */
 .revision li.many .arabic { grid-area: 1 / 2; }
 .revision li.many .range { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5em, 1fr)); gap: var(--space-2); }
 /* Each surah's part stays on one line (unless it alone is too wide), so a long list breaks between surahs. */
 .range-part { display: inline-block; }
-/* Experiment: a round play link after each surah name, opening a YouTube search. The hit area reaches past the circle. */
-.range-part.with-play { display: inline-flex; align-items: center; margin-inline-end: 0.5em; }
-.play-link {
+/* Experiment: a round listen link after each surah name, opening a YouTube search. The hit area reaches past the circle. */
+.range-part.with-listen { display: inline-flex; align-items: center; margin-inline-end: 0.5em; }
+.listen-link {
   position: relative;
   display: inline-grid;
   place-items: center;
@@ -190,8 +206,9 @@ button:disabled { opacity: 0.35; cursor: default; }
   background: var(--lapis-wash);
   color: var(--lapis);
 }
-.play-link::before { content: ''; position: absolute; inset: -10px; }
-.play-link svg { width: 62%; height: 62%; fill: currentColor; }
+.listen-link::before { content: ''; position: absolute; inset: -10px; }
+.listen-link svg { width: 62%; height: 62%; fill: currentColor; }
+.listen-link .band { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
 
 /* The check that answers a Done tap */
 .tick { width: 1.1em; height: 1.1em; flex: none; }
@@ -250,7 +267,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 
 /* Settings: credits at the end, as a quiet list. */
 .credits-title { margin-top: var(--space-6); } /* after the long surah list */
-.intro-replay { margin: var(--space-1) 0 var(--space-6); } /* spaced from the next section like the Theme and Muraja'a choices */
+.help-buttons { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-2); margin: var(--space-1) 0 var(--space-6); } /* spaced like the Theme and Muraja'a choices */
 .credits { padding-inline-start: var(--space-4); display: grid; gap: var(--space-2); }
 
 /* First-run setup */
@@ -961,3 +978,31 @@ select, input[type='number'] {
 .m-lines.enter-prev { animation: turn-prev var(--motion-quick) ease-out; }
 @keyframes turn-next { from { transform: translateX(calc(-1 * var(--space-6))); opacity: 0.3; } }
 @keyframes turn-prev { from { transform: translateX(var(--space-6)); opacity: 0.3; } }
+
+/* Tips: a sheet at the bottom of the screen the first time a tool is used, over a dimmed screen. */
+.tip-backdrop { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgb(28 26 23 / 35%); animation: tip-fade var(--motion-quick) ease-out; }
+.tip {
+  width: 100%;
+  max-width: var(--screen-max);
+  padding: var(--space-5) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--leaf);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  box-shadow: var(--float-shadow);
+  animation: tip-rise var(--motion-calm) cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.tip-kicker { color: var(--lapis); font-size: var(--text-sm); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.tip h2 { font-size: var(--text-lg); margin: var(--space-1) 0 var(--space-2); }
+.tip p:not(.tip-kicker) { margin-bottom: var(--space-5); }
+@keyframes tip-fade { from { opacity: 0; } }
+@keyframes tip-rise { from { transform: translateY(100%); } }
+
+/* All tips, from Settings: one card at a time, swiped through like the intro. */
+.tips-intro { margin-bottom: var(--space-4); }
+.tip-card { padding: var(--space-5) var(--space-4); border-radius: var(--radius-lg); background: var(--leaf); }
+.tip-card h2 { font-size: var(--text-lg); margin: var(--space-1) 0 var(--space-2); }
+
+/* Each card of the intro and the tips comes in with a short fade. */
+.card-in { animation: card-in var(--motion-quick) ease-out; }
+@keyframes card-in { from { opacity: 0; transform: translateY(6px); } }

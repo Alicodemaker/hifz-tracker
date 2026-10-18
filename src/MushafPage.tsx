@@ -11,6 +11,7 @@ import { drawingKey, type Stroke } from './drawings'
 import { pageHalves } from './halves'
 import PageRating from './PageRating'
 import { portionPins } from './pins'
+import { tipOnce } from './tips'
 import { RATINGS, type Rating } from './ratings'
 import Stars from './Stars'
 import SurahBadge from './SurahBadge'
@@ -431,7 +432,10 @@ export default function MushafPage({
           {rating && (
             <button
               className={`rate ${ratingOpen ? 'on' : ''} ${mainRating ? 'rated' : ''}`}
-              onClick={() => setRatingOpen(!ratingOpen)}
+              onClick={() => {
+                if (!ratingOpen) tipOnce('rate')
+                setRatingOpen(!ratingOpen)
+              }}
               aria-expanded={ratingOpen}
               aria-label={
                 mainRating ? `Rate surahs on this page (${surahName(mainSurah!)}: ${mainRating.label})` : 'Rate surahs on this page'
@@ -628,7 +632,10 @@ export default function MushafPage({
       ) : (
         <button
           className={`step-toggle ${buttonVisible ? '' : 'faded-out'}`}
-          onClick={() => onSteps(FRESH_STEPS)}
+          onClick={() => {
+            onSteps(FRESH_STEPS)
+            tipOnce('ayah-by-ayah')
+          }}
           aria-label="Ayah by ayah"
           tabIndex={buttonVisible ? 0 : -1}
         >
@@ -655,7 +662,10 @@ export default function MushafPage({
       {!stepping && (
         <button
           className={`pen-toggle ${buttonVisible ? '' : 'faded-out'} ${penOn ? 'on' : ''}`}
-          onClick={onTogglePen}
+          onClick={() => {
+            if (!penOn) tipOnce('pen')
+            onTogglePen()
+          }}
           aria-pressed={penOn}
           aria-label={penOn ? 'Stop drawing' : 'Draw on the page'}
           tabIndex={buttonVisible ? 0 : -1}
@@ -670,7 +680,10 @@ export default function MushafPage({
       {!stepping && (
         <button
           className={`hide-toggle ${buttonVisible ? '' : 'faded-out'} ${hiding ? 'on' : ''}`}
-          onClick={onToggleHiding}
+          onClick={() => {
+            if (!hiding) tipOnce('hide')
+            onToggleHiding()
+          }}
           aria-pressed={hiding}
           aria-label={hiding ? 'Show the text' : 'Hide the text'}
           tabIndex={buttonVisible ? 0 : -1}

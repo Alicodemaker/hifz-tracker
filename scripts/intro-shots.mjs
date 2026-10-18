@@ -25,7 +25,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM })
 const PHONE = { width: 375, height: 760 }
 
 // A phone that has finished setup with Juz 29 and 30 memorised, and some Surahs rated.
-// Every Surah on the pictured pages is rated, so no rating reminder opens over them.
+// Every Surah on the pictured pages is rated, so no rating reminder opens over them, and every tip has been seen.
 const RATINGS = { 114: 'strong', 113: 'strong', 112: 'holes', 111: 'holes', 110: 'holes', 109: 'lastPage', 108: 'weak' }
 const newPhone = async (colorScheme = 'light', deviceScaleFactor = 2) => {
   const context = await browser.newContext({ viewport: PHONE, deviceScaleFactor, colorScheme })
@@ -46,6 +46,7 @@ const newPhone = async (colorScheme = 'light', deviceScaleFactor = 2) => {
     const saved = JSON.parse(localStorage.getItem('hifz-tracker'))
     localStorage.setItem('hifz-tracker', JSON.stringify({ ...saved, ratings }))
   }, RATINGS)
+  await page.evaluate(async (tips) => (await import(tips)).seeAllTips(), `${server.config.base}src/tips.ts`)
   await page.reload()
   return page
 }

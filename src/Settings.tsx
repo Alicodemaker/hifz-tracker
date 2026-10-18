@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import BackButton from './BackButton'
+import AllTips from './AllTips'
 import Intro from './Intro'
 import { DEFAULT_MURAJA_PAGES, type Progress } from './plan'
 import { MemorisedSurahs, MurajaPagesChoice, NextHifzFields } from './ProgressFields'
@@ -36,6 +37,7 @@ export default function Settings({ initial, onSave, onBack }: Props) {
   const [murajaPages, setMurajaPages] = useState(initial.murajaPages ?? DEFAULT_MURAJA_PAGES)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle')
   const [introCard, setIntroCard] = useState<number | null>(null) // the intro, replayed in place of Settings; edits wait
+  const [tipsOpen, setTipsOpen] = useState(false) // every tip, listed in place of Settings, the same way
 
   // The theme applies straight away; progress changes wait for Save.
   const chooseTheme = (choice: Theme) => {
@@ -65,6 +67,11 @@ export default function Settings({ initial, onSave, onBack }: Props) {
     window.scrollTo(0, 0)
   }
   if (introCard !== null) return <Intro card={introCard} onCard={showIntro} onDone={() => showIntro(null)} doneLabel="Done" />
+  const showTips = (open: boolean) => {
+    setTipsOpen(open)
+    window.scrollTo(0, 0)
+  }
+  if (tipsOpen) return <AllTips onBack={() => showTips(false)} />
 
   const submit = () =>
     onSave({
@@ -111,11 +118,16 @@ export default function Settings({ initial, onSave, onBack }: Props) {
       <p className="faded small">Whole surahs, up to this many pages. A longer surah is split across days.</p>
       <MurajaPagesChoice value={murajaPages} onChange={setMurajaPages} />
 
-      <h2 className="section-title">Intro</h2>
-      <p className="faded small">What the app does, in five cards, as on the first run.</p>
-      <button className="button quiet intro-replay" onClick={() => showIntro(0)}>
-        Replay the intro
-      </button>
+      <h2 className="section-title">Help</h2>
+      <p className="faded small">The intro shows what the app does, in five cards. Tips explain each tool the first time you use it.</p>
+      <div className="help-buttons">
+        <button className="button quiet" onClick={() => showIntro(0)}>
+          Replay the intro
+        </button>
+        <button className="button quiet" onClick={() => showTips(true)}>
+          Show all tips
+        </button>
+      </div>
 
       <h2 className="section-title">Memorised surahs</h2>
       <p className="faded small">Tick whole surahs, or a whole juz at once.</p>
