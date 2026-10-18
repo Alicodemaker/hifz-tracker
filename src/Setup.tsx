@@ -50,7 +50,8 @@ export default function Setup({ onStart, onRestore }: Props) {
           setCard(to)
           window.scrollTo(0, 0)
         }}
-        onSetUp={() => go('memorised')}
+        onDone={() => go('memorised')}
+        doneLabel="Set up"
         notice={message && <p className="notice">{message}</p>}
         restore={<RestoreButton className="link" onRestore={onRestore} onMessage={setMessage} />}
       />

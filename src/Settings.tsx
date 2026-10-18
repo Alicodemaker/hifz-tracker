@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import BackButton from './BackButton'
+import Intro from './Intro'
 import { DEFAULT_MURAJA_PAGES, type Progress } from './plan'
 import { MemorisedSurahs, MurajaPagesChoice, NextHifzFields } from './ProgressFields'
 import { surahName } from './quran'
@@ -34,6 +35,7 @@ export default function Settings({ initial, onSave, onBack }: Props) {
   const [theme, setTheme] = useState(loadTheme)
   const [murajaPages, setMurajaPages] = useState(initial.murajaPages ?? DEFAULT_MURAJA_PAGES)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle')
+  const [introCard, setIntroCard] = useState<number | null>(null) // the intro, replayed in place of Settings; edits wait
 
   // The theme applies straight away; progress changes wait for Save.
   const chooseTheme = (choice: Theme) => {
@@ -57,6 +59,12 @@ export default function Settings({ initial, onSave, onBack }: Props) {
     })
 
   const nextIsMemorised = memorised.has(next.surah)
+
+  const showIntro = (card: number | null) => {
+    setIntroCard(card)
+    window.scrollTo(0, 0)
+  }
+  if (introCard !== null) return <Intro card={introCard} onCard={showIntro} onDone={() => showIntro(null)} doneLabel="Done" />
 
   const submit = () =>
     onSave({
@@ -106,6 +114,12 @@ export default function Settings({ initial, onSave, onBack }: Props) {
       <h2 className="section-title">Memorised surahs</h2>
       <p className="faded small">Tick whole surahs, or a whole juz at once.</p>
       <MemorisedSurahs memorised={memorised} next={next} onToggle={toggle} />
+
+      <h2 className="section-title intro-replay-title">Intro</h2>
+      <p className="faded small">What the app does, in five cards, as on the first run.</p>
+      <button className="button quiet intro-replay" onClick={() => showIntro(0)}>
+        Replay the intro
+      </button>
 
       <h2 className="section-title credits-title">Credits</h2>
       <ul className="faded small credits">
