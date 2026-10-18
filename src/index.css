@@ -212,6 +212,7 @@ button:disabled { opacity: 0.35; cursor: default; }
   direction: rtl; /* Juz 1 at the right, as a mushaf opens */
 }
 .juz-summary { margin-bottom: var(--space-3); }
+.juz-title { margin-top: var(--space-6); } /* after the logged days */
 
 /* History */
 .days { list-style: none; padding: 0; }
