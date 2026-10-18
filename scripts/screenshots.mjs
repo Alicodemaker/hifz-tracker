@@ -86,8 +86,7 @@ const SHORT = { width: PHONE.width, height: 270 }
 
 // Tip pictures zoom in on what the tip is about, with a gold ring around each thing to tap or look at: a circle round
 // a round button, a pill round the rest. Every ring is something the tip's words name, and the words name nothing the
-// picture doesn't show. With two rings or more, each has a gold number at its top left, in the order of the tip's
-// steps (src/tips.ts). The crop is a small area around the rings (shown larger in the tip), unless the rings need
+// picture doesn't show. The crop is a small area around the rings (shown larger in the tip), unless the rings need
 // more room or `area` gives it outright; `pad` is the gap between a pill and what it rings.
 const RING = '#f0b429'
 const box = async (locator) => locator.first().boundingBox()
@@ -113,7 +112,7 @@ const focus = async (page, name, targets, { width = 260, height = 170, at, area,
   const y = Math.min(Math.max(0, Math.min(Math.max(centre.y - h / 2, bottom + keep - h), top - keep)), view.height - h)
   await page.evaluate(
     ({ rects, colour, pad }) =>
-      rects.forEach((r, i) => {
+      rects.forEach((r) => {
         const round = Math.abs(r.width - r.height) < 8
         const side = Math.max(r.width, r.height) + 12
         const ring = document.createElement('div')
@@ -131,32 +130,6 @@ const focus = async (page, name, targets, { width = 260, height = 170, at, area,
           boxShadow: '0 0 0 2px rgb(255 255 255 / 70%), 0 0 14px rgb(240 180 41 / 55%)',
         })
         document.body.append(ring)
-        if (rects.length < 2) return
-        // Its number, at the ring's top left (on a circle, where the edge crosses the diagonal), kept on the screen.
-        const size = 20
-        const corner = round
-          ? { x: r.x + r.width / 2 - (side / 2) * 0.71, y: r.y + r.height / 2 - (side / 2) * 0.71 }
-          : { x: r.x - pad + 6, y: r.y - pad }
-        const badge = document.createElement('div')
-        badge.className = 'shot-ring'
-        badge.textContent = String(i + 1)
-        Object.assign(badge.style, {
-          position: 'fixed',
-          zIndex: 100000,
-          pointerEvents: 'none',
-          left: `${Math.max(2, corner.x - size / 2)}px`,
-          top: `${Math.max(2, corner.y - size / 2)}px`,
-          width: `${size}px`,
-          height: `${size}px`,
-          borderRadius: '50%',
-          display: 'grid',
-          placeItems: 'center',
-          background: colour,
-          color: '#2a2118',
-          font: '700 12px/1 Figtree Variable, sans-serif',
-          boxShadow: '0 0 0 2px rgb(255 255 255 / 85%), 0 1px 3px rgb(0 0 0 / 30%)',
-        })
-        document.body.append(badge)
       }),
     { rects, colour: RING, pad },
   )

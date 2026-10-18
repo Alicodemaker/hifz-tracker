@@ -1072,23 +1072,6 @@ select, input[type='number'] {
 /* A line for each button a tip explains, a little apart. */
 .tip-text { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
 .tip .tip-text p { margin: 0; }
-/* Numbered steps: a gold number like the one on its ring in the picture, then a few words. */
-.tip-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
-.tip-steps li { display: flex; align-items: flex-start; gap: var(--space-3); }
-.tip-number {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  margin-top: 0.05em; /* level with the line's first words */
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--ring);
-  color: var(--on-ring);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
 .tip-after { color: var(--ink-faded); }
 .tip-symbol { font-size: 1.5em; font-weight: 600; line-height: 0; vertical-align: -0.1em; color: var(--exit); }
 @keyframes tip-fade { from { opacity: 0; } }
