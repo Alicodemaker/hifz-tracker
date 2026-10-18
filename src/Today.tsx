@@ -37,7 +37,7 @@ type RowProps = { name: string; ranges: Range[]; done: boolean; empty: string; o
 
 function RevisionRow({ name, ranges, done, empty, onOpen }: RowProps) {
   return (
-    <li className={`${ranges.length ? 'opens-page' : ''} ${done ? 'done' : ''}`} onClick={onOpen}>
+    <li className={`${ranges.length ? 'opens-page' : ''} ${ranges.length > 3 ? 'many' : ''} ${done ? 'done' : ''}`} onClick={onOpen}>
       <KindLabel name={name} done={done} />
       {ranges.length ? (
         <>

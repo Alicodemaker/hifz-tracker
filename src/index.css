@@ -171,17 +171,21 @@ button:disabled { opacity: 0.35; cursor: default; }
 .revision li:last-child { border-bottom: 1px solid var(--rule); }
 .revision .arabic { grid-row: span 3; align-self: center; font-size: var(--arabic-row); max-width: 9ch; text-align: right; }
 .revision .range { font-weight: 600; }
+/* A long list of surahs, each with its play link, takes the full width in tidy columns, under the Arabic beside the label. */
+.revision li.many .arabic { grid-area: 1 / 2; }
+.revision li.many .range { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5em, 1fr)); gap: var(--space-2); }
 /* Each surah's part stays on one line (unless it alone is too wide), so a long list breaks between surahs. */
 .range-part { display: inline-block; }
 /* Experiment: a round play link after each surah name, opening a YouTube search. The hit area reaches past the circle. */
+.range-part.with-play { display: inline-flex; align-items: center; margin-inline-end: 0.5em; }
 .play-link {
   position: relative;
   display: inline-grid;
   place-items: center;
   width: 1.6em;
   height: 1.6em;
+  flex: none;
   margin-inline-start: 0.35em;
-  vertical-align: -0.4em;
   border-radius: 50%;
   background: var(--lapis-wash);
   color: var(--lapis);
