@@ -531,6 +531,7 @@ select, input[type='number'] {
 .m-lines {
   flex: 1;
   padding-inline: var(--space-2);
+  padding-block-start: 0.4em; /* room for a pin above the first line's first word, which the overflow would cut off */
   display: flex;
   flex-direction: column;
   font-family: var(--font-quran);
@@ -627,8 +628,8 @@ select, input[type='number'] {
 .m-words.pin::before {
   content: '';
   position: absolute;
-  width: 0.5em;
-  height: 0.36em;
+  width: 0.75em;
+  height: 0.54em;
   background: var(--mushaf-olive);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   pointer-events: none;
