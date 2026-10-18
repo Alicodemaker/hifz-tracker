@@ -16,7 +16,8 @@ export type TipId =
   | 'history'
 
 // In the order Settings lists them: Today, then the Mushaf page, then the other screens. Each one's words name only
-// what its picture shows (src/tipPictures.ts), so nothing in a tip has to be looked for elsewhere.
+// what its picture shows (src/tipPictures.ts), so nothing in a tip has to be looked for elsewhere. A tip with several
+// buttons to explain gives each its own line.
 export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'hifz-amount',
@@ -30,8 +31,14 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
   },
   {
     id: 'hifz-page',
-    title: "Today's Hifz",
-    text: 'One ayah at a time: tap "+\u00a0ayah" for the next. "2.\u00a0half" starts from the middle of the page, and × shows the whole page. If the buttons fade, tap the page.',
+    title: 'Hifz, ayah by ayah',
+    text: [
+      "Today's new ayahs show one at a time, zoomed in, so you can focus on each.",
+      '+\u00a0ayah: add the next ayah once you know this one. 1\u00a0/\u00a07 is how many of the page\'s ayahs are showing.',
+      '2.\u00a0half: start from the middle of the page.',
+      '×: show the whole page.',
+      'If the buttons fade, tap the page.',
+    ].join('\n'),
   },
   {
     id: 'rabt-page',

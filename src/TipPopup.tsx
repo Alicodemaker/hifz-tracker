@@ -1,4 +1,5 @@
 import TipPicture from './TipPicture'
+import TipText from './TipText'
 import { TIPS, dismissTip, useTip } from './tips'
 
 // The tip showing now, as a sheet at the bottom of the screen, within thumb reach, with a picture of what it explains.
@@ -20,7 +21,7 @@ export default function TipPopup() {
         <TipPicture id={tip.id} />
         <p className="tip-kicker">Tip</p>
         <h2 id="tip-title">{tip.title}</h2>
-        <p>{tip.text}</p>
+        <TipText text={tip.text} />
         <button className="button primary" onClick={dismissTip} autoFocus>
           Got it
         </button>

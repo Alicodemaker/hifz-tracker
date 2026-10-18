@@ -356,8 +356,9 @@ export default function MushafPage({
   const mainSurah = ratableSurahs.reduce<number | null>((best, s) => (best === null || ayahsHere(s) > ayahsHere(best) ? s : best), null)
   const mainRating = RATINGS.find((r) => mainSurah !== null && r.rating === rating?.ratings?.[mainSurah])
   const [remindedBefore] = useState(rating?.reminded ?? []) // as this page opened; the page remounts on every visit
-  const toRemind = rating ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
-  const ratingOpen = ratingChoice ?? toRemind.length > 0
+  // While ayah by ayah is zoomed in, the rating stays put away (its button too), and the reminder waits for the page.
+  const toRemind = rating && !zoomed ? ratableSurahs.filter((s) => !rating.ratings?.[s] && !remindedBefore.includes(s)) : []
+  const ratingOpen = !zoomed && (ratingChoice ?? toRemind.length > 0)
   const remindKey = toRemind.join(',')
   const onReminded = rating?.onReminded
   useEffect(() => {
@@ -429,7 +430,7 @@ export default function MushafPage({
               {surahName(top.surah)} – Juz {juzOfAyah(ayahIndex(top))}
             </span>
           )}
-          {rating && (
+          {rating && !zoomed && (
             <button
               className={`rate ${ratingOpen ? 'on' : ''} ${mainRating ? 'rated' : ''}`}
               onClick={() => {
@@ -643,8 +644,9 @@ export default function MushafPage({
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="9.6" cy="9.6" r="8.6" />
             <path className="handle" d="M15.8 15.8L22 22" />
-            <path className="letter" d="M14 8.2v2q0 2-2 2H7.2q-2 0-2-2V9.4" />
-            <circle className="dot" cx="9.6" cy="15" r="1.1" />
+            <text className="letter" x="9.6" y="12.8" textAnchor="middle">
+              ب
+            </text>
           </svg>
           <span className="step-toggle-label">Ayah by ayah</span>
         </button>

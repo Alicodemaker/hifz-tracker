@@ -808,8 +808,8 @@ select, input[type='number'] {
 }
 .page-turns svg { width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Ayah by ayah: off, an outlined pill in the bottom left corner: a magnifying glass on the letter ب, and its name,
-   so it needs no guessing (on a narrow phone, only the glass, in a round button, leaving room for ‹ ›). On,
+/* Ayah by ayah: off, an outlined pill in the bottom left corner: a magnifying glass on the letter ب (in Amiri), and
+   its name, so it needs no guessing (on a narrow phone, only the glass, in a round button, leaving room for ‹ ›). On,
    "+ ayah", "2. half" and a round exit button in one row across the bottom; "+ ayah" also holds the count. The exit
    is red, like the pen's Clear page: it leaves the mode. Hide and the pen are put away meanwhile. They fade with the
    hide button. */
@@ -832,8 +832,7 @@ select, input[type='number'] {
 }
 .step-toggle svg { flex: none; width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .step-toggle .handle { stroke-width: 2.8; }
-.step-toggle .letter { stroke-width: 1.8; }
-.step-toggle .dot { fill: currentColor; stroke: none; }
+.step-toggle .letter { fill: currentColor; stroke: currentColor; stroke-width: 0.5; font-family: var(--font-arabic); font-size: 16px; } /* a touch bolder, so its dot shows */
 @media (max-width: 359px) {
   .step-toggle { width: var(--float-button); padding: 0; justify-content: center; }
   .step-toggle-label { display: none; }
@@ -1009,10 +1008,15 @@ select, input[type='number'] {
   font-family: var(--font-ui);
   box-shadow: var(--float-shadow);
   animation: tip-rise var(--motion-calm) cubic-bezier(0.2, 0.7, 0.3, 1);
+  max-height: calc(100dvh - var(--space-4)); /* a long tip on a short screen scrolls, rather than losing its top */
+  overflow-y: auto;
 }
 .tip-kicker { color: var(--lapis); font-size: var(--text-sm); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
 .tip h2 { font-size: var(--text-lg); margin: var(--space-1) 0 var(--space-2); }
 .tip p:not(.tip-kicker) { margin-bottom: var(--space-5); }
+/* A line for each button a tip explains, a little apart. */
+.tip-text { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
+.tip .tip-text p { margin: 0; }
 @keyframes tip-fade { from { opacity: 0; } }
 @keyframes tip-rise { from { transform: translateY(100%); } }
 
@@ -1021,6 +1025,7 @@ select, input[type='number'] {
 .tip-picture { display: flex; justify-content: center; margin-bottom: var(--space-4); }
 .tip-picture picture { display: contents; }
 .tip-picture img { display: block; width: auto; height: auto; max-width: 100%; max-height: 34dvh; border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--rule); }
+@media (max-height: 680px) { .tip .tip-picture img { max-height: 26dvh; } } /* on a short phone, room for the words */
 
 /* All tips, from Settings: one card at a time, swiped through like the intro. */
 .tip-card { padding: var(--space-4); border-radius: var(--radius-lg); background: var(--leaf); }
