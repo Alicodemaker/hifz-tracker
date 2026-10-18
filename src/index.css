@@ -646,13 +646,8 @@ select, input[type='number'] {
 .m-line.center .m-text,
 .m-lines.short .m-text { text-align: center; text-align-last: center; word-spacing: normal; }
 
-/* Ayah rosettes: filled green, with the number inside, as on the reference page. */
-.rosette { width: 1.45em; height: 1.45em; vertical-align: -0.42em; }
-.rosette .petal,
-.rosette .ring { fill: var(--mushaf-rosette); }
-.rosette .field { fill: var(--mushaf-rosette-field); }
-.rosette .inner { fill: none; stroke: var(--mushaf-rosette); stroke-width: 0.8; }
-.rosette text { fill: var(--mushaf-ink); font-family: var(--font-quran); }
+/* Ayah signs: the KFGQPC font's own medallion with the number inside, green like the exact font's signs. */
+.m-sign { color: var(--mushaf-rosette); }
 
 /* Surah header: the builder's badge image across the line, with the name in its central panel. */
 .m-line.surah-band { overflow: visible; }
@@ -709,7 +704,7 @@ select, input[type='number'] {
 }
 /* Over a sign, centred on it. A QCF4 glyph's box is the whole line, with the sign's ink in its middle. */
 .qcf-glyph.sign.pin::before { left: 50%; transform: translateX(-50%); bottom: calc(50% + 0.62em); }
-.m-sign.pin::before { left: 50%; transform: translateX(-50%); bottom: 1.72em; } /* the rosette's top, measured */
+.m-sign.pin::before { left: 50%; transform: translateX(-50%); bottom: 1.45em; } /* the sign's top, measured */
 /* Over a first word, at the edge where it starts, high enough to clear tall letters and their vowel marks. */
 .qcf-glyph.word.pin::before { inset-inline-start: 0; bottom: calc(50% + 0.95em); }
 .m-words.pin::before { inset-inline-start: 0; bottom: calc(100% + 0.2em); }

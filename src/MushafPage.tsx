@@ -12,7 +12,6 @@ import { pageHalves } from './halves'
 import PageRating from './PageRating'
 import { portionPins } from './pins'
 import { RATINGS, type Rating } from './ratings'
-import Rosette from './Rosette'
 import Stars from './Stars'
 import SurahBadge from './SurahBadge'
 
@@ -95,9 +94,9 @@ const splitMarker = (piece: Piece): [string, string] => {
 }
 
 const BASE_SIZE = 20 // px, used only to measure
-// At 20px (tighter word spacing, rosettes, heavier ink), most pages have no line wider than this. Sizing to it
-// keeps one text size on every page; the few wider lines are narrowed slightly to fit (at most about 12%).
-const TYPICAL_WIDEST_AT_BASE = 385
+// At 20px (tighter word spacing, the font's own ayah signs), 19 pages in 20 have no line wider than this. Sizing to
+// it keeps one text size on every page; the few wider lines are narrowed slightly to fit (at most about 10%).
+const TYPICAL_WIDEST_AT_BASE = 366
 const NO_LINES: Line[] = []
 const NO_STROKES: Stroke[] = []
 
@@ -297,26 +296,26 @@ export default function MushafPage({
               )),
       )
     // The bundled font: each ayah's pieces from its lines joined, then its marker.
-    const ayahs = new Map<string, { words: string[]; ayah: number; ends: boolean }>()
+    const ayahs = new Map<string, { words: string[]; sign: string }>()
     for (const line of lines) {
       if (typeof line === 'string') continue
       for (const piece of line) {
         const key = `${piece[0]}:${piece[1]}`
         if (!shownKeys.has(key)) continue
-        const [words] = splitMarker(piece)
-        const entry = ayahs.get(key) ?? { words: [], ayah: piece[1], ends: false }
+        const [words, marker] = splitMarker(piece)
+        const entry = ayahs.get(key) ?? { words: [], sign: '' }
         entry.words.push(words)
-        entry.ends ||= piece[3] === 1
+        entry.sign ||= marker
         ayahs.set(key, entry)
       }
     }
-    return [...ayahs].map(([key, { words, ayah, ends }]) => (
+    return [...ayahs].map(([key, { words, sign }]) => (
       <span key={key} className={`m-ayah ${hidden(key) ? 'hidden' : ''}`} data-ayah={key}>
         <span className="m-words">{words.join(' ')}</span>
-        {ends && (
+        {sign && (
           <span className="m-marker">
             {' '}
-            <Rosette ayah={ayah} />
+            <span className="m-sign">{sign}</span>
           </span>
         )}{' '}
       </span>
@@ -520,7 +519,7 @@ export default function MushafPage({
                           <span className="m-marker">
                             {' '}
                             <span className={`m-sign ${pins.signs.has(key) ? 'pin' : ''} ${key === leadSign ? 'lead' : ''}`}>
-                              <Rosette ayah={piece[1]} />
+                              {marker}
                             </span>
                           </span>
                         )}{' '}
