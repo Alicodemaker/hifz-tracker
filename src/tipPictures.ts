@@ -1,7 +1,6 @@
-// The picture with each tip: what it explains, in use, taken from the real app by `npm run screenshots` as a crop across
-// the screen. Screens that follow the theme have a dark one too; the Mushaf page stays light.
-import surahsDark from './assets/intro/surahs-dark.webp'
-import surahsLight from './assets/intro/surahs-light.webp'
+// The picture with each tip: what it explains, in use, taken from the real app by `npm run screenshots`, zoomed in on it
+// with gold rings round what to tap or look at. Screens that follow the theme have a dark one too; the Mushaf page
+// stays light.
 import ayahByAyah from './assets/tips/ayah-by-ayah.webp'
 import hide from './assets/tips/hide.webp'
 import hifzAmountDark from './assets/tips/hifz-amount-dark.webp'
@@ -15,6 +14,8 @@ import nextDayLight from './assets/tips/next-day-light.webp'
 import pen from './assets/tips/pen.webp'
 import rabtPage from './assets/tips/rabt-page.webp'
 import rate from './assets/tips/rate.webp'
+import surahsDark from './assets/tips/surahs-dark.webp'
+import surahsLight from './assets/tips/surahs-light.webp'
 import type { TipId } from './tips'
 
 export type TipPictureSource = { light: string; dark?: string }
