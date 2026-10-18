@@ -596,8 +596,8 @@ export default function MushafPage({
         </div>
       )}
 
-      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, one row of "+ ayah" (the count on its left), the
-          halves and a button to leave it. */}
+      {/* Ayah by ayah: off, a pill named for it in the bottom left corner; on, one row of "+ ayah" (the count on its
+          left), the halves and a red × to leave it. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
           <button
@@ -636,13 +636,9 @@ export default function MushafPage({
             onSteps(FRESH_STEPS)
             tipOnce('ayah-by-ayah')
           }}
-          aria-label="Ayah by ayah"
           tabIndex={buttonVisible ? 0 : -1}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 7h14" />
-            <path className="faint" d="M5 12h14M5 17h9" />
-          </svg>
+          Ayah by ayah
         </button>
       )}
 
