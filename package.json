@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "data": "node scripts/build-quran-data.mjs && node scripts/build-mushaf-data.mjs && node scripts/build-qcf-data.mjs",
-    "intro-shots": "node scripts/intro-shots.mjs"
+    "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import BackButton from './BackButton'
 import CardNav from './CardNav'
+import TipPicture from './TipPicture'
 import { useSwipe } from './swipe'
 import { TIPS, resetTips } from './tips'
 
@@ -25,8 +26,8 @@ export default function AllTips({ onBack }: { onBack: () => void }) {
           <h1>Tips</h1>
         </div>
       </header>
-      <p className="faded small tips-intro">Each one pops up once, the first time you use what it explains.</p>
       <section key={index} className="tip-card card-in">
+        <TipPicture id={tip.id} />
         <p className="tip-kicker">
           Tip {index + 1} of {TIPS.length}
         </p>

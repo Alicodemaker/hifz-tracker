@@ -11,7 +11,7 @@ import Tick from './Tick'
 type Card = { title: string; picture: ReactNode; body: ReactNode; note?: string }
 
 // Each card has a picture of what it talks about: a sketch from the app's own pieces, or a screenshot of the app
-// taken by `npm run intro-shots`.
+// taken by `npm run screenshots`.
 const CARDS: Card[] = [
   {
     title: 'Your hifz, planned each day',

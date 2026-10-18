@@ -596,8 +596,8 @@ export default function MushafPage({
         </div>
       )}
 
-      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, one row of "+ ayah" (holding the count), the halves
-          and a button to leave it. */}
+      {/* Ayah by ayah: off, a toggle in the bottom left corner; on, one row of "+ ayah" (the count on its left), the
+          halves and a button to leave it. */}
       {pageSteps ? (
         <div className={`step-tools ${buttonVisible ? '' : 'faded-out'}`}>
           <button
@@ -606,11 +606,11 @@ export default function MushafPage({
             disabled={!stepActive}
             tabIndex={buttonVisible ? 0 : -1}
           >
-            + ayah
             {/* Counted across the whole page, also when starting from the second half. */}
             <span className="step-count">
               {shownTo} / {stepKeys.length}
             </span>
+            + ayah
           </button>
           {split !== null && (
             <button

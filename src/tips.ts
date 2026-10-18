@@ -30,17 +30,17 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'hifz-page',
     title: "Today's Hifz",
-    text: "The page opens ayah by ayah: tap \"+\u00a0ayah\" to add the next one. Small olive pins mark where today's Hifz starts and ends. Tap the page to show or hide the buttons.",
+    text: "The page opens ayah by ayah: tap \"+\u00a0ayah\" to add the next one. Small green triangles mark where today's Hifz starts and ends. Tap the page to show or hide the buttons.",
   },
   {
     id: 'rabt-page',
     title: 'Rabt on the page',
-    text: "Olive pins mark where today's Rabt starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
+    text: "Green triangles mark where today's Rabt starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
   },
   {
     id: 'muraja-page',
     title: "Muraja'a on the page",
-    text: "Olive pins mark where today's Muraja'a starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
+    text: "Green triangles mark where today's Muraja'a starts and ends. Tap the page to show the buttons: hide the text to test yourself, the pen for weak spots, and ayah by ayah in the corner. The star at the top rates the Surah. Swipe to turn the page.",
   },
   {
     id: 'ayah-by-ayah',
@@ -127,5 +127,5 @@ export const resetTips = () => {
   }
 }
 
-// For `npm run intro-shots`, whose screenshots must not have tips over them.
+// For `npm run screenshots`, whose screenshots must not have tips over them.
 export const seeAllTips = () => writeSeen(new Set(TIPS.map((tip) => tip.id)))
