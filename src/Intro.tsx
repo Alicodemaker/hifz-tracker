@@ -13,7 +13,7 @@ type Card = { title: string; picture: ReactNode; body: ReactNode }
 const KINDS = [
   {
     name: 'Hifz',
-    what: 'New memorisation',
+    what: 'Memorise new ayahs',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 21v-8" />
@@ -24,7 +24,7 @@ const KINDS = [
   },
   {
     name: 'Rabt',
-    what: 'Recent revision',
+    what: 'Revise recent ones',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
@@ -34,7 +34,7 @@ const KINDS = [
   },
   {
     name: "Muraja'a",
-    what: 'Older revision',
+    what: 'Revise older ones',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="3.5" y="15" width="17" height="4.5" rx="1" />
@@ -64,7 +64,7 @@ const CARDS: Card[] = [
     body: <p>The app plans all three for you each day.</p>,
   },
   {
-    title: 'Tick each one done',
+    title: 'Tick off each one',
     picture: (
       <div className="intro-ticking">
         <div className="intro-done">
@@ -74,15 +74,15 @@ const CARDS: Card[] = [
             </span>
           ))}
         </div>
-        <p className="intro-tomorrow">Next day's plan ready</p>
+        <p className="intro-tomorrow">Next day's plan is ready</p>
       </div>
     ),
-    body: <p>When all three are done, the next day's plan appears.</p>,
+    body: <p>Finished one? Tap its button at the bottom of Today. Once all three are ticked, the next day's plan appears.</p>,
   },
   {
     title: 'Open the Mushaf',
     picture: <img className="intro-crop" src={mushaf} alt="Surah al-Ikhlas on a page of the Madani mushaf" />,
-    body: <p>Tap Hifz, Rabt or Muraja'a on Today to open its page.</p>,
+    body: <p>On Today, tap a Surah to open it in the Mushaf.</p>,
   },
   {
     title: 'Tools on the page',
@@ -105,11 +105,11 @@ const CARDS: Card[] = [
           <span className="intro-tool">
             <PenIcon />
           </span>
-          Mark weak spots
+          Draw to mark weak spots
         </li>
       </ul>
     ),
-    body: <p>They sit at the bottom of the page. If they fade, tap the screen.</p>,
+    body: <p>These buttons are at the bottom of each page. If they fade, tap the screen.</p>,
   },
   {
     title: 'Know your strong Surahs',
@@ -119,7 +119,7 @@ const CARDS: Card[] = [
         <img className="intro-crop faded-end" src={surahsLight} alt="The Surahs screen, grouped by rating" />
       </picture>
     ),
-    body: <p>Rate each Surah from one to three stars and see which are ready for salah.</p>,
+    body: <p>Rate each Surah from one to three stars, and see which you know well enough for salah.</p>,
   },
 ]
 

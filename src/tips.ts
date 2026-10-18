@@ -25,12 +25,12 @@ export const TIPS: Tip[] = [
     id: 'hifz-amount',
     title: 'How much Hifz',
     lines: ['− and + change how much new Hifz you take each day.'],
-    after: 'The estimate between them shows when you would finish.',
+    after: 'Between them: when you would finish the Surah and the Quran at that pace.',
   },
   {
     id: 'next-day',
     title: 'Day done',
-    lines: ["Tomorrow's plan is showing.", 'Ticked one by mistake? Tap Undo.'],
+    lines: ['Your next plan is showing.', 'Ticked one by mistake? Tap Undo.'],
   },
   {
     id: 'hifz-page',
@@ -50,7 +50,7 @@ export const TIPS: Tip[] = [
       "Green triangles mark where today's Rabt starts and ends.",
       '"Ayah by ayah" shows one ayah at a time.',
       'The eye hides the text, to test yourself.',
-      'The pen marks weak spots.',
+      'The pen lets you mark weak spots.',
     ],
     after: 'If the buttons fade, tap the screen.',
   },
@@ -61,7 +61,7 @@ export const TIPS: Tip[] = [
       "Green triangles mark where today's Muraja'a starts and ends.",
       '"Ayah by ayah" shows one ayah at a time.',
       'The eye hides the text, to test yourself.',
-      'The pen marks weak spots.',
+      'The pen lets you mark weak spots.',
     ],
     after: 'If the buttons fade, tap the screen.',
   },
@@ -69,7 +69,7 @@ export const TIPS: Tip[] = [
     id: 'ayah-by-ayah',
     title: 'Ayah by ayah',
     lines: [
-      'Only the ayahs you have added show, zoomed in.',
+      'The ayahs appear one at a time, zoomed in.',
       '"+\u00a0ayah" adds the next one.',
       '"2.\u00a0Half" starts from the middle of the page.',
       '× leaves ayah by ayah and shows the whole page.',
@@ -83,13 +83,17 @@ export const TIPS: Tip[] = [
   {
     id: 'pen',
     title: 'The pen',
-    lines: ['Draw with your finger to mark weak spots.', 'The bin clears the page.', 'While drawing, ‹ and › turn the page.'],
+    lines: [
+      'Draw with your finger to mark weak spots.',
+      'The bin clears your drawing on this page.',
+      'While the pen is on, swiping draws, so ‹ and › turn the page.',
+    ],
   },
   {
     id: 'rate',
     title: 'Rate a Surah',
-    lines: ['Tap the star and choose from Weak to Strong.'],
-    after: 'Ratings never change your plan.',
+    lines: ['Choose how well you know this Surah, from Weak to Strong.'],
+    after: 'Ratings never change your daily plan.',
   },
   {
     id: 'surahs',
@@ -99,7 +103,7 @@ export const TIPS: Tip[] = [
   {
     id: 'history',
     title: 'Back up your progress',
-    lines: ['Your progress is stored only on this phone.', 'Back up saves a copy.', 'Restore brings it back on a new phone.'],
+    lines: ['Your progress is stored only on this phone.', 'Back up saves a copy, to Google Drive for example.', 'Restore brings it back on a new phone.'],
   },
 ]
 
