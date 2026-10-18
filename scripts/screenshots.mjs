@@ -256,7 +256,7 @@ const PAGE_TOP = { width: PHONE.width, height: 330 }
   const back = () => page.getByRole('button', { name: 'Back to Today' }).click()
   const stepButtons = () => Promise.all(['.step-tool', '.step-half', '.step-exit'].map((button) => box(page.locator(button))))
 
-  // On a short screen: opened from Hifz, ayah by ayah, one ayah in, with "+ ayah", "2. half" and ×. Then al-Ikhlas
+  // On a short screen: opened from Hifz, ayah by ayah, one ayah in, with "+ ayah", "2. Half" and ×. Then al-Ikhlas
   // three ayahs in (they are short enough to stay zoomed in at that height).
   await page.locator('section.hifz').click()
   await exactFont(page)

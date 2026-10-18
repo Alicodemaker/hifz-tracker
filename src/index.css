@@ -810,7 +810,7 @@ select, input[type='number'] {
 
 /* Ayah by ayah: off, an outlined pill in the bottom left corner: a magnifying glass on the letter ب (in Amiri), and
    its name, so it needs no guessing (on a narrow phone, only the glass, in a round button, leaving room for ‹ ›). On,
-   "+ ayah", "2. half" and a round exit button in one row across the bottom; "+ ayah" also holds the count. The exit
+   "+ ayah", "2. Half" and a round exit button in one row across the bottom; "+ ayah" also holds the count. The exit
    is red, like the pen's Clear page: it leaves the mode. Hide and the pen are put away meanwhile. They fade with the
    hide button. */
 .step-toggle {
@@ -895,7 +895,7 @@ select, input[type='number'] {
 .step-tool:disabled { opacity: 0.45; }
 .step-exit { flex: none; }
 
-/* "2. half": an outlined pill, filled while ayah by ayah starts from the second half. */
+/* "2. Half": an outlined pill, filled while ayah by ayah starts from the second half. */
 .step-half {
   position: relative;
   flex: none;

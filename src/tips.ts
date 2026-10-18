@@ -35,7 +35,7 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
     text: [
       "Today's new ayahs show one at a time, zoomed in, so you can focus on each.",
       '+\u00a0ayah: add the next ayah once you know this one. 1\u00a0/\u00a07 is how many of the page\'s ayahs are showing.',
-      '2.\u00a0half: start from the middle of the page.',
+      '2.\u00a0Half: start from the middle of the page.',
       '×: leave ayah by ayah and see the normal Mushaf page.',
       'If the buttons fade, tap the screen to show them again.',
     ].join('\n'),
@@ -53,7 +53,7 @@ export const TIPS: { id: TipId; title: string; text: string }[] = [
   {
     id: 'ayah-by-ayah',
     title: 'Ayah by ayah',
-    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, "2.\u00a0half" starts from the middle of the page, and × leaves ayah by ayah for the normal Mushaf page.',
+    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, "2.\u00a0Half" starts from the middle of the page, and × leaves ayah by ayah for the normal Mushaf page.',
   },
   {
     id: 'hide',
