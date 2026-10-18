@@ -115,7 +115,7 @@ export default function Settings({ initial, onSave, onBack }: Props) {
       {nextIsMemorised && <p className="notice alert">{surahName(next.surah)} is also ticked as memorised below. Untick it to save.</p>}
 
       <h2 className="section-title">Muraja'a per day</h2>
-      <p className="faded small">Whole surahs, up to this many pages. A longer surah is split across days.</p>
+      <p className="faded small">How many pages of Muraja'a to do each day.</p>
       <MurajaPagesChoice value={murajaPages} onChange={setMurajaPages} />
 
       <h2 className="section-title">Help</h2>

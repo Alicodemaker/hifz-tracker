@@ -11,6 +11,7 @@ import { drawingKey, type Stroke } from './drawings'
 import { pageHalves } from './halves'
 import PageRating from './PageRating'
 import { portionPins } from './pins'
+import { AyahByAyahIcon, EyeIcon, PenIcon } from './icons'
 import { tipOnce } from './tips'
 import { RATINGS, type Rating } from './ratings'
 import Stars from './Stars'
@@ -642,13 +643,7 @@ export default function MushafPage({
           aria-label="Ayah by ayah"
           tabIndex={buttonVisible ? 0 : -1}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="9.6" cy="9.6" r="8.6" />
-            <path className="handle" d="M15.8 15.8L22 22" />
-            <text className="letter" x="9.6" y="12.8" textAnchor="middle">
-              ب
-            </text>
-          </svg>
+          <AyahByAyahIcon />
           <span className="step-toggle-label">Ayah by ayah</span>
         </button>
       )}
@@ -677,10 +672,7 @@ export default function MushafPage({
           aria-label={penOn ? 'Stop drawing' : 'Draw on the page'}
           tabIndex={buttonVisible ? 0 : -1}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4.5 19.5l1-4.2L16 4.8a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.7 18.5z" />
-            <path d="M14.2 6.6l3.2 3.2" />
-          </svg>
+          <PenIcon />
         </button>
       )}
 
@@ -695,11 +687,7 @@ export default function MushafPage({
           aria-label={hiding ? 'Show the text' : 'Hide the text'}
           tabIndex={buttonVisible ? 0 : -1}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
-            <circle cx="12" cy="12" r="3" />
-            {!hiding && <path d="M4 4l16 16" />}
-          </svg>
+          <EyeIcon struck={!hiding} />
         </button>
       )}
     </main>

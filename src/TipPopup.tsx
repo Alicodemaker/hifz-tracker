@@ -21,7 +21,7 @@ export default function TipPopup() {
         <TipPicture id={tip.id} />
         <p className="tip-kicker">Tip</p>
         <h2 id="tip-title">{tip.title}</h2>
-        <TipText text={tip.text} />
+        <TipText tip={tip} />
         <button className="button primary" onClick={dismissTip} autoFocus>
           Got it
         </button>

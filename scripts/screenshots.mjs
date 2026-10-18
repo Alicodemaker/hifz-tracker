@@ -73,13 +73,12 @@ const openPage = async (page, n) => {
 const webp = (png, dir, name, width) =>
   execFileSync('convert', [png, '-resize', `${width}x>`, '-quality', '82', join(dir, `${name}.webp`)])
 
-// A whole phone screen (the intro shows two side by side) or a crop across the screen's width.
+// A crop of the screen, made smaller to `width`.
 const shot = async (page, dir, name, width, clip) => {
   const png = join(raw, `${name}.png`)
   await page.screenshot({ path: png, clip })
   webp(png, dir, name, width)
 }
-const PHONE_WIDTH = 440
 const CROP_WIDTH = 940
 const across = (y, height) => ({ x: 0, y: Math.max(0, y), width: PHONE.width, height })
 // Ayah by ayah on a short screen, so the zoomed ayahs and their buttons fit in one tip picture.
@@ -91,6 +90,12 @@ const SHORT = { width: PHONE.width, height: 270 }
 // more room or `area` gives it outright; `pad` is the gap between a pill and what it rings.
 const RING = '#f0b429'
 const box = async (locator) => locator.first().boundingBox()
+// One rect round several, for one ring round a group (the pen's ‹ ›).
+const union = (rects) => {
+  const x = Math.min(...rects.map((r) => r.x))
+  const y = Math.min(...rects.map((r) => r.y))
+  return { x, y, width: Math.max(...rects.map((r) => r.x + r.width)) - x, height: Math.max(...rects.map((r) => r.y + r.height)) - y }
+}
 const focus = async (page, name, targets, { width = 260, height = 170, at, area, pad = 7 } = {}) => {
   const rects = targets.filter(Boolean)
   const left = Math.min(...rects.map((r) => r.x))
@@ -153,35 +158,6 @@ const closeRating = async (page) => {
   // From al-Ikhlas's banner to just before al-Falaq's.
   const [ikhlas, falaq] = await Promise.all([0, 1].map((i) => page.locator('.surah-badge').nth(i).boundingBox()))
   await shot(page, intro, 'mushaf', 1000, across(ikhlas.y - 8, falaq.y - ikhlas.y))
-}
-
-// Intro 4: the page's tools. Ayah by ayah (opened from Hifz, three ayahs in), and hide mode with the pen.
-{
-  const page = await newPhone()
-  await page.locator('section.hifz').click()
-  await exactFont(page)
-  await page.getByRole('button', { name: '+ ayah' }).click()
-  await page.getByRole('button', { name: '+ ayah' }).click()
-  await page.waitForTimeout(800)
-  await shot(page, intro, 'ayah-by-ayah', PHONE_WIDTH)
-
-  await openPage(page, 603)
-  await page.getByRole('button', { name: 'Hide the text' }).click()
-  const words = page.locator('.qcf-glyph.word')
-  for (const i of [0, 5, 9]) await words.nth(i).click()
-  await page.getByRole('button', { name: 'Draw on the page' }).click()
-  // Underline a shown ayah, as a weak spot.
-  const ayah = await words.nth(5).getAttribute('data-ayah')
-  const boxes = await Promise.all((await page.locator(`.qcf-glyph.word[data-ayah="${ayah}"]`).all()).map((w) => w.boundingBox()))
-  const right = Math.max(...boxes.map((b) => b.x + b.width))
-  const left = Math.min(...boxes.map((b) => b.x))
-  const y = Math.max(...boxes.map((b) => b.y + b.height)) - 2
-  await page.mouse.move(right, y)
-  await page.mouse.down()
-  for (let i = 1; i <= 16; i++) await page.mouse.move(right - ((right - left) * i) / 16, y + Math.sin(i / 2) * 2)
-  await page.mouse.up()
-  await page.waitForTimeout(400)
-  await shot(page, intro, 'hide-and-pen', PHONE_WIDTH)
 }
 
 // Intro 5: the Surahs screen's first rating groups, in each theme.
@@ -323,7 +299,7 @@ const PAGE_TOP = { width: PHONE.width, height: 330 }
   await focus(page, 'hide', [shown, await box(page.getByRole('button', { name: 'Show the text' }))], { area: across(from, PHONE.height - from), pad: 4 })
   await page.getByRole('button', { name: 'Show the text' }).click()
 
-  // The pen: a weak spot underlined in red near it, the pen, its bin, and ‹ › to turn the page.
+  // The pen: a weak spot underlined in red near it, the pen, its bin, and ‹ › (one ring) to turn the page.
   const penButton = await box(page.getByRole('button', { name: 'Draw on the page' }))
   await page.getByRole('button', { name: 'Draw on the page' }).click()
   const zone = { x: penButton.x + penButton.width + 12 - 300, y: penButton.y + penButton.height + 12 - 220 }
@@ -344,8 +320,9 @@ const PAGE_TOP = { width: PHONE.width, height: 330 }
   await page.mouse.up()
   await page.waitForTimeout(400)
   await showButtons(page)
-  const pen = ['Stop drawing', 'Clear page', 'Previous page', 'Next page'].map((name) => box(page.getByRole('button', { name })))
-  await focus(page, 'pen', await Promise.all(pen), { width: 300, height: 220, at: { x: zone.x + 150, y: zone.y + 110 } })
+  const [pen, bin, ...turns] = await Promise.all(['Stop drawing', 'Clear page', 'Next page', 'Previous page'].map((name) => box(page.getByRole('button', { name }))))
+  // Across the whole screen, so the "Ayah by ayah" pill left of ‹ shows whole rather than cut.
+  await focus(page, 'pen', [pen, bin, union(turns)], { area: across(zone.y, 220) })
   await page.getByRole('button', { name: 'Clear page' }).click()
   await page.getByRole('button', { name: 'Stop drawing' }).click()
   await back()

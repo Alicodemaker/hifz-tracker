@@ -15,70 +15,95 @@ export type TipId =
   | 'surahs'
   | 'history'
 
-// In the order Settings lists them: Today, then the Mushaf page, then the other screens. Each one's words name only
-// what its picture shows (src/tipPictures.ts), so nothing in a tip has to be looked for elsewhere. A tip with several
-// buttons to explain gives each its own line.
-export const TIPS: { id: TipId; title: string; text: string }[] = [
+// A tip: a short title and a few concise lines, each naming what it is about, which has a gold ring round it in the
+// tip's picture (src/tipPictures.ts). A tip's words name only what its picture shows. `after` is a quieter last line.
+export type Tip = { id: TipId; title: string; lines: string[]; after?: string }
+
+// In the order Settings lists them: Today, then the Mushaf page, then the other screens.
+export const TIPS: Tip[] = [
   {
     id: 'hifz-amount',
     title: 'How much Hifz',
-    text: 'Tap − or + for a quarter of a page less or more new Hifz each day. The lines between them show when you would finish at that pace.',
+    lines: ['− and + change how much new Hifz you take each day.'],
+    after: 'Between them: when you would finish the Surah and the Quran at that pace.',
   },
   {
     id: 'next-day',
     title: 'Day done',
-    text: 'All three are done, so your next plan is showing. Ticked one by mistake? Tap Undo.',
+    lines: ['Your next plan is showing.', 'Ticked one by mistake? Tap Undo.'],
   },
   {
     id: 'hifz-page',
     title: 'Hifz, ayah by ayah',
-    text: [
-      "Today's new ayahs show one at a time, zoomed in, so you can focus on each.",
-      '+\u00a0ayah: add the next ayah once you know this one. 1\u00a0/\u00a07 is how many of the page\'s ayahs are showing.',
-      '2.\u00a0Half: start from the middle of the page.',
-      '×: leave ayah by ayah and see the normal Mushaf page.',
-      'If the buttons fade, tap the screen to show them again.',
-    ].join('\n'),
+    lines: [
+      "Today's Hifz shows one ayah at a time.",
+      '"+\u00a0ayah" adds the next one.',
+      '"2.\u00a0Half" starts from the middle of the page.',
+      '× leaves ayah by ayah and shows the whole page.',
+    ],
+    after: 'If the buttons fade, tap the screen.',
   },
   {
     id: 'rabt-page',
     title: 'Rabt on the page',
-    text: "Green triangles like this one mark where today's Rabt starts and ends. If the buttons fade, tap the screen to show them again.",
+    lines: [
+      "Green triangles mark where today's Rabt starts and ends.",
+      '"Ayah by ayah" shows one ayah at a time.',
+      'The eye hides the text, to test yourself.',
+      'The pen lets you mark weak spots.',
+    ],
+    after: 'If the buttons fade, tap the screen.',
   },
   {
     id: 'muraja-page',
     title: "Muraja'a on the page",
-    text: "Green triangles like this one mark where today's Muraja'a starts and ends. If the buttons fade, tap the screen to show them again.",
+    lines: [
+      "Green triangles mark where today's Muraja'a starts and ends.",
+      '"Ayah by ayah" shows one ayah at a time.',
+      'The eye hides the text, to test yourself.',
+      'The pen lets you mark weak spots.',
+    ],
+    after: 'If the buttons fade, tap the screen.',
   },
   {
     id: 'ayah-by-ayah',
     title: 'Ayah by ayah',
-    text: 'Only the ayahs you have added show, zoomed in. "+\u00a0ayah" adds the next one, "2.\u00a0Half" starts from the middle of the page, and × leaves ayah by ayah for the normal Mushaf page.',
+    lines: [
+      'The ayahs appear one at a time, zoomed in.',
+      '"+\u00a0ayah" adds the next one.',
+      '"2.\u00a0Half" starts from the middle of the page.',
+      '× leaves ayah by ayah and shows the whole page.',
+    ],
   },
   {
     id: 'hide',
     title: 'Hide the text',
-    text: 'Every ayah is hidden, to test yourself. Tap an ayah to show it, and tap it again to hide it. The eye shows the whole text again.',
+    lines: ['Every ayah is hidden, to test yourself.', 'Tap an ayah to show or hide it.', 'The eye shows the whole text again.'],
   },
   {
     id: 'pen',
     title: 'The pen',
-    text: 'Draw with your finger to mark weak spots in red. The bin clears the page. While the pen is on, ‹ and › turn the page.',
+    lines: [
+      'Draw with your finger to mark weak spots.',
+      'The bin clears your drawing on this page.',
+      'While the pen is on, swiping draws, so ‹ and › turn the page.',
+    ],
   },
   {
     id: 'rate',
     title: 'Rate a Surah',
-    text: 'How well do you hold this Surah? Pick from Weak to Strong. A rating never changes your plan.',
+    lines: ['Choose how well you know this Surah, from Weak to Strong.'],
+    after: 'Ratings never change your daily plan.',
   },
   {
     id: 'surahs',
     title: 'Surahs',
-    text: 'Your Surahs, grouped by how well you hold them. Tap a Surah to rate it, or the book to open it in the Mushaf.',
+    lines: ['Your memorised Surahs, grouped by rating.', 'Tap a Surah to rate it.', 'The book opens it in the Mushaf.'],
   },
   {
     id: 'history',
     title: 'Back up your progress',
-    text: 'Your progress is kept only on this phone. Tap Back up now and then to save a copy, and Restore it on a new phone.',
+    lines: ['Your progress is stored only on this phone.', 'Back up saves a copy, to Google Drive for example.', 'Restore brings it back on a new phone.'],
   },
 ]
 

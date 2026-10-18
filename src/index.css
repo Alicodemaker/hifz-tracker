@@ -293,11 +293,19 @@ button:disabled { opacity: 0.35; cursor: default; }
 .intro-dots span { width: 8px; height: 8px; border-radius: 4px; background: var(--rule); transition: background var(--motion-quick), width var(--motion-quick); }
 .intro-dots span.on { width: 24px; background: var(--lapis); }
 
-/* Card 1: the three kinds as stacked labels, Hifz on top like the band on Today. */
-.intro-kinds { display: grid; gap: var(--space-2); width: min(100%, 220px); }
-.intro-kinds span { padding: var(--space-1) var(--space-4); border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--rule); text-align: center; font-weight: 600; }
-.intro-kinds span:first-child { border-block: 3px double var(--lapis); border-radius: 0; box-shadow: none; }
-/* Card 2: Done buttons, two of them ticked. */
+/* The sketches come in once, a piece at a time, from where they would be without the animation (so with reduced
+   motion they simply show). */
+@keyframes intro-pop { from { opacity: 0; transform: translateY(8px) scale(0.92); } }
+/* Card 1: the three kinds side by side, each with a little picture and a few words. */
+.intro-kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); width: 100%; text-align: center; }
+.intro-kinds > div { display: grid; justify-items: center; align-content: start; gap: var(--space-1); animation: intro-pop var(--motion-calm) ease-out backwards; }
+.intro-kinds > div:nth-child(2) { animation-delay: 150ms; }
+.intro-kinds > div:nth-child(3) { animation-delay: 300ms; }
+.intro-kinds .small { color: var(--ink-faded); line-height: 1.3; }
+.intro-kind-icon { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; margin-bottom: var(--space-1); background: var(--lapis); color: var(--on-lapis); }
+.intro-kind-icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Card 2: the Done buttons tick one after the other, then tomorrow's plan is ready. */
+.intro-ticking { display: grid; gap: var(--space-3); width: 100%; justify-items: center; }
 .intro-done { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); width: 100%; }
 .intro-done span {
   min-height: var(--tap);
@@ -312,15 +320,44 @@ button:disabled { opacity: 0.35; cursor: default; }
   font-size: var(--text-sm);
   white-space: nowrap;
 }
-.intro-done span.on { background: var(--lapis); color: var(--on-lapis); box-shadow: none; }
-/* Cards 3 to 5: screenshots of the app. A crop fills the leaf; whole phone screens stand side by side, as tall as
-   the phone leaves room for. */
+.intro-done span.on { background: var(--lapis); color: var(--on-lapis); box-shadow: none; animation: intro-tick 300ms ease-out backwards; }
+.intro-ticking .intro-done span { gap: 3px; font-size: 0.875rem; } /* room for a tick beside "Muraja'a" */
+.intro-done span.on .tick path { stroke-dasharray: 14; animation: draw var(--motion-calm) ease-out backwards; }
+.intro-done span:nth-child(1),
+.intro-done span:nth-child(1) .tick path { animation-delay: 500ms; }
+.intro-done span:nth-child(2),
+.intro-done span:nth-child(2) .tick path { animation-delay: 1100ms; }
+.intro-done span:nth-child(3),
+.intro-done span:nth-child(3) .tick path { animation-delay: 1700ms; }
+@keyframes intro-tick { from { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule); } }
+.intro-tomorrow { color: var(--lapis); font-weight: 600; animation: intro-pop var(--motion-calm) ease-out 2300ms backwards; }
+/* Card 4: the page's own buttons, as they look on the page, each with a few words. */
+.intro-tools { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); width: 100%; }
+.intro-tools li { display: flex; align-items: center; gap: var(--space-3); animation: intro-pop var(--motion-calm) ease-out backwards; }
+.intro-tools li:nth-child(2) { animation-delay: 150ms; }
+.intro-tools li:nth-child(3) { animation-delay: 300ms; }
+.intro-tool {
+  flex: none;
+  width: var(--float-button);
+  height: var(--float-button);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--mushaf-paper);
+  color: var(--mushaf-olive);
+  box-shadow: inset 0 0 0 1.5px var(--mushaf-olive);
+  font-size: var(--mushaf-head-size);
+  white-space: nowrap;
+}
+.intro-tool.pill { width: auto; padding-inline: 10px var(--space-3); border-radius: 999px; }
+.intro-tool svg { flex: none; width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Cards 3 and 5: screenshots of the app, filling the leaf. */
 .intro-picture:has(.intro-crop) { padding: 0; overflow: hidden; }
 .intro-picture picture,
 .intro-crop { display: block; width: 100%; height: auto; }
 .intro-crop.faded-end { mask-image: linear-gradient(to bottom, black 70%, transparent); }
-.intro-phones { display: flex; justify-content: center; gap: var(--space-3); }
-.intro-phones img { display: block; height: clamp(160px, calc(100dvh - 460px), 340px); width: auto; border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--rule), var(--float-shadow); }
 
 /* Settings */
 /* Theme: three choices in one track, the chosen one filled like a ticked Done button. */
@@ -847,8 +884,10 @@ select, input[type='number'] {
   transition: opacity var(--motion-calm) ease;
 }
 .step-toggle svg { flex: none; width: var(--float-icon); height: var(--float-icon); fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
-.step-toggle .handle { stroke-width: 2.8; }
-.step-toggle .letter { fill: currentColor; stroke: currentColor; stroke-width: 0.5; font-family: var(--font-arabic); font-size: 16px; } /* a touch bolder, so its dot shows */
+.step-toggle .handle,
+.intro-tool .handle { stroke-width: 2.8; }
+.step-toggle .letter,
+.intro-tool .letter { fill: currentColor; stroke: currentColor; stroke-width: 0.5; font-family: var(--font-arabic); font-size: 16px; } /* a touch bolder, so its dot shows */
 @media (max-width: 359px) {
   .step-toggle { width: var(--float-button); padding: 0; justify-content: center; }
   .step-toggle-label { display: none; }
@@ -1033,6 +1072,7 @@ select, input[type='number'] {
 /* A line for each button a tip explains, a little apart. */
 .tip-text { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
 .tip .tip-text p { margin: 0; }
+.tip-after { color: var(--ink-faded); }
 .tip-symbol { font-size: 1.5em; font-weight: 600; line-height: 0; vertical-align: -0.1em; color: var(--exit); }
 @keyframes tip-fade { from { opacity: 0; } }
 @keyframes tip-rise { from { transform: translateY(100%); } }
