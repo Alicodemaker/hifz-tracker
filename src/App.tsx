@@ -13,6 +13,8 @@ import Settings from './Settings'
 import Setup from './Setup'
 import { load, save } from './storage'
 import Surahs from './Surahs'
+import TipPopup from './TipPopup'
+import { tipOnce } from './tips'
 import Today from './Today'
 import { useWakeLock } from './wakeLock'
 
@@ -72,11 +74,17 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', onTap, true)
   }, [])
   const [celebration, setCelebration] = useState<Cheer | null>(null)
-  const endCelebration = useCallback(() => setCelebration(null), [])
+  const tipAfterCheer = useRef(false) // the "Day done" tip waits for the big celebration to finish
+  const endCelebration = useCallback(() => {
+    setCelebration(null)
+    if (tipAfterCheer.current) tipOnce('next-day')
+    tipAfterCheer.current = false
+  }, [])
   const changeToday = (day: Day) => {
     if (!saved) return
     const size = saved.today && celebrationFor(saved.today, day)
     if (size) setCelebration((last) => ({ size, origin: lastTap.current, id: (last?.id ?? 0) + 1 })) // a new id restarts a running one
+    tipAfterCheer.current = size === 'big'
     update(updateToday(saved, day))
   }
 
@@ -129,6 +137,7 @@ export default function App() {
 
   // Opening adds a history entry, so the phone's back gesture returns to Today (or Surahs).
   const openPage = (kind: Kind | 'surah', ranges: Range[]) => {
+    if (kind !== 'surah') tipOnce(`${kind}-page`)
     setOpenedKind(kind)
     setPortion(ranges)
     setSteps({}) // every page starts again from Today
@@ -224,11 +233,20 @@ export default function App() {
         onUndoNextDay={saved.beforeNextDay ? () => update(undoNextDay(saved)) : null}
         backupReminder={backupDue(saved, saved.today!.date) ? describeLastBackup(saved.lastBackup, saved.today!.date) : null}
         onBackUp={backUp}
-        onChangeAmount={(direction) => update(changeHifzAmount(saved, direction))}
+        onChangeAmount={(direction) => {
+          update(changeHifzAmount(saved, direction))
+          tipOnce('hifz-amount')
+        }}
         onOpenPage={openPage}
         onSettings={() => setScreen('settings')}
-        onHistory={() => setScreen('history')}
-        onSurahs={() => setScreen('surahs')}
+        onHistory={() => {
+          setScreen('history')
+          tipOnce('history')
+        }}
+        onSurahs={() => {
+          setScreen('surahs')
+          tipOnce('surahs')
+        }}
       />
     )
   }
@@ -239,6 +257,7 @@ export default function App() {
       {celebration && (
         <Celebration key={celebration.id} size={celebration.size} origin={celebration.origin} onEnd={endCelebration} />
       )}
+      <TipPopup />
     </>
   )
 }
