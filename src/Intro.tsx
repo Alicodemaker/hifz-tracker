@@ -100,13 +100,14 @@ const CARDS: Card[] = [
 type Props = {
   card: number
   onCard: (card: number) => void
-  onSetUp: () => void
-  notice: ReactNode // a message from Restore
-  restore: ReactNode // the Restore link, for a moved phone
+  onDone: () => void // after the last card, or on Skip
+  doneLabel: string // the last card's button: "Set up" on the first run, "Done" when replayed from Settings
+  notice?: ReactNode // a message from Restore
+  restore?: ReactNode // the Restore link, for a moved phone (first run only)
 }
 
-// The first-run intro: five cards on what the app does, then on to setting it up. Skip goes straight there.
-export default function Intro({ card, onCard, onSetUp, notice, restore }: Props) {
+// The intro: five cards on what the app does. On the first run it leads into setup; Settings can replay it.
+export default function Intro({ card, onCard, onDone, doneLabel, notice, restore }: Props) {
   const { title, picture, body, note } = CARDS[card]
   const last = card === CARDS.length - 1
   return (
@@ -114,7 +115,7 @@ export default function Intro({ card, onCard, onSetUp, notice, restore }: Props)
       <header className="screen-head intro-head">
         <span className="faded small">Hifz Tracker</span>
         {!last && (
-          <button className="link" onClick={onSetUp}>
+          <button className="link" onClick={onDone}>
             Skip
           </button>
         )}
@@ -137,11 +138,11 @@ export default function Intro({ card, onCard, onSetUp, notice, restore }: Props)
               Back
             </button>
           )}
-          <button className="button primary" onClick={last ? onSetUp : () => onCard(card + 1)}>
-            {last ? 'Set up' : 'Next'}
+          <button className="button primary" onClick={last ? onDone : () => onCard(card + 1)}>
+            {last ? doneLabel : 'Next'}
           </button>
         </div>
-        <p className="faded small hint">Moving from another phone? {restore}</p>
+        {restore && <p className="faded small hint">Moving from another phone? {restore}</p>}
       </div>
     </main>
   )
