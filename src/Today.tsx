@@ -45,7 +45,7 @@ function RevisionRow({ name, ranges, done, empty, onOpen }: RowProps) {
             {arabicNames(ranges)}
           </p>
           <p className="range">
-            <RangeText ranges={ranges} />
+            <RangeText ranges={ranges} play />
           </p>
           <p className="faded small">{describeSize(ranges)}</p>
         </>
@@ -73,9 +73,9 @@ export default function Today({
   const { plan } = day
   const hifzDone = day.hifzEnd !== null
 
-  // Tapping an area opens its Mushaf page; its own buttons keep their jobs.
+  // Tapping an area opens its Mushaf page; its own buttons and links keep their jobs.
   const openFrom = (kind: Kind, portion: Range[]) => (event: React.MouseEvent) => {
-    if (portion.length && !(event.target as Element).closest('button')) onOpenPage(kind, portion)
+    if (portion.length && !(event.target as Element).closest('button, a')) onOpenPage(kind, portion)
   }
 
   const toggle = (kind: Kind) => () => onChange(toggleDone(day, kind))
@@ -116,7 +116,7 @@ export default function Today({
               </p>
             </div>
             <p className="range">
-              <RangeText ranges={plan.hifz} />
+              <RangeText ranges={plan.hifz} play />
             </p>
             <p className="faded small">{describeSize(plan.hifz)}</p>
             {!hifzDone && (

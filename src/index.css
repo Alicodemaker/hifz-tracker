@@ -173,6 +173,21 @@ button:disabled { opacity: 0.35; cursor: default; }
 .revision .range { font-weight: 600; }
 /* Each surah's part stays on one line (unless it alone is too wide), so a long list breaks between surahs. */
 .range-part { display: inline-block; }
+/* Experiment: a round play link before each surah name, opening a YouTube search. The hit area reaches past the circle. */
+.play-link {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  margin-inline-end: 0.35em;
+  vertical-align: -0.4em;
+  border-radius: 50%;
+  background: var(--lapis-wash);
+  color: var(--lapis);
+}
+.play-link::before { content: ''; position: absolute; inset: -10px; }
+.play-link svg { width: 62%; height: 62%; fill: currentColor; margin-inline-start: 8%; }
 
 /* The check that answers a Done tap */
 .tick { width: 1.1em; height: 1.1em; flex: none; }
