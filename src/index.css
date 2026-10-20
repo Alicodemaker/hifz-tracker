@@ -160,8 +160,8 @@ button:disabled { opacity: 0.35; cursor: default; }
 .stepper .estimates { text-align: center; line-height: 1.4; }
 
 .opens-page { cursor: pointer; }
-/* The arrow beside an Arabic name that opens its page: a bare arrow in the link colour, at a fixed size whatever the
-   name's size, lined up with the middle of the name. */
+/* The arrow beside an Arabic name that opens its page: a bare arrow in the name's own colour, at a fixed size
+   whatever the name's size, lined up with the middle of the name. */
 .read-mark {
   display: inline-grid;
   place-items: center;
@@ -169,7 +169,6 @@ button:disabled { opacity: 0.35; cursor: default; }
   height: 1.75rem;
   margin-inline-end: 0.3em;
   vertical-align: middle;
-  color: var(--lapis);
 }
 .read-mark svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 
