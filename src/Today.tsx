@@ -24,14 +24,14 @@ type Props = {
 const longDate = (date: string) =>
   new Date(`${date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })
 
-// A small book beside the Arabic name, so it reads as something to tap: the area opens its page in the Mushaf.
-// The same book as the Surahs screen's open button. Placed first, so in the right-to-left name it sits on the right.
+// A small arrow beside the Arabic name, the web's usual sign of something to tap: the area opens its page in the
+// Mushaf. Placed first, so in the right-to-left name it sits on the right.
 function ReadMark() {
   return (
     <span className="read-mark" aria-hidden="true">
       <svg viewBox="0 0 24 24">
-        <path d="M12 6.5C10.2 5.2 7.6 4.6 4 4.8v13c3.6-.2 6.2.4 8 1.7 1.8-1.3 4.4-1.9 8-1.7v-13c-3.6-.2-6.2.4-8 1.7z" />
-        <path d="M12 6.5v13" />
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
       </svg>
     </span>
   )
