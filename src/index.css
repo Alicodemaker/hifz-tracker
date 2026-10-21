@@ -129,6 +129,9 @@ button:disabled { opacity: 0.35; cursor: default; }
 }
 /* Smaller than the hero size and with room above, so the vowel marks clear the double rule. */
 .band .arabic { font-size: var(--arabic-band); line-height: 1.75; color: var(--ink); }
+/* The name alone is centred; its arrow hangs just to its right, outside the centring (with room kept for it). */
+.band .arabic { position: relative; width: fit-content; max-width: calc(100% - 2 * 2.25rem); margin-inline: auto; }
+.band .read-mark { position: absolute; left: 100%; top: 50%; translate: 0 -50%; margin: 0 0 0 0.3em; }
 .hifz .range { font-size: var(--text-lg); font-weight: 600; }
 .hifz .empty { padding: var(--space-6) 0; }
 
