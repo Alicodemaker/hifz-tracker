@@ -20,6 +20,17 @@ describe('backupDue', () => {
     expect(backupDue({ ...logged, lastBackup: '2026-09-29' }, '2026-10-12')).toBe(false) // 13 days
     expect(backupDue({ ...logged, lastBackup: '2026-09-28' }, '2026-10-12')).toBe(true) // 14 days
   })
+
+  it('once closed, comes back two weeks later', () => {
+    const closed = { ...logged, lastBackup: '2026-09-01', backupReminderDismissed: '2026-10-12' }
+    expect(backupDue(closed, '2026-10-12')).toBe(false)
+    expect(backupDue(closed, '2026-10-25')).toBe(false) // 13 days
+    expect(backupDue(closed, '2026-10-26')).toBe(true) // 14 days
+  })
+
+  it('counts from a Backup made after it was closed', () => {
+    expect(backupDue({ ...logged, lastBackup: '2026-10-20', backupReminderDismissed: '2026-10-12' }, '2026-10-30')).toBe(false)
+  })
 })
 
 describe('describeLastBackup', () => {
