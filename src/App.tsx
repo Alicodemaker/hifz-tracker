@@ -233,6 +233,7 @@ export default function App() {
         onUndoNextDay={saved.beforeNextDay ? () => update(undoNextDay(saved)) : null}
         backupReminder={backupDue(saved, saved.today!.date) ? describeLastBackup(saved.lastBackup, saved.today!.date) : null}
         onBackUp={backUp}
+        onDismissBackup={() => update({ ...saved, backupReminderDismissed: saved.today!.date })}
         onChangeAmount={(direction) => {
           update(changeHifzAmount(saved, direction))
           tipOnce('hifz-amount')

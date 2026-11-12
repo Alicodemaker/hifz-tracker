@@ -23,6 +23,7 @@ export type Saved = {
   beforeNextDay?: { progress: Progress; today: Day } // the moment before the last tick moved on to the next Day, for undo
   drawings?: Record<string, Stroke[]> // pen strokes by drawingKey; absent in older saves
   lastBackup?: string // local date of the last Backup handed to the share sheet; absent before the first
+  backupReminderDismissed?: string // local date the backup reminder was last closed with its ×
 }
 
 const somethingDone = (day: Day) => day.hifzEnd !== null || day.rabtDone || day.murajaDone

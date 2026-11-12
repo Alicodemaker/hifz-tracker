@@ -14,6 +14,7 @@ type Props = {
   onUndoNextDay: (() => void) | null // only just after finishing a Day moved on to the next
   backupReminder: string | null // "Last backup 16 days ago", when a Backup is due
   onBackUp: () => void
+  onDismissBackup: () => void // hides the reminder for another two weeks
   onChangeAmount: (direction: 1 | -1) => void
   onOpenPage: (kind: Kind, portion: Range[]) => void
   onSettings: () => void
@@ -78,6 +79,7 @@ export default function Today({
   onUndoNextDay,
   backupReminder,
   onBackUp,
+  onDismissBackup,
   onChangeAmount,
   onOpenPage,
   onSettings,
@@ -112,12 +114,19 @@ export default function Today({
       </header>
 
       {backupReminder && (
-        <p className="notice backup-reminder">
-          {backupReminder}.{' '}
-          <button className="link" onClick={onBackUp}>
-            Back up now
+        <div className="notice backup-reminder">
+          <p>
+            {backupReminder}.{' '}
+            <button className="link" onClick={onBackUp}>
+              Back up now
+            </button>
+          </p>
+          <button className="notice-close" onClick={onDismissBackup} aria-label="Remind me in two weeks">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
-        </p>
+        </div>
       )}
 
       <section className={`hifz opens-page ${hifzDone ? 'done' : ''}`} onClick={openFrom('hifz', plan.hifz)}>

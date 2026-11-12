@@ -4,10 +4,14 @@ import { daysBetween, type Saved } from './day'
 const BACKUP_DUE_DAYS = 14
 
 // Everything lives on this one phone, so a Backup is due two weeks after the last one, or, with none yet,
-// once the app has been in use for two weeks (counted from the first logged day).
+// once the app has been in use for two weeks (counted from the first logged day). Closing the reminder puts it
+// off for another two weeks.
 export const backupDue = (saved: Saved, date: string): boolean => {
-  const since = saved.lastBackup ?? saved.history[saved.history.length - 1]?.date
-  return since !== undefined && daysBetween(since, date) >= BACKUP_DUE_DAYS
+  const started = saved.lastBackup ?? saved.history[saved.history.length - 1]?.date
+  if (started === undefined) return false
+  const dismissed = saved.backupReminderDismissed
+  const since = dismissed && dismissed > started ? dismissed : started // YYYY-MM-DD dates compare as strings
+  return daysBetween(since, date) >= BACKUP_DUE_DAYS
 }
 
 // "Not backed up yet", "Last backup today", "Last backup yesterday" or "Last backup 14 days ago".
